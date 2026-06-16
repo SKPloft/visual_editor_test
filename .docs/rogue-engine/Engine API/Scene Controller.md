@@ -1,0 +1,188 @@
+Title: EngineAPI/SceneController
+Source URL: https://docs.rogueengine.io/EngineAPI/SceneController
+
+###  SceneController
+
+The **SceneController** is an abstract class so it should never be directly instantiated. This class defines the life cycle of a Scene and its components. The [Runtime](/EngineAPI/Runtime) and **editorRuntime** both extend this class to implement functionality related to the scene when it's being played, and the scene when it's being edited respectively.
+
+###  Properties
+
+####  .scene
+
+```
+readonly scene: THREE.Scene
+```
+
+The [Scene (opens new window)](https://threejs.org/docs/#api/en/scenes/Scene) instance that is currently running.
+
+####  .camera
+
+```
+camera: THREE.Camera
+```
+
+The [Camera (opens new window)](https://threejs.org/docs/#api/en/cameras/Camera) instance that's currently "showing" us the scene.
+
+####  .deltaTime
+
+```
+readonly deltaTime: number
+```
+
+This value represents the seconds elapsed between the last frame and the current one.
+
+####  .clock
+
+```
+readonly clock: THREE.Clock
+```
+
+The three.js [Clock (opens new window)](https://threejs.org/docs/#api/en/core/Clock) being used to keep track of time.
+
+###  .height
+
+```
+readonly height: number
+```
+
+This value represents the height of the Scene Renderer.
+
+###  .width
+
+```
+readonly width: number
+```
+
+This value represents the width of the Scene Renderer.
+
+###  .rogueDOMContainer
+
+```
+readonly rogueDOMContainer: HTMLElement
+```
+
+This property keeps a reference to the current **HTMLElement** where the scene is being rendered
+
+###  .containerId
+
+```
+readonly containerId: string
+```
+
+This field contains the id of the **HTMLElement** where the Scene is being rendered.
+
+####  .renderer
+
+```
+readonly renderer: THREE.WebGLRenderer
+```
+
+The active [WebGLrenderer (opens new window)](https://threejs.org/docs/#api/en/renderers/WebGLRenderer).
+
+####  .isRunning
+
+```
+readonly isRunning: boolean
+```
+
+This flag tells us if the **SceneController** is running the animation loop or not.
+
+###  .isPaused
+
+```
+readonly isPaused: boolean
+```
+
+This flag tells us if the **SceneController** is paused. Pausing will only stop **beforeUpdate()** **update()** and **afterUpdate()** from running along with their respective event listeners, but not the loop itself, so keep that in mind.
+
+###  .defaultRenderFunc
+
+```
+readonly defaultRenderFunc: () => void
+```
+
+This keeps a reference to the default render function that is called on every frame.
+
+###  .renderFunc
+
+```
+renderFunc: () => void
+```
+
+This is the render function being called every frame. By default it calls **defaultRenderFunc**. By setting this property you can modify the behavior of the renderer to apply post-production effects among other things.
+
+###  .resolution
+
+```
+resolution?: number;
+```
+
+Sets the maximum screen width before we start scaling the renderer's pixel ratio. The lower the resolution, the higher the performance. If set to `0` or `undefined` the resolution is let free.
+
+###  .aspectRatio
+
+```
+aspectRatio?: number;
+```
+
+Fixes the aspect ratio of the canvas container. If set to `0` or `undefined` the aspect ratio is let free.
+
+###  .useAspectRatio
+
+```
+useAspectRatio: boolean;
+```
+
+This makes the aspect ratio visible in the current Runtime. It's used by the editor to preview the aspect ratio in edit mode.
+
+###  Methods
+
+####  .pause
+
+```
+pause(): void
+```
+
+This method will pause the animation loop if it's running.
+
+####  .resume
+
+```
+resume(): void
+```
+
+This method will resume the animation loop if it's paused.
+
+####  .togglePause
+
+```
+togglePause(): void
+```
+
+This handy method will toggle between [pause()](#pause) and [resume()](#resume).
+
+####  .setFullscreen
+
+```
+setFullscreen(): void;
+```
+
+Requests the browser to set the container div full screen.
+
+###  Events
+
+####  .onPlay
+
+```
+onPlay(callback: () => any): {stop: () => void}
+```
+
+This event listener helps us hook into the initialization sequence of this **SceneController** instance. It returns an object with a **stop()** function you should call in order to stop the listener.
+
+####  .onStop
+
+```
+onStop(callback: () => any): {stop: () => void}
+```
+
+This event listener helps us hook into the stopping sequence of this **SceneController** instance. It returns an object with a **stop()** function you should call in order to stop the listener.
