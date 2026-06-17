@@ -6,6 +6,13 @@
 
 **What I'm building:** A zero-code / low-code visual world editor with in-app editing, that exports as a standard VRChat/Resonite world.
 
+currently i only have blurry vision, next is maybe to do basic UX design:
+
+  • User flows (flowcharts) → used at companies like Google, Spotify, everywhere, draw statemachine
+  • Clickable prototypes → that's what Figma, InVision, Marvel are built for
+  • Wireframes → rough sketches of screens before building them
+
+to make a prototype, maybe using mermaid or plantuml for flowcharts, pencil for UX and sketches, i havent figured out rest
 ---
 
 ## What is MVP?
