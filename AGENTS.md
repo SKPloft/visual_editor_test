@@ -1,10 +1,31 @@
-<!-- CODEGRAPH_START -->
-## CodeGraph
+# visual_editor_test
 
-In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the repo root), reach for it BEFORE grep/find or reading files when you need to understand or locate code:
+A rogue engine visual editor built with Three.js, Express, TypeScript, and Webpack.
 
-- **MCP tools** (when available): `codegraph_explore` answers most code questions in one call — the relevant symbols' verbatim source plus the call paths between them. `codegraph_node` returns one symbol's source + callers, or reads a whole file with line numbers. If the tools are listed but deferred, load them by name via tool search.
-- **Shell** (always works): `codegraph explore "<symbol names or question>"` and `codegraph node <symbol-or-file>` print the same output.
+## Tech stack
+- **Runtime**: Node.js
+- **Language**: TypeScript (tsconfig.json)
+- **Bundler**: Webpack 5 (webpack.config.js, webpack.config.rogue.js, webpack.config.user.js)
+- **3D**: Three.js 0.182
+- **Server**: Express + CORS (file-server.js)
 
-If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
-<!-- CODEGRAPH_END -->
+## Build & run
+- Install: `npm install`
+- Build: `npm run build` (cross-env NODE_ENV=production webpack --progress)
+- Build output goes to `dist/`
+
+## Project structure
+- `Assets/` — static assets
+- `Static/` — static files
+- `_Rogue/` — engine internals
+- `dist/` — webpack output (gitignored)
+- `scratch/` — scratch/experimental work
+- `rogue-config.json`, `user-config.json` — configuration
+- `tsconfig.json`, `tsconfig.rogue.json`, `tsconfig.user.json` — TypeScript configs
+- `webpack.config.js`, `webpack.config.rogue.js`, `webpack.config.user.js` — Webpack configs
+
+## Conventions
+- Use TypeScript for all new code
+- Place 3D/scene code using Three.js in `_Rogue/`
+- Server logic lives in `file-server.js` (Express)
+- Keep configuration in JSON files, not hardcoded
