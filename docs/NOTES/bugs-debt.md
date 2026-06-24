@@ -4,6 +4,34 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 
 ---
 
+## M1 — milestone blockers
+
+### M1-01 — Void click selects synthetic object
+- **Severity:** Blocker
+- **Acceptance:** Clicking empty canvas deselects current object and hides the gizmo. No unnamed/synthetic object appears selected.
+- **Proposed approach:** Ensure selection raycast only hits selectable scene objects; on miss, clear selection state.
+
+### M1-02 — Transform gizmo not visible/discoverable
+- **Severity:** Blocker
+- **Acceptance:** When translate/rotate/scale tool is active and an object is selected, a gizmo is drawn at the object pivot. Tool buttons visually reflect active tool.
+- **Proposed approach:** Verify gizmo renderer is attached to selection state and tool state.
+
+### M1-03 — Orbit/pan/zoom erratic or unresponsive
+- **Severity:** Blocker
+- **Acceptance:** Mouse drag on background orbits; right-drag pans; scroll zooms smoothly; no browser gesture triggers instead.
+- **Proposed approach:** Capture pointer events on canvas, prevent default, normalize wheel delta.
+
+### M1-04 — Browser gesture conflict (Vivaldi)
+- **Severity:** High
+- **Acceptance:** Canvas input does not trigger browser back/forward or pinch gestures in Chromium-based browsers.
+- **Proposed approach:** `touch-action: none`, `preventDefault()` on pointer/wheel events, pointer capture during drag.
+- **Fallback:** If a specific browser cannot be tamed, document as known limitation.
+
+### M1-05 — Provisional middle-mouse orbit
+- **Severity:** Note
+- **Decision:** Middle-mouse drag for orbit is acceptable for M1.
+- **Follow-up:** Revisit default viewport bindings in M4+ input/shortcut milestone.
+
 ## Performance
 
 - **M0 — Scene traversal O(n):** Implemented scene lookups use nested loops / branches in places. Review `editor/src/scene/sceneLoader.ts` and related scene-graph code; replace with Maps or indexed structures where lookups repeat.

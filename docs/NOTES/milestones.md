@@ -25,6 +25,9 @@ Running observations, discoveries, and post-mortem notes for each milestone. Kee
 
 ## M1: 3D Editor Basics
 
+### Status
+Milestone is currently **⚠️ blocked / needs review** due to viewport and gizmo usability issues. See `docs/NOTES/bugs-debt.md#M1` for blockers and acceptance criteria.
+
 ### Scope clarification
 - The renderer already renders a grid and a point light from the canonical scene, but these are part of M0 scene loading, not user-editable editor features.
 
@@ -35,6 +38,10 @@ Running observations, discoveries, and post-mortem notes for each milestone. Kee
   - `E` Rotate
   - `R` Scale
 - WASD camera movement must be disabled when any text input is focused.
+- **Provisional viewport binding:** Middle-mouse drag for orbit is acceptable for M1; default bindings will be revisited in M4+.
+
+### Open questions
+- Can browser gestures be fully suppressed on the canvas in Vivaldi/other Chromium browsers, or will this become a documented limitation?
 
 ---
 

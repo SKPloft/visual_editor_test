@@ -30,17 +30,18 @@ This document tracks the implementation status of each World Creator milestone. 
 
 ## M1: 3D Editor Basics
 
-**Status:** ✅ Completed
+**Status:** ⚠️ Partially completed / blocked / needs review
 
 **Deliverables:**
-- ✅ Viewport with orbit camera and grid
-- ✅ Toolbar to add primitives (cube, sphere, cylinder, plane)
-- ✅ Gizmo interactions: translate, rotate, scale
-- ✅ Property panel showing position, rotation, scale values
-- ✅ Basic lighting (directional, point, spot) and flat-color materials
+- ⚠️ Viewport with orbit camera and grid
+- ⚠️ Toolbar to add primitives (cube, sphere, cylinder, plane)
+- ⚠️ Gizmo interactions: translate, rotate, scale
+- ⚠️ Property panel showing position, rotation, scale values
+- ⚠️ Basic lighting (directional, point, spot) and flat-color materials
 
 **Current notes:**
-- See `docs/NOTES/milestones.md` for M1 observations and shortcut decisions.
+- Viewport and gizmo interactions have usability blockers. See `docs/NOTES/bugs-debt.md#M1`.
+- All M1 deliverables need review before M2 starts.
 
 ---
 
@@ -128,6 +129,7 @@ These decisions affect multiple milestones and should be revisited if scope chan
 4. **WASD navigation:** Disabled when any text input is focused.
 5. **Unity JSON parser:** Use Newtonsoft.Json for the real implementation.
 6. **Templates:** Template gallery and template variables are Post-PoC (M4+).
+7. **M1 viewport binding:** Middle-mouse drag for orbit is provisional and will be revisited in M4+.
 
 ---
 
