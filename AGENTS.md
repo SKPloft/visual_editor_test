@@ -38,7 +38,10 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
   - `index.html` — editor entry point
   - `package.json` — Vite build scripts and dependencies
 - `_legacy/` — archived Rogue Engine visual editor code and assets
-- `docs/IMPLEMENTATION_TRACKER.md` — milestone completion status and notes (now tracks tooling changes, imported reference docs, and review/optimization notes)
+- `docs/IMPLEMENTATION_TRACKER.md` — milestone completion status dashboard
+  - `docs/NOTES/milestones.md` — per-milestone observations, discoveries, and post-mortems
+  - `docs/NOTES/bugs-debt.md` — known bugs, performance debt, and refactor candidates
+  - `docs/NOTES/decisions.md` — informal decisions not worth a full ADR
 - `DRAFT.md` — raw MVP methodology notes and early brainstorming
 
 ## Architecture decisions
@@ -70,6 +73,7 @@ Post-PoC work (lights, materials, pickables, NPC avatars, VRChat adapter) is doc
 - Export and adapter code lives under `adapters/`; browser editor code lives under `editor/`.
 - Treat `_legacy/` as read-only reference. Do not build new features on top of it.
 - Update ADRs when making architectural changes that affect scope, format, or export targets.
+- Log informal decisions, discovered bugs/debt, and milestone observations in `docs/NOTES/` rather than in `docs/IMPLEMENTATION_TRACKER.md`.
 - Add TODO/FOR REVIEW markers in planning docs for decisions that need manual validation before coding begins.
 - Update AGENTS.md when project structure, build tooling, or milestone status changes.
 - Review viewport controls and existing implementations for performance (data structures, algorithms) before expanding M1 features.
