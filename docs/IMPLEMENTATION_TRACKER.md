@@ -27,6 +27,10 @@ This document tracks the implementation status of each World Creator milestone. 
 - The scene graph intentionally uses inline `children` arrays only. The old `parent` ID reference was removed from the canonical format in `docs/CANONICAL_FORMAT.md`.
 - The M0 demo scene is hard-coded in `editor/src/scene/demoScene.ts`. Loading from a real JSON file is planned for M1/M2.
 - Build output produces a 500 kB+ bundle because Three.js is bundled as one chunk. This is acceptable for the technology prototype; code-splitting is a future optimization.
+- legacy three.js docs was imported for better coding reference but not yet used
+- npm tooling was changed to bun tooling for maybe better uses
+- mouse viewpoint operation was found implemented, this should be reviewed later
+- implemented functions were found with branches and some basic implementing, they deserve for optimizing with better data structure, algorithm to reduce O(n) and improve performance, even in PoC as it may affect evaluation
 
 ---
 
