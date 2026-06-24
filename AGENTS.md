@@ -13,7 +13,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
 
 - **Runtime:** Browser-first web application (no install for users)
 - **Language:** TypeScript
-- **3D viewport:** Three.js or Babylon.js (decision pending implementation)
+- **3D viewport:** Three.js (confirmed for the technology prototype; see ADR-001)
 - **Scene format:** Custom canonical JSON (`docs/CANONICAL_FORMAT.md`)
 - **Export target:** Unity Editor C# script (`docs/UNITY_EXPORT.md`)
 - **Build tooling:** Not yet configured at repo root; old Webpack/Express setup lives in `_legacy/`

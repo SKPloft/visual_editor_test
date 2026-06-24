@@ -147,7 +147,7 @@ This is intentionally a placeholder. No AI behavior, animation, or actual avatar
 
 Below is a complete, self-contained Unity Editor script that imports the example JSON from `docs/CANONICAL_FORMAT.md`. Place it in `Assets/Editor/WorldCreatorSceneImporter.cs`.
 
-> **TODO / FOR REVIEW:** This sample uses `JsonUtility`, which handles polymorphic arrays poorly. Consider switching to `Newtonsoft.Json` (included with Unity) for the real implementation.
+The real implementation should use **Newtonsoft.Json** (included with Unity) to handle polymorphic components cleanly. The sample below uses `JsonUtility` only as a temporary reference; do not use it for production scenes.
 
 ```csharp
 using System;
@@ -236,11 +236,11 @@ namespace WorldCreator.Editor
             GameObject go = new GameObject(node.name);
             go.transform.SetParent(parent, false);
 
-            // Apply transform
+            // Apply transform (Z negated for Unity's left-handed space)
             go.transform.localPosition = new Vector3(
                 node.transform.position[0],
                 node.transform.position[1],
-                node.transform.position[2]
+                -node.transform.position[2]
             );
             go.transform.localRotation = new Quaternion(
                 node.transform.rotation[0],
@@ -560,8 +560,8 @@ The following limitations apply to the Proof-of-Concept importer. They are inten
 | **No texture import** | Texture assets are parsed but not imported into the Unity AssetDatabase. Only albedo color and scalar material properties are applied. |
 | **Builtin meshes only** | External mesh files (`.obj`, `.fbx`, `.gltf`) are not resolved. Only `builtin:plane` and `builtin:cube` are mapped to Unity primitives. |
 | **No prefab instantiation** | `prefabRef` components create a placeholder cube instead of a real prefab. Prefab assets in the JSON are ignored. |
-| **No coordinate system conversion** | The importer assumes Y-up, right-handed data and maps it directly into Unity's Y-up, left-handed space. For the PoC primitives, this is sufficient. |
-| **No nested parenting by `parent` ID** | The `parent` field on nodes is ignored; only the `children` array defines hierarchy. |
+| **Coordinate system conversion** | Z positions are negated when importing into Unity's left-handed space. Rotation handedness conversion for non-trivial orientations is deferred to the VRChat adapter (M6). |
+| **No nested parenting by `parent` ID** | The `parent` field on nodes is not part of the canonical format; only the `children` array defines hierarchy. |
 | **No scene cleanup on re-import** | Re-importing a scene creates a second root GameObject. Manual deletion of the old root is required. |
 
 ---

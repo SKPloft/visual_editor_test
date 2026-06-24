@@ -15,16 +15,14 @@ World Creator is a browser-based 3D editor that lets non-technical creators asse
 
 ## Success Metric (Technology Prototype)
 
-> **TODO / FOR REVIEW:** The exact success metrics need manual review before coding begins.
-
 1. A non-technical user can build a scene with at least 5 distinct objects and export it to a runnable Unity project within 30 minutes of first opening the editor.
-2. The export produces a Unity scene that loads in VRChat without manual C# changes.
+2. The export produces a Unity scene that loads in the Unity Editor without manual C# changes. VRChat-zero-manual-changes is deferred to the VRChat adapter (M6).
 
 ## Scope
 
 ### In Scope (Technology Prototype — M0 to M3)
 
-- Browser-based 3D viewport (Three.js or Babylon.js)
+- Browser-based 3D viewport (Three.js)
 - Scene graph with transform hierarchy
 - Place, move, rotate, and scale primitives (cube, sphere, cylinder, plane)
 - Save / load scene to a canonical JSON format
@@ -33,8 +31,7 @@ World Creator is a browser-based 3D editor that lets non-technical creators asse
 
 ### Out of Scope (Technology Prototype)
 
-> **TODO / FOR REVIEW:** Whether basic lighting and flat-color materials belong in the PoC needs manual confirmation.
-
+- Basic lighting (directional, point, spot) and flat-color materials are included in the technology prototype.
 - Custom asset upload or import (only built-in primitives and prefabs)
 - Real-time collaboration / multiplayer editing
 - Visual scripting or behavior authoring

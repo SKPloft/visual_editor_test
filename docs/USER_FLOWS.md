@@ -2,7 +2,7 @@
 
 This document describes the primary user flows and state machine for the World Creator 3D world editor.
 
-> **TODO / FOR REVIEW:** This flow assumes lighting configuration and a "Create World" template step. Confirm whether these belong in the technology prototype (M0–M3).
+> **Scope note:** The happy path covers the full product vision, but the technology prototype (M0–M3) implements the editor and export flow only. The **template gallery / template variables** steps are Post-PoC (M4+). Basic lighting configuration is included in M0–M3.
 
 ---
 
@@ -28,6 +28,23 @@ flowchart TD
     style H fill:#0f172a,stroke:#38bdf8,color:#f8fafc
     style K fill:#0f172a,stroke:#38bdf8,color:#f8fafc
     style N fill:#1e293b,stroke:#22c55e,color:#f8fafc
+```
+
+### Scope for Technology Prototype (M0–M3)
+
+The editor entry point for the technology prototype is a **"New Empty World"** button on the home screen. Template browsing, template detail, and variable configuration are deferred to Post-PoC (M4+). The M0–M3 happy path is therefore:
+
+```mermaid
+flowchart TD
+    A[Open App] --> B[Home Screen]
+    B --> C[Click New Empty World]
+    C --> D[3D Editor Viewport]
+    D --> E[Place Objects from Asset Library]
+    E --> F[Configure Lighting]
+    F --> G[Export to Unity]
+    G --> H[Download C# Script + Scene]
+    H --> I[Open in Unity Editor]
+    I --> J[World Ready in Unity]
 ```
 
 ### Flow Description
@@ -121,8 +138,8 @@ stateDiagram-v2
 ### Transitions
 
 - **Idle -> Select**: Left-click on any object in the 3D viewport.
-- **Idle -> Transform**: Click a transform tool button (Move `T`, Rotate `R`, Scale `S`) without an object selected; selecting an object enters Transform directly.
-- **Select -> Transform**: Click a transform tool or press `T`/`R`/`S`.
+- **Idle -> Transform**: Click a transform tool button (Move `W`, Rotate `E`, Scale `R`) without an object selected; selecting an object enters Transform directly.
+- **Select -> Transform**: Click a transform tool or press `W`/`E`/`R`.
 - **Select -> Inspect**: Inspector panel is already visible by default when an object is selected.
 - **Transform -> Select**: Release mouse after dragging a handle, or press `Enter`.
 - **Transform -> Idle**: Press `Esc` to cancel the transform and deselect.
@@ -158,7 +175,7 @@ flowchart TD
 
 ## Keyboard Shortcuts Reference
 
-> **TODO / FOR REVIEW:** These shortcuts need manual confirmation. In particular, `WASD` may conflict with text input, and `Q`/`T`/`R`/`S` should be verified against common 3D editor conventions.
+> **Scope note:** WASD camera movement is active only when no text input or property field is focused. When an input is focused, `W`/`A`/`S`/`D` are treated as text entry.
 
 | Shortcut | Action | State |
 |----------|--------|-------|
@@ -166,9 +183,9 @@ flowchart TD
 | `RMB + Drag` | Orbit camera | Idle, Select, Transform |
 | `Scroll` | Zoom camera | Idle, Select, Transform |
 | `Q` | Select tool | Any -> Select |
-| `T` | Move tool | Any -> Transform (Move) |
-| `R` | Rotate tool | Any -> Transform (Rotate) |
-| `S` | Scale tool | Any -> Transform (Scale) |
+| `W` | Move tool | Any -> Transform (Move) |
+| `E` | Rotate tool | Any -> Transform (Rotate) |
+| `R` | Scale tool | Any -> Transform (Scale) |
 | `Esc` | Cancel / Deselect | Transform -> Idle, Select -> Idle |
 | `Delete` | Delete selected object | Select -> Idle |
 | `Ctrl+E` | Open Export modal | Any -> Export |

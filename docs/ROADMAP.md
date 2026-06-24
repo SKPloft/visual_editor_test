@@ -21,9 +21,10 @@
 **What it proves:** We can represent a 3D scene as structured JSON and render it in a browser.
 
 **Deliverables:**
+- Set up build tooling for `editor/` (e.g., Vite) with TypeScript, dev server, and production build
 - JSON schema for nodes, transforms, and components
 - In-memory scene graph with parent/child hierarchy
-- Basic browser renderer (Three.js or Babylon.js) that loads the format and displays a few hard-coded objects
+- Basic browser renderer (Three.js) that loads the format and displays a few hard-coded objects
 
 **Approximate sequencing:** TBD (manual review)
 
@@ -38,6 +39,7 @@
 - Toolbar to add primitives (cube, sphere, cylinder, plane)
 - Gizmo interactions: translate, rotate, scale
 - Property panel showing position, rotation, scale values
+- Basic lighting (directional, point, spot) and flat-color materials
 
 **Approximate sequencing:** 2–3 weeks (after M0)
 

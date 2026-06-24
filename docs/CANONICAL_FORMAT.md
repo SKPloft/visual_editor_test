@@ -102,27 +102,20 @@ interface PrefabAsset {
 
 #### 2.3 Scene Graph
 
-The scene graph is a tree of nodes. Each node has a unique ID, a name, a local transform, and a list of components.
-
-> **TODO / FOR REVIEW:** Decide whether to keep `parent` references only, `children` arrays only, or both. Having both is redundant and can lead to inconsistent state.
+The scene graph is a tree of nodes. Each node has a unique ID, a name, a local transform, a list of components, and an inline list of child nodes. Parent/child relationships are expressed **only** through the `children` array; a separate `parent` reference is not supported.
 
 ```typescript
 interface SceneGraph {
-  root: Node[];             // The scene may have multiple top-level nodes
+  root: Node;                 // A single root node whose children are the top-level scene objects
 }
 
 interface Node {
   id: string;
   name: string;
-  parent?: string;          // ID of parent node. If omitted, node is at root level
   transform: Transform;
   components: Component[];
-  children?: Node[];        // Optional inline children for convenience
+  children: Node[];           // Inline children define the hierarchy
 }
-
-#### Transform Representation
-
-> **TODO / FOR REVIEW:** The canonical format stores rotation as a quaternion for engine neutrality. The editor UI will likely expose Euler angles for usability, converting to/from quaternion on save/load. Confirm the desired convention (e.g., intrinsic/extrinsic order, degree/radian display).
 ```
 
 ### 3. Node Components
@@ -202,10 +195,9 @@ interface ColliderComponent {
 interface PrefabReferenceComponent {
   type: "prefabRef";
   prefabRef: string;        // Reference to PrefabAsset.id
-  // Overrides to the prefab's root transform or components can be added here
-  // TODO / FOR REVIEW: decide whether transform/component overrides are needed for the PoC
-  transformOverride?: Partial<Transform>;
-  componentOverrides?: Partial<Component>[];
+  // Transform/component overrides are out of scope for the technology prototype.
+  // transformOverride?: Partial<Transform>;
+  // componentOverrides?: Partial<Component>[];
 }
 ```
 
@@ -291,208 +283,227 @@ A single room with a floor, 4 walls, a point light, a spot light, a pickable cub
     "prefabs": []
   },
   "sceneGraph": {
-    "root": [
-      {
-        "id": "node_floor",
-        "name": "Floor",
-        "transform": {
-          "position": [0, 0, 0],
-          "rotation": [0, 0, 0, 1],
-          "scale": [10, 1, 10]
-        },
-        "components": [
-          {
-            "type": "mesh",
-            "meshRef": "mesh_plane",
-            "materialRef": "mat_floor",
-            "castShadows": false,
-            "receiveShadows": true
+    "root": {
+      "id": "node_world",
+      "name": "Demo Room",
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "components": [],
+      "children": [
+        {
+          "id": "node_floor",
+          "name": "Floor",
+          "transform": {
+            "position": [0, 0, 0],
+            "rotation": [0, 0, 0, 1],
+            "scale": [10, 1, 10]
           },
-          {
-            "type": "collider",
-            "shape": "box",
-            "isTrigger": false,
-            "isPickable": false
-          }
-        ]
-      },
-      {
-        "id": "node_wall_north",
-        "name": "Wall North",
-        "transform": {
-          "position": [0, 2.5, -5],
-          "rotation": [0, 0, 0, 1],
-          "scale": [10, 5, 0.2]
+          "components": [
+            {
+              "type": "mesh",
+              "meshRef": "mesh_plane",
+              "materialRef": "mat_floor",
+              "castShadows": false,
+              "receiveShadows": true
+            },
+            {
+              "type": "collider",
+              "shape": "box",
+              "isTrigger": false,
+              "isPickable": false
+            }
+          ],
+          "children": []
         },
-        "components": [
-          {
-            "type": "mesh",
-            "meshRef": "mesh_cube",
-            "materialRef": "mat_wall",
-            "castShadows": true,
-            "receiveShadows": true
+        {
+          "id": "node_wall_north",
+          "name": "Wall North",
+          "transform": {
+            "position": [0, 2.5, -5],
+            "rotation": [0, 0, 0, 1],
+            "scale": [10, 5, 0.2]
           },
-          {
-            "type": "collider",
-            "shape": "box",
-            "isTrigger": false,
-            "isPickable": false
-          }
-        ]
-      },
-      {
-        "id": "node_wall_south",
-        "name": "Wall South",
-        "transform": {
-          "position": [0, 2.5, 5],
-          "rotation": [0, 0, 0, 1],
-          "scale": [10, 5, 0.2]
+          "components": [
+            {
+              "type": "mesh",
+              "meshRef": "mesh_cube",
+              "materialRef": "mat_wall",
+              "castShadows": true,
+              "receiveShadows": true
+            },
+            {
+              "type": "collider",
+              "shape": "box",
+              "isTrigger": false,
+              "isPickable": false
+            }
+          ],
+          "children": []
         },
-        "components": [
-          {
-            "type": "mesh",
-            "meshRef": "mesh_cube",
-            "materialRef": "mat_wall",
-            "castShadows": true,
-            "receiveShadows": true
+        {
+          "id": "node_wall_south",
+          "name": "Wall South",
+          "transform": {
+            "position": [0, 2.5, 5],
+            "rotation": [0, 0, 0, 1],
+            "scale": [10, 5, 0.2]
           },
-          {
-            "type": "collider",
-            "shape": "box",
-            "isTrigger": false,
-            "isPickable": false
-          }
-        ]
-      },
-      {
-        "id": "node_wall_east",
-        "name": "Wall East",
-        "transform": {
-          "position": [5, 2.5, 0],
-          "rotation": [0, 0.7071068, 0, 0.7071068],
-          "scale": [10, 5, 0.2]
+          "components": [
+            {
+              "type": "mesh",
+              "meshRef": "mesh_cube",
+              "materialRef": "mat_wall",
+              "castShadows": true,
+              "receiveShadows": true
+            },
+            {
+              "type": "collider",
+              "shape": "box",
+              "isTrigger": false,
+              "isPickable": false
+            }
+          ],
+          "children": []
         },
-        "components": [
-          {
-            "type": "mesh",
-            "meshRef": "mesh_cube",
-            "materialRef": "mat_wall",
-            "castShadows": true,
-            "receiveShadows": true
+        {
+          "id": "node_wall_east",
+          "name": "Wall East",
+          "transform": {
+            "position": [5, 2.5, 0],
+            "rotation": [0, 0.7071068, 0, 0.7071068],
+            "scale": [10, 5, 0.2]
           },
-          {
-            "type": "collider",
-            "shape": "box",
-            "isTrigger": false,
-            "isPickable": false
-          }
-        ]
-      },
-      {
-        "id": "node_wall_west",
-        "name": "Wall West",
-        "transform": {
-          "position": [-5, 2.5, 0],
-          "rotation": [0, 0.7071068, 0, 0.7071068],
-          "scale": [10, 5, 0.2]
+          "components": [
+            {
+              "type": "mesh",
+              "meshRef": "mesh_cube",
+              "materialRef": "mat_wall",
+              "castShadows": true,
+              "receiveShadows": true
+            },
+            {
+              "type": "collider",
+              "shape": "box",
+              "isTrigger": false,
+              "isPickable": false
+            }
+          ],
+          "children": []
         },
-        "components": [
-          {
-            "type": "mesh",
-            "meshRef": "mesh_cube",
-            "materialRef": "mat_wall",
-            "castShadows": true,
-            "receiveShadows": true
+        {
+          "id": "node_wall_west",
+          "name": "Wall West",
+          "transform": {
+            "position": [-5, 2.5, 0],
+            "rotation": [0, 0.7071068, 0, 0.7071068],
+            "scale": [10, 5, 0.2]
           },
-          {
-            "type": "collider",
-            "shape": "box",
-            "isTrigger": false,
-            "isPickable": false
-          }
-        ]
-      },
-      {
-        "id": "node_point_light",
-        "name": "Point Light",
-        "transform": {
-          "position": [0, 4, 0],
-          "rotation": [0, 0, 0, 1],
-          "scale": [1, 1, 1]
+          "components": [
+            {
+              "type": "mesh",
+              "meshRef": "mesh_cube",
+              "materialRef": "mat_wall",
+              "castShadows": true,
+              "receiveShadows": true
+            },
+            {
+              "type": "collider",
+              "shape": "box",
+              "isTrigger": false,
+              "isPickable": false
+            }
+          ],
+          "children": []
         },
-        "components": [
-          {
-            "type": "light",
-            "lightType": "point",
-            "color": "#FFD700",
-            "intensity": 10,
-            "range": 15,
-            "castShadows": true
-          }
-        ]
-      },
-      {
-        "id": "node_spot_light",
-        "name": "Spot Light",
-        "transform": {
-          "position": [0, 4.5, 0],
-          "rotation": [0.7071068, 0, 0, 0.7071068],
-          "scale": [1, 1, 1]
-        },
-        "components": [
-          {
-            "type": "light",
-            "lightType": "spot",
-            "color": "#FFFFFF",
-            "intensity": 20,
-            "range": 20,
-            "angle": 30,
-            "castShadows": true
-          }
-        ]
-      },
-      {
-        "id": "node_pickable_cube",
-        "name": "Pickable Cube",
-        "transform": {
-          "position": [2, 1, 2],
-          "rotation": [0, 0, 0, 1],
-          "scale": [1, 1, 1]
-        },
-        "components": [
-          {
-            "type": "mesh",
-            "meshRef": "mesh_cube",
-            "materialRef": "mat_cube",
-            "castShadows": true,
-            "receiveShadows": true
+        {
+          "id": "node_point_light",
+          "name": "Point Light",
+          "transform": {
+            "position": [0, 4, 0],
+            "rotation": [0, 0, 0, 1],
+            "scale": [1, 1, 1]
           },
-          {
-            "type": "collider",
-            "shape": "box",
-            "isTrigger": false,
-            "isPickable": true
-          }
-        ]
-      },
-      {
-        "id": "node_npc",
-        "name": "NPC Avatar",
-        "transform": {
-          "position": [-2, 0, -2],
-          "rotation": [0, 0.7071068, 0, 0.7071068],
-          "scale": [1, 1, 1]
+          "components": [
+            {
+              "type": "light",
+              "lightType": "point",
+              "color": "#FFD700",
+              "intensity": 10,
+              "range": 15,
+              "castShadows": true
+            }
+          ],
+          "children": []
         },
-        "components": [
-          {
-            "type": "avatar",
-            "avatarType": "npc",
-            "modelRef": "mesh_cube",
-            "displayName": "Guide Bot"
-          }
-        ]
-      }
-    ]
+        {
+          "id": "node_spot_light",
+          "name": "Spot Light",
+          "transform": {
+            "position": [0, 4.5, 0],
+            "rotation": [0.7071068, 0, 0, 0.7071068],
+            "scale": [1, 1, 1]
+          },
+          "components": [
+            {
+              "type": "light",
+              "lightType": "spot",
+              "color": "#FFFFFF",
+              "intensity": 20,
+              "range": 20,
+              "angle": 30,
+              "castShadows": true
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "node_pickable_cube",
+          "name": "Pickable Cube",
+          "transform": {
+            "position": [2, 1, 2],
+            "rotation": [0, 0, 0, 1],
+            "scale": [1, 1, 1]
+          },
+          "components": [
+            {
+              "type": "mesh",
+              "meshRef": "mesh_cube",
+              "materialRef": "mat_cube",
+              "castShadows": true,
+              "receiveShadows": true
+            },
+            {
+              "type": "collider",
+              "shape": "box",
+              "isTrigger": false,
+              "isPickable": true
+            }
+          ],
+          "children": []
+        },
+        {
+          "id": "node_npc",
+          "name": "NPC Avatar",
+          "transform": {
+            "position": [-2, 0, -2],
+            "rotation": [0, 0.7071068, 0, 0.7071068],
+            "scale": [1, 1, 1]
+          },
+          "components": [
+            {
+              "type": "avatar",
+              "avatarType": "npc",
+              "modelRef": "mesh_cube",
+              "displayName": "Guide Bot"
+            }
+          ],
+          "children": []
+        }
+      ]
+    }
   }
 }
 ```
@@ -547,10 +558,7 @@ A formal JSON Schema for validation and auto-completion.
       "type": "object",
       "required": ["root"],
       "properties": {
-        "root": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/node" }
-        }
+        "root": { "$ref": "#/definitions/node" }
       }
     }
   },
@@ -603,11 +611,10 @@ A formal JSON Schema for validation and auto-completion.
     },
     "node": {
       "type": "object",
-      "required": ["id", "name", "transform", "components"],
+      "required": ["id", "name", "transform", "components", "children"],
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
-        "parent": { "type": "string" },
         "transform": {
           "type": "object",
           "required": ["position", "rotation", "scale"],
@@ -718,13 +725,14 @@ A formal JSON Schema for validation and auto-completion.
 
 ### 6. Notes for the Unity Editor Script Exporter
 
-- **Coordinate System**: The format uses a Y-up, right-handed coordinate system by default. The Unity exporter should convert to Unity's Y-up, left-handed system by negating the Z component of positions and rotations as needed.
+- **Coordinate System**: The format uses a Y-up, right-handed coordinate system by default. The Unity exporter converts positions to Unity's Y-up, left-handed system by negating the Z component. Rotation handedness conversion for non-trivial orientations is deferred to the VRChat adapter (M6) unless needed sooner.
 - **Asset Resolution**: The exporter should map `assetLibrary` entries to Unity `AssetDatabase` imports or runtime loads. `builtin:*` sources can be mapped to Unity primitives (Cube, Plane, Sphere, etc.).
 - **Prefab Instancing**: `prefabRef` components should be instantiated using `PrefabUtility` or `Object.Instantiate` in editor scripts.
 - **Collider Generation**: If a mesh has `generateColliders: true` or a node has a `collider` component, the exporter should add the corresponding `MeshCollider`, `BoxCollider`, etc.
 - **Pickable Objects**: The `isPickable` flag is a hint for the editor and VR interactions. In Unity, this might map to a specific tag, layer, or a custom `Interactable` component.
 - **Lights**: Intensity is abstract in the canonical format. The exporter may apply a conversion factor to match Unity's light intensity units (e.g., 1 candela = 1 Unity unit for point lights).
 - **Versioning**: The exporter should check `version` and emit a warning or error if the major version is higher than what it supports.
+- **Hierarchy**: The exporter reads the scene graph hierarchy **only** from the inline `children` arrays. No separate `parent` reference is supported.
 
 ---
 
