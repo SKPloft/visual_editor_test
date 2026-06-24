@@ -1,8 +1,8 @@
-# Unity Export Specification
+# World Creator — Unity Export Specification
 
 ## 1. Overview
 
-This document specifies how the canonical JSON scene format (defined in `docs/CANONICAL_FORMAT.md`) is imported into Unity. The chosen approach is a **Unity Editor script** that reads the canonical JSON and constructs GameObjects in the active scene. This keeps the export pipeline simple, deterministic, and fully under our control without requiring a custom Unity package or runtime loader.
+This document specifies how the canonical JSON scene format (defined in `docs/CANONICAL_FORMAT.md`) is imported into Unity for World Creator. The chosen approach is a **Unity Editor script** that reads the canonical JSON and constructs GameObjects in the active scene. This keeps the export pipeline simple, deterministic, and fully under our control without requiring a custom Unity package or runtime loader.
 
 The resulting Unity scene is the **foundation** for all downstream targets, including VRChat. VRChat-specific metadata (e.g., VRC Scene Descriptor, spawn points, occlusion culling) will be added later by a dedicated adapter layer.
 
@@ -13,14 +13,16 @@ The resulting Unity scene is the **foundation** for all downstream targets, incl
 ### Menu Item Path
 
 ```
-Warp -> Import Scene from JSON
+World Creator -> Import Scene from JSON
 ```
+
+> **TODO / FOR REVIEW:** Confirm the final menu item path and naming convention.
 
 ### Workflow
 
 1. Open the target Unity project.
-2. Select `Warp -> Import Scene from JSON` from the menu bar.
-3. A file dialog opens. Select the `.json` file exported from the Warp editor.
+2. Select `World Creator -> Import Scene from JSON` from the menu bar.
+3. A file dialog opens. Select the `.json` file exported from the World Creator editor.
 4. The script parses the JSON, validates the version, and builds the scene under a single root GameObject named after the scene metadata.
 
 ### Expected JSON Path
@@ -28,8 +30,10 @@ Warp -> Import Scene from JSON
 The script accepts any absolute or relative file path. The recommended convention is to place exported scenes under:
 
 ```
-Assets/WarpScenes/<scene-name>.json
+Assets/WorldCreatorScenes/<scene-name>.json
 ```
+
+> **TODO / FOR REVIEW:** Confirm the recommended folder name.
 
 ---
 
@@ -59,7 +63,7 @@ This keeps the Hierarchy clean and makes it easy to delete or re-import the enti
 For every `MaterialAsset` in the JSON `assetLibrary`, the importer creates a corresponding Unity `Material` using the **Standard shader**:
 
 ```
-Assets/WarpScenes/<scene-name>/Materials/
+Assets/WorldCreatorScenes/<scene-name>/Materials/
   ├── Floor Material.mat
   ├── Wall Material.mat
   └── Cube Material.mat
@@ -82,7 +86,7 @@ If a texture is referenced but not found in the `textures` array, a warning is l
 For every `PrefabAsset` in the JSON `assetLibrary`, the importer creates a `.prefab` file:
 
 ```
-Assets/WarpScenes/<scene-name>/Prefabs/
+Assets/WorldCreatorScenes/<scene-name>/Prefabs/
   └── <PrefabName>.prefab
 ```
 
@@ -118,7 +122,9 @@ Additional mappings:
 | `mesh`           | `MeshCollider` |
 
 - `isTrigger` -> `Collider.isTrigger`
-- `isPickable` -> A custom `WarpPickable` MonoBehaviour is added, and the GameObject is tagged with `WarpPickable`. This marker is used by the editor and future VR interactions.
+- `isPickable` -> A custom `WorldCreatorPickable` MonoBehaviour is added, and the GameObject is tagged with `WorldCreatorPickable`. This marker is used by the editor and future VR interactions.
+
+> **TODO / FOR REVIEW:** Decide whether the pickable marker is needed for the PoC, and whether it should be a tag, a component, or both.
 
 Size overrides (`size`, `radius`, `height`) are applied directly. If omitted, the collider size is derived from the node's `transform.scale`.
 
@@ -126,7 +132,7 @@ Size overrides (`size`, `radius`, `height`) are applied directly. If omitted, th
 
 `AvatarPlaceholderComponent` nodes create an **empty GameObject** with:
 
-- A `WarpAvatarPlaceholder` MonoBehaviour attached.
+- A `WorldCreatorAvatarPlaceholder` MonoBehaviour attached.
 - The component stores:
   - `avatarType` (`npc` or `player`)
   - `displayName`
@@ -139,7 +145,9 @@ This is intentionally a placeholder. No AI behavior, animation, or actual avatar
 
 ## 4. Sample C# Editor Script
 
-Below is a complete, self-contained Unity Editor script that imports the example JSON from `docs/CANONICAL_FORMAT.md`. Place it in `Assets/Editor/WarpSceneImporter.cs`.
+Below is a complete, self-contained Unity Editor script that imports the example JSON from `docs/CANONICAL_FORMAT.md`. Place it in `Assets/Editor/WorldCreatorSceneImporter.cs`.
+
+> **TODO / FOR REVIEW:** This sample uses `JsonUtility`, which handles polymorphic arrays poorly. Consider switching to `Newtonsoft.Json` (included with Unity) for the real implementation.
 
 ```csharp
 using System;
@@ -149,14 +157,14 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.Rendering;
 
-namespace Warp.Editor
+namespace WorldCreator.Editor
 {
-    public static class WarpSceneImporter
+    public static class WorldCreatorSceneImporter
     {
-        [MenuItem("Warp/Import Scene from JSON")]
+        [MenuItem("World Creator/Import Scene from JSON")]
         public static void ImportScene()
         {
-            string path = EditorUtility.OpenFilePanel("Select Warp Scene JSON", "Assets", "json");
+            string path = EditorUtility.OpenFilePanel("Select World Creator Scene JSON", "Assets", "json");
             if (string.IsNullOrEmpty(path)) return;
 
             string json = File.ReadAllText(path);
@@ -164,14 +172,14 @@ namespace Warp.Editor
 
             if (scene == null || scene.version == null)
             {
-                Debug.LogError("[Warp] Failed to parse scene JSON.");
+                Debug.LogError("[World Creator] Failed to parse scene JSON.");
                 return;
             }
 
             // Version check (PoC supports 1.x)
             if (!scene.version.StartsWith("1."))
             {
-                Debug.LogError($"[Warp] Unsupported scene version: {scene.version}");
+                Debug.LogError($"[World Creator] Unsupported scene version: {scene.version}");
                 return;
             }
 
@@ -179,7 +187,7 @@ namespace Warp.Editor
             GameObject root = new GameObject(scene.metadata.name);
 
             // Prepare asset folders
-            string sceneFolder = $"Assets/WarpScenes/{scene.metadata.name}";
+            string sceneFolder = $"Assets/WorldCreatorScenes/{scene.metadata.name}";
             string materialsFolder = $"{sceneFolder}/Materials";
             string prefabsFolder = $"{sceneFolder}/Prefabs";
             EnsureFolder(materialsFolder);
@@ -220,7 +228,7 @@ namespace Warp.Editor
                 BuildNode(node, root.transform, materialCache, prefabsFolder);
             }
 
-            Debug.Log($"[Warp] Imported scene '{scene.metadata.name}' with {scene.sceneGraph.root.Length} root nodes.");
+            Debug.Log($"[World Creator] Imported scene '{scene.metadata.name}' with {scene.sceneGraph.root.Length} root nodes.");
         }
 
         private static void BuildNode(Node node, Transform parent, Dictionary<string, Material> materialCache, string prefabsFolder)
@@ -262,17 +270,17 @@ namespace Warp.Editor
                         break;
                     case "prefabRef":
                         // PoC: instantiate placeholder cube
-                        Debug.LogWarning($"[Warp] Prefab references not yet supported. Creating placeholder for '{node.name}'.");
+                        Debug.LogWarning($"[World Creator] Prefab references not yet supported. Creating placeholder for '{node.name}'.");
                         GameObject placeholder = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         placeholder.name = $"{node.name}_PrefabPlaceholder";
                         placeholder.transform.SetParent(go.transform, false);
                         DestroyImmediate(placeholder.GetComponent<Collider>());
                         break;
                     case "avatar":
-                        go.AddComponent<WarpAvatarPlaceholder>().Initialize(comp);
+                        go.AddComponent<WorldCreatorAvatarPlaceholder>().Initialize(comp);
                         break;
                     default:
-                        Debug.LogWarning($"[Warp] Unknown component type '{comp.type}' on node '{node.name}'. Skipped.");
+                        Debug.LogWarning($"[World Creator] Unknown component type '{comp.type}' on node '{node.name}'. Skipped.");
                         break;
                 }
             }
@@ -299,7 +307,7 @@ namespace Warp.Editor
             else if (meshRef == "mesh_cube" || meshRef.EndsWith(":cube"))
                 filter.sharedMesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
             else
-                Debug.LogWarning($"[Warp] Mesh '{meshRef}' not resolved. Using Cube fallback.");
+                Debug.LogWarning($"[World Creator] Mesh '{meshRef}' not resolved. Using Cube fallback.");
 
             if (filter.sharedMesh == null)
                 filter.sharedMesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
@@ -378,8 +386,8 @@ namespace Warp.Editor
 
             if (comp.isPickable)
             {
-                go.AddComponent<WarpPickable>();
-                go.tag = "WarpPickable";
+                go.AddComponent<WorldCreatorPickable>();
+                go.tag = "WorldCreatorPickable";
             }
         }
 
@@ -520,9 +528,9 @@ namespace Warp.Editor
 
     // --- Custom MonoBehaviours ---
 
-    public class WarpPickable : MonoBehaviour { }
+    public class WorldCreatorPickable : MonoBehaviour { }
 
-    public class WarpAvatarPlaceholder : MonoBehaviour
+    public class WorldCreatorAvatarPlaceholder : MonoBehaviour
     {
         public string avatarType;
         public string displayName;
@@ -565,7 +573,7 @@ The Unity scene produced by this importer is the **foundational layer** for all 
 1. Add a `VRC_SceneDescriptor` component to the root.
 2. Configure spawn points from `AvatarPlaceholderComponent` nodes with `avatarType: "player"`.
 3. Set up collision layers and occlusion culling.
-4. Replace `WarpPickable` markers with VRChat's `VRC_Pickup` or `VRC_ObjectSync` components.
+4. Replace `WorldCreatorPickable` markers with VRChat's `VRC_Pickup` or `VRC_ObjectSync` components.
 5. Bake lightmaps and reflection probes if the user opts into static lighting.
 6. Resolve external avatar models and animation controllers.
 

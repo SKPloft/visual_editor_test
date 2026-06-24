@@ -2,6 +2,8 @@
 
 ## Overview
 
+> **TODO / FOR REVIEW:** This roadmap intentionally does not include fixed durations. The order of milestones should be preserved, but per-milestone timing will be set manually during review.
+
 | Phase | Milestone | Label |
 |-------|-----------|-------|
 | M0 | Canonical format + scene graph | Technology Prototype |
@@ -23,7 +25,7 @@
 - In-memory scene graph with parent/child hierarchy
 - Basic browser renderer (Three.js or Babylon.js) that loads the format and displays a few hard-coded objects
 
-**Approximate sequencing:** 1–2 weeks
+**Approximate sequencing:** TBD (manual review)
 
 ---
 

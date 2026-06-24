@@ -1,6 +1,8 @@
 # User Flows
 
-This document describes the primary user flows and state machine for the MapForge 3D world editor.
+This document describes the primary user flows and state machine for the World Creator 3D world editor.
+
+> **TODO / FOR REVIEW:** This flow assumes lighting configuration and a "Create World" template step. Confirm whether these belong in the technology prototype (M0–M3).
 
 ---
 
@@ -30,7 +32,7 @@ flowchart TD
 
 ### Flow Description
 
-1. **Open App**: User launches MapForge in the browser.
+1. **Open App**: User launches World Creator in the browser.
 2. **Home / Template Gallery**: The landing screen shows a grid of pre-built world templates categorized by genre (RPG, Sci-Fi, Fantasy, Modern).
 3. **Browse Templates**: User scrolls through templates, uses category tabs, or searches by name.
 4. **Select Template**: User clicks on a template card (e.g., "Dungeon Crawl").
@@ -155,6 +157,8 @@ flowchart TD
 ---
 
 ## Keyboard Shortcuts Reference
+
+> **TODO / FOR REVIEW:** These shortcuts need manual confirmation. In particular, `WASD` may conflict with text input, and `Q`/`T`/`R`/`S` should be verified against common 3D editor conventions.
 
 | Shortcut | Action | State |
 |----------|--------|-------|

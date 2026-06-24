@@ -104,6 +104,8 @@ interface PrefabAsset {
 
 The scene graph is a tree of nodes. Each node has a unique ID, a name, a local transform, and a list of components.
 
+> **TODO / FOR REVIEW:** Decide whether to keep `parent` references only, `children` arrays only, or both. Having both is redundant and can lead to inconsistent state.
+
 ```typescript
 interface SceneGraph {
   root: Node[];             // The scene may have multiple top-level nodes
@@ -117,6 +119,10 @@ interface Node {
   components: Component[];
   children?: Node[];        // Optional inline children for convenience
 }
+
+#### Transform Representation
+
+> **TODO / FOR REVIEW:** The canonical format stores rotation as a quaternion for engine neutrality. The editor UI will likely expose Euler angles for usability, converting to/from quaternion on save/load. Confirm the desired convention (e.g., intrinsic/extrinsic order, degree/radian display).
 ```
 
 ### 3. Node Components
@@ -197,6 +203,7 @@ interface PrefabReferenceComponent {
   type: "prefabRef";
   prefabRef: string;        // Reference to PrefabAsset.id
   // Overrides to the prefab's root transform or components can be added here
+  // TODO / FOR REVIEW: decide whether transform/component overrides are needed for the PoC
   transformOverride?: Partial<Transform>;
   componentOverrides?: Partial<Component>[];
 }
@@ -235,7 +242,7 @@ A single room with a floor, 4 walls, a point light, a spot light, a pickable cub
   "metadata": {
     "name": "Demo Room",
     "description": "A simple room for testing the canonical format exporter",
-    "author": "Warp Editor",
+    "author": "World Creator",
     "createdAt": "2026-06-23T10:00:00Z",
     "modifiedAt": "2026-06-23T10:00:00Z",
     "unitScale": 1.0,
@@ -497,7 +504,7 @@ A formal JSON Schema for validation and auto-completion.
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "WarpScene",
+  "title": "WorldCreatorScene",
   "type": "object",
   "required": ["version", "metadata", "assetLibrary", "sceneGraph"],
   "properties": {
