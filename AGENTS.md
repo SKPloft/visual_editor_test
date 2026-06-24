@@ -16,7 +16,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
 - **3D viewport:** Three.js (confirmed for the technology prototype; see ADR-001)
 - **Scene format:** Custom canonical JSON (`docs/CANONICAL_FORMAT.md`)
 - **Export target:** Unity Editor C# script (`docs/UNITY_EXPORT.md`)
-- **Build tooling:** Vite in `editor/` (configured for M0). Legacy Webpack/Express setup lives in `_legacy/`.
+- **Build tooling:** Vite in `editor/` (configured for M0), package management via `bun`. Legacy Webpack/Express setup lives in `_legacy/`.
 
 ## Project structure
 
@@ -27,6 +27,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
   - `CANONICAL_FORMAT.md` — engine-agnostic JSON scene format
   - `UNITY_EXPORT.md` — Unity Editor script exporter spec
   - `ADR/` — accepted architectural decision records
+  - `threejs/` — legacy Three.js API docs imported as a coding reference (not yet integrated)
 - `design/` — UX source files and exported mockups
   - `visual-editor.pen` — Pencil design file
   - `exports/` — PNG mockups
@@ -37,7 +38,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
   - `index.html` — editor entry point
   - `package.json` — Vite build scripts and dependencies
 - `_legacy/` — archived Rogue Engine visual editor code and assets
-- `docs/IMPLEMENTATION_TRACKER.md` — milestone completion status and notes
+- `docs/IMPLEMENTATION_TRACKER.md` — milestone completion status and notes (now tracks tooling changes, imported reference docs, and review/optimization notes)
 - `DRAFT.md` — raw MVP methodology notes and early brainstorming
 
 ## Architecture decisions
@@ -70,6 +71,8 @@ Post-PoC work (lights, materials, pickables, NPC avatars, VRChat adapter) is doc
 - Treat `_legacy/` as read-only reference. Do not build new features on top of it.
 - Update ADRs when making architectural changes that affect scope, format, or export targets.
 - Add TODO/FOR REVIEW markers in planning docs for decisions that need manual validation before coding begins.
+- Update AGENTS.md when project structure, build tooling, or milestone status changes.
+- Review viewport controls and existing implementations for performance (data structures, algorithms) before expanding M1 features.
 
 ## Build & run
 
@@ -79,10 +82,10 @@ The editor is a standalone Vite project under `editor/`:
 
 ```bash
 cd editor
-npm install
-npm run dev      # Start development server with hot reload
-npm run build    # Production build to editor/dist/
-npm run preview  # Preview production build locally
+bun install
+bun run dev      # Start development server with hot reload
+bun run build    # Production build to editor/dist/
+bun run preview  # Preview production build locally
 ```
 
 ### Legacy
