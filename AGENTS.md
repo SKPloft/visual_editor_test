@@ -16,7 +16,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
 - **3D viewport:** Three.js (confirmed for the technology prototype; see ADR-001)
 - **Scene format:** Custom canonical JSON (`docs/CANONICAL_FORMAT.md`)
 - **Export target:** Unity Editor C# script (`docs/UNITY_EXPORT.md`)
-- **Build tooling:** Not yet configured at repo root; old Webpack/Express setup lives in `_legacy/`
+- **Build tooling:** Vite in `editor/` (configured for M0). Legacy Webpack/Express setup lives in `_legacy/`.
 
 ## Project structure
 
@@ -32,8 +32,12 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
   - `exports/` — PNG mockups
 - `assets/mockups/` — prototype screenshots and related docs
 - `adapters/` — reserved for future engine adapters (currently empty)
-- `editor/` — reserved for the browser editor source (currently empty)
+- `editor/` — browser editor source (Vite + TypeScript + Three.js)
+  - `src/scene/` — canonical format types, demo scene, and Three.js scene loader
+  - `index.html` — editor entry point
+  - `package.json` — Vite build scripts and dependencies
 - `_legacy/` — archived Rogue Engine visual editor code and assets
+- `docs/IMPLEMENTATION_TRACKER.md` — milestone completion status and notes
 - `DRAFT.md` — raw MVP methodology notes and early brainstorming
 
 ## Architecture decisions
@@ -69,7 +73,21 @@ Post-PoC work (lights, materials, pickables, NPC avatars, VRChat adapter) is doc
 
 ## Build & run
 
-The top-level repo does not yet have a configured build system. The legacy setup in `_legacy/` can be run independently for reference only:
+### Editor (M0+)
+
+The editor is a standalone Vite project under `editor/`:
+
+```bash
+cd editor
+npm install
+npm run dev      # Start development server with hot reload
+npm run build    # Production build to editor/dist/
+npm run preview  # Preview production build locally
+```
+
+### Legacy
+
+The legacy setup in `_legacy/` can be run independently for reference only:
 
 ```bash
 cd _legacy
@@ -77,4 +95,4 @@ npm install
 npm run build
 ```
 
-The new `editor/` and `adapters/` directories will get their own build setup as M0/M1 implementation begins.
+The new `adapters/` directory will get its own build setup as M3 implementation begins.
