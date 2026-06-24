@@ -1,0 +1,26 @@
+Title: AudioContext
+Source URL: https://threejs.org/docs/pages/AudioContext.html
+
+# AudioContext
+
+Manages the global audio context in the engine.
+
+## Static Methods
+
+### .[getContext](#.getContext)() : Window.AudioContext
+
+Returns the global native audio context.
+
+**Returns:** The native audio context.
+
+### .[setContext](#.setContext)( value : Window.AudioContext )
+
+Allows to set the global native audio context from outside.
+
+**value**
+
+The native context to set.
+
+## Source
+
+[src/audio/AudioContext.js](https://github.com/mrdoob/three.js/blob/master/src/audio/AudioContext.js)
