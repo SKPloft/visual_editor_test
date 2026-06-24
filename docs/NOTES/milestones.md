@@ -1,6 +1,20 @@
 # Milestone Notes
 
-Running observations, discoveries, and post-mortem notes for each milestone. Keep this lightweight: one or two lines per item, with a file or issue reference when possible.
+<!--
+FORMAT:
+- One section per milestone: ## M0, ## M1, etc.
+- Subsections are optional but use these names when they apply:
+    ### Status
+    ### Scope clarification
+    ### Tooling
+    ### Discoveries
+    ### Input / shortcuts
+    ### Open questions
+- Keep entries to one or two lines with a file or issue reference when possible.
+- Do not change this structure without discussing it first.
+-->
+
+Running observations, discoveries, and post-mortem notes for each milestone.
 
 ---
 
@@ -13,13 +27,11 @@ Running observations, discoveries, and post-mortem notes for each milestone. Kee
 ### Tooling
 - Switched from npm to bun for faster installs and scripts.
 - Imported legacy three.js docs for better coding reference; not yet integrated into the build or workflow.
+- Build output produces a 500 kB+ bundle because Three.js is bundled as one chunk. This is acceptable for the technology prototype; code-splitting is a future optimization.
 
 ### Discoveries
 - Mouse viewpoint controls were already implemented. Need to review whether they conflict with gizmo/shortcut behavior later.
 - Several implemented functions rely on nested branches and basic lookups. They are candidates for better data structures and algorithms to reduce O(n) traversal, even in the PoC, because performance may affect evaluation.
-
-### Build
-- Build output produces a 500 kB+ bundle because Three.js is bundled as one chunk. This is acceptable for the technology prototype; code-splitting is a future optimization.
 
 ---
 

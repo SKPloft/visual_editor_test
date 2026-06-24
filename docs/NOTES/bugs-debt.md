@@ -1,10 +1,23 @@
 # Bugs and Technical Debt
 
-Known bugs, performance hotspots, refactor candidates, and “review later” items. Items should be small enough to move into a TODO comment, issue, or milestone task when someone starts work on them.
+<!--
+FORMAT:
+- Group items by milestone first.
+- Cross-cutting items that do not belong to a single milestone live under category sections at the end.
+- Each item is a level-3 heading with this exact card shape:
+    ### ID — Title
+    - **Severity:** Blocker | High | Medium | Low | Note
+    - **Acceptance:** Observable behavior that would let us close the item.
+    - **Proposed approach:** One-line hint; do not prescribe APIs unless necessary.
+- Items should be small enough to become a TODO comment, issue, or milestone task once work starts.
+- Do not change this structure without discussing it first.
+-->
+
+Known bugs, performance hotspots, refactor candidates, and “review later” items.
 
 ---
 
-## M1 — milestone blockers
+## M1 — Viewport and gizmo
 
 ### M1-01 — Void click selects synthetic object
 - **Severity:** Blocker
@@ -24,32 +37,51 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 ### M1-04 — Browser gesture conflict (Vivaldi)
 - **Severity:** High
 - **Acceptance:** Canvas input does not trigger browser back/forward or pinch gestures in Chromium-based browsers.
-- **Proposed approach:** `touch-action: none`, `preventDefault()` on pointer/wheel events, pointer capture during drag.
-- **Fallback:** If a specific browser cannot be tamed, document as known limitation.
+- **Proposed approach:** `touch-action: none`, `preventDefault()` on pointer/wheel events, pointer capture during drag. If a specific browser cannot be tamed, document as a known limitation.
 
 ### M1-05 — Provisional middle-mouse orbit
 - **Severity:** Note
-- **Decision:** Middle-mouse drag for orbit is acceptable for M1.
-- **Follow-up:** Revisit default viewport bindings in M4+ input/shortcut milestone.
+- **Acceptance:** Middle-mouse drag for orbit is acceptable for M1.
+- **Proposed approach:** Revisit default viewport bindings in M4+ input/shortcut milestone.
 
-## Performance
+---
 
-- **M0 — Scene traversal O(n):** Implemented scene lookups use nested loops / branches in places. Review `editor/src/scene/sceneLoader.ts` and related scene-graph code; replace with Maps or indexed structures where lookups repeat.
-- **M0 — Bundle size:** Three.js is bundled as one chunk producing 500 kB+. Acceptable for PoC; revisit code-splitting before M4/M5 when asset count grows.
+## M0 — Scene graph and tooling
 
-## UX / Interaction
+### M0-01 — Scene traversal O(n)
+- **Severity:** Medium
+- **Acceptance:** Repeated scene lookups use indexed structures instead of nested loops where it measurably matters.
+- **Proposed approach:** Review `editor/src/scene/sceneLoader.ts` and related scene-graph code; replace hot paths with Maps or indexed structures.
 
-- **M0 — Mouse viewpoint controls:** Already present. Review for conflict with gizmo interactions and M1 shortcuts (`Q/W/E/R`).
-- **M1 — WASD text-input guard:** Implemented in principle; verify focus handling on all property-panel inputs and number fields.
+### M0-02 — Bundle size
+- **Severity:** Low
+- **Acceptance:** Three.js code-splitting is evaluated and either implemented or explicitly deferred.
+- **Proposed approach:** Three.js is bundled as one chunk producing 500 kB+. Acceptable for PoC; revisit before M4/M5 when asset count grows.
 
-## Tooling / Build
+### M0-03 — Mouse viewpoint controls
+- **Severity:** Medium
+- **Acceptance:** Existing mouse viewpoint controls do not conflict with gizmo interactions or M1 shortcuts (`Q/W/E/R`).
+- **Proposed approach:** Review current implementation and unify with M1 viewport controls.
 
-- **M0 — Legacy three.js docs imported:** Currently unused. Either wire them into the build/reference workflow or remove them before the PoC is evaluated.
-- **M0 — npm → bun migration:** Complete, but CI/scripts should be checked for any remaining `npm` calls.
+### M0-04 — WASD text-input guard
+- **Severity:** Medium
+- **Acceptance:** WASD camera navigation is suppressed whenever any property-panel input or number field is focused.
+- **Proposed approach:** Verify focus handling on all property-panel inputs and number fields.
 
-## Code quality
+### M0-05 — Legacy three.js docs imported
+- **Severity:** Note
+- **Acceptance:** Legacy docs are either wired into the build/reference workflow or removed before PoC evaluation.
+- **Proposed approach:** Currently unused; decide whether to integrate or delete.
 
-- **M0 — Branch-heavy functions:** Several helper functions grew branches during fast implementation. Candidate for early refactor before M2 adds save/load complexity on top of the same structures.
+### M0-06 — npm → bun migration
+- **Severity:** Note
+- **Acceptance:** No `npm` calls remain in CI, scripts, or README instructions.
+- **Proposed approach:** Audit and replace any remaining `npm` references.
+
+### M0-07 — Branch-heavy functions
+- **Severity:** Low
+- **Acceptance:** Helper functions with excessive branching are simplified before M2 adds save/load complexity.
+- **Proposed approach:** Refactor candidate helpers to reduce nesting and clarify data flow.
 
 ---
 
