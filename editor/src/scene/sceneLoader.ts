@@ -31,10 +31,10 @@ function buildMaterial(asset: MaterialAsset): THREE.Material {
   return material;
 }
 
-function resolveMaterial(id: string | undefined, assets: MaterialAsset[]): THREE.Material {
+function resolveMaterial(id: string | undefined, assetMap: Map<string, MaterialAsset>): THREE.Material {
   if (!id) return new THREE.MeshStandardMaterial({ color: 0xffffff });
   if (materialCache.has(id)) return materialCache.get(id)!;
-  const asset = assets.find((m) => m.id === id);
+  const asset = assetMap.get(id);
   const material = asset ? buildMaterial(asset) : new THREE.MeshStandardMaterial({ color: 0xffffff });
   if (asset) materialCache.set(id, material);
   return material;
@@ -70,7 +70,7 @@ function addLight(object: THREE.Object3D, component: Extract<Component, { type: 
   object.add(light);
 }
 
-function buildNode(node: Node, assets: { meshes: MeshAsset[]; materials: MaterialAsset[] }): THREE.Object3D {
+function buildNode(node: Node, assets: { meshes: Map<string, MeshAsset>; materials: Map<string, MaterialAsset> }): THREE.Object3D {
   const object = new THREE.Group();
   object.name = node.name;
   applyTransform(object, node.transform);
@@ -78,7 +78,7 @@ function buildNode(node: Node, assets: { meshes: MeshAsset[]; materials: Materia
   for (const component of node.components) {
     switch (component.type) {
       case "mesh": {
-        const meshAsset = assets.meshes.find((m) => m.id === component.meshRef);
+        const meshAsset = assets.meshes.get(component.meshRef);
         const geometry = meshAsset ? getBuiltinMeshGeometry(meshAsset.source) : new THREE.BoxGeometry(1, 1, 1);
         const material = resolveMaterial(component.materialRef, assets.materials);
         const mesh = new THREE.Mesh(geometry, material);
@@ -109,6 +109,7 @@ function buildNode(node: Node, assets: { meshes: MeshAsset[]; materials: Materia
 }
 
 export function loadSceneInto(scene: THREE.Scene, sceneFile: SceneFile): void {
+  scene.clear();
   materialCache.clear();
 
   // Ambient light so unlit faces are visible.
@@ -117,9 +118,12 @@ export function loadSceneInto(scene: THREE.Scene, sceneFile: SceneFile): void {
   // A subtle grid for spatial reference.
   scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));
 
+  const meshMap = new Map(sceneFile.assetLibrary.meshes.map((m) => [m.id, m]));
+  const materialMap = new Map(sceneFile.assetLibrary.materials.map((m) => [m.id, m]));
+
   const root = buildNode(sceneFile.sceneGraph.root, {
-    meshes: sceneFile.assetLibrary.meshes,
-    materials: sceneFile.assetLibrary.materials,
+    meshes: meshMap,
+    materials: materialMap,
   });
   scene.add(root);
 }

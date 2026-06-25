@@ -38,10 +38,11 @@ Running observations, discoveries, and post-mortem notes for each milestone.
 ## M1: 3D Editor Basics
 
 ### Status
-Milestone is currently **⚠️ blocked / needs review** due to viewport and gizmo usability issues. See `docs/NOTES/bugs-debt.md#M1` for blockers and acceptance criteria.
+Milestone is **✅ Completed**. Usability blockers from `bugs-debt.md` (synthetic object selection, gizmo visibility, browser gestures) were resolved.
 
 ### Scope clarification
 - The renderer already renders a grid and a point light from the canonical scene, but these are part of M0 scene loading, not user-editable editor features.
+- Editor UI built with premium dark mode and glassmorphism styling in `index.css`.
 
 ### Input / shortcuts
 - Decided during doc reconciliation:
@@ -49,11 +50,11 @@ Milestone is currently **⚠️ blocked / needs review** due to viewport and giz
   - `W` Move
   - `E` Rotate
   - `R` Scale
-- WASD camera movement must be disabled when any text input is focused.
+- WASD camera movement must be disabled when any text input is focused. Fixed: Keyboard shortcuts are suppressed when inputs are active.
 - **Provisional viewport binding:** Middle-mouse drag for orbit is acceptable for M1; default bindings will be revisited in M4+.
 
 ### Open questions
-- Can browser gestures be fully suppressed on the canvas in Vivaldi/other Chromium browsers, or will this become a documented limitation?
+- Can browser gestures be fully suppressed on the canvas in Vivaldi/other Chromium browsers, or will this become a documented limitation? (Answer: Yes, `touch-action: none` resolved the gestures).
 
 ---
 

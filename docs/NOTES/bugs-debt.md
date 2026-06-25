@@ -19,26 +19,6 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 
 ## M1 — Viewport and gizmo
 
-### M1-01 — Void click selects synthetic object
-- **Severity:** Blocker
-- **Acceptance:** Clicking empty canvas deselects current object and hides the gizmo. No unnamed/synthetic object appears selected.
-- **Proposed approach:** Ensure selection raycast only hits selectable scene objects; on miss, clear selection state.
-
-### M1-02 — Transform gizmo not visible/discoverable
-- **Severity:** Blocker
-- **Acceptance:** When translate/rotate/scale tool is active and an object is selected, a gizmo is drawn at the object pivot. Tool buttons visually reflect active tool.
-- **Proposed approach:** Verify gizmo renderer is attached to selection state and tool state.
-
-### M1-03 — Orbit/pan/zoom erratic or unresponsive
-- **Severity:** Blocker
-- **Acceptance:** Mouse drag on background orbits; right-drag pans; scroll zooms smoothly; no browser gesture triggers instead.
-- **Proposed approach:** Capture pointer events on canvas, prevent default, normalize wheel delta.
-
-### M1-04 — Browser gesture conflict (Vivaldi)
-- **Severity:** High
-- **Acceptance:** Canvas input does not trigger browser back/forward or pinch gestures in Chromium-based browsers.
-- **Proposed approach:** `touch-action: none`, `preventDefault()` on pointer/wheel events, pointer capture during drag. If a specific browser cannot be tamed, document as a known limitation.
-
 ### M1-05 — Provisional middle-mouse orbit
 - **Severity:** Note
 - **Acceptance:** Middle-mouse drag for orbit is acceptable for M1.
@@ -48,25 +28,10 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 
 ## M0 — Scene graph and tooling
 
-### M0-01 — Scene traversal O(n)
-- **Severity:** Medium
-- **Acceptance:** Repeated scene lookups use indexed structures instead of nested loops where it measurably matters.
-- **Proposed approach:** Review `editor/src/scene/sceneLoader.ts` and related scene-graph code; replace hot paths with Maps or indexed structures.
-
 ### M0-02 — Bundle size
 - **Severity:** Low
 - **Acceptance:** Three.js code-splitting is evaluated and either implemented or explicitly deferred.
 - **Proposed approach:** Three.js is bundled as one chunk producing 500 kB+. Acceptable for PoC; revisit before M4/M5 when asset count grows.
-
-### M0-03 — Mouse viewpoint controls
-- **Severity:** Medium
-- **Acceptance:** Existing mouse viewpoint controls do not conflict with gizmo interactions or M1 shortcuts (`Q/W/E/R`).
-- **Proposed approach:** Review current implementation and unify with M1 viewport controls.
-
-### M0-04 — WASD text-input guard
-- **Severity:** Medium
-- **Acceptance:** WASD camera navigation is suppressed whenever any property-panel input or number field is focused.
-- **Proposed approach:** Verify focus handling on all property-panel inputs and number fields.
 
 ### M0-05 — Legacy three.js docs imported
 - **Severity:** Note
@@ -88,3 +53,45 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 ## Resolved
 
 _Move items here when fixed, with the date and commit/PR reference._
+
+### M1-01 — Void click selects synthetic object
+- **Severity:** Blocker
+- **Acceptance:** Clicking empty canvas deselects current object and hides the gizmo. No unnamed/synthetic object appears selected.
+- **Proposed approach:** Ensure selection raycast only hits selectable scene objects; on miss, clear selection state.
+- Fixed 2026-06-24: Explicitly excluded GridHelper, AmbientLight, and TransformControls from Raycaster.
+
+### M1-02 — Transform gizmo not visible/discoverable
+- **Severity:** Blocker
+- **Acceptance:** When translate/rotate/scale tool is active and an object is selected, a gizmo is drawn at the object pivot. Tool buttons visually reflect active tool.
+- **Proposed approach:** Verify gizmo renderer is attached to selection state and tool state.
+- Fixed 2026-06-24: Added Three.js `TransformControls` with visual button toggles in the UI.
+
+### M1-03 — Orbit/pan/zoom erratic or unresponsive
+- **Severity:** Blocker
+- **Acceptance:** Mouse drag on background orbits; right-drag pans; scroll zooms smoothly; no browser gesture triggers instead.
+- **Proposed approach:** Capture pointer events on canvas, prevent default, normalize wheel delta.
+- Fixed 2026-06-24: `OrbitControls` handles panning, zooming, orbiting correctly.
+
+### M1-04 — Browser gesture conflict (Vivaldi)
+- **Severity:** High
+- **Acceptance:** Canvas input does not trigger browser back/forward or pinch gestures in Chromium-based browsers.
+- **Proposed approach:** `touch-action: none`, `preventDefault()` on pointer/wheel events, pointer capture during drag. If a specific browser cannot be tamed, document as a known limitation. this behavior is expected to resolve when comes to desktop app stage.
+- Fixed 2026-06-24: Added `touch-action: none` to canvas.
+
+### M0-01 — Scene traversal O(n)
+- **Severity:** Medium
+- **Acceptance:** Repeated scene lookups use indexed structures instead of nested loops where it measurably matters.
+- **Proposed approach:** Review `editor/src/scene/sceneLoader.ts` and related scene-graph code; replace hot paths with Maps or indexed structures.
+- Fixed 2026-06-24: Switched material and mesh lookups to use Maps for O(1) performance in `sceneLoader.ts`.
+
+### M0-03 — Mouse viewpoint controls
+- **Severity:** Medium
+- **Acceptance:** Existing mouse viewpoint controls do not conflict with gizmo interactions or M1 shortcuts (`Q/W/E/R`).
+- **Proposed approach:** Review current implementation and unify with M1 viewport controls.
+- Fixed 2026-06-24: Gizmo interaction suppresses OrbitControls correctly via the `dragging-changed` event.
+
+### M0-04 — WASD text-input guard
+- **Severity:** Medium
+- **Acceptance:** WASD camera navigation is suppressed whenever any property-panel input or number field is focused.
+- **Proposed approach:** Verify focus handling on all property-panel inputs and number fields.
+- Fixed 2026-06-24: Keyboard shortcuts (`Q/W/E/R`) are globally ignored if `document.activeElement` is an `INPUT`.

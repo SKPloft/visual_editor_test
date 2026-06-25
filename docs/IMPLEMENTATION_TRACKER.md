@@ -30,18 +30,17 @@ This document tracks the implementation status of each World Creator milestone. 
 
 ## M1: 3D Editor Basics
 
-**Status:** ⚠️ Partially completed / blocked / needs review
+**Status:** ✅ Completed
 
 **Deliverables:**
-- ⚠️ Viewport with orbit camera and grid
-- ⚠️ Toolbar to add primitives (cube, sphere, cylinder, plane)
-- ⚠️ Gizmo interactions: translate, rotate, scale
-- ⚠️ Property panel showing position, rotation, scale values
-- ⚠️ Basic lighting (directional, point, spot) and flat-color materials
+- ✅ Viewport with orbit camera and grid
+- ✅ Toolbar to add primitives (cube, sphere, cylinder, plane)
+- ✅ Gizmo interactions: translate, rotate, scale
+- ✅ Property panel showing position, rotation, scale values
+- ✅ Basic lighting (directional, point, spot) and flat-color materials
 
 **Current notes:**
-- Viewport and gizmo interactions have usability blockers. See `docs/NOTES/bugs-debt.md#M1`.
-- All M1 deliverables need review before M2 starts.
+- See `docs/NOTES/milestones.md` and `docs/NOTES/bugs-debt.md` for M1 bug fixes and decisions.
 
 ---
 
