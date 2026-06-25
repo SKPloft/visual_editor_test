@@ -90,8 +90,8 @@ _Move items here when fixed, with the date and commit/PR reference._
 - **Proposed approach:** Review current implementation and unify with M1 viewport controls.
 - Fixed 2026-06-24: Gizmo interaction suppresses OrbitControls correctly via the `dragging-changed` event.
 
-### M0-04 — WASD text-input guard
+### M0-04 — WASD / QWER disambiguation
 - **Severity:** Medium
-- **Acceptance:** WASD camera navigation is suppressed whenever any property-panel input or number field is focused.
-- **Proposed approach:** Verify focus handling on all property-panel inputs and number fields.
-- Fixed 2026-06-24: Keyboard shortcuts (`Q/W/E/R`) are globally ignored if `document.activeElement` is an `INPUT`.
+- **Acceptance:** `Q/W/E/R` tool shortcuts and `Hold RMB + WASD` camera fly are suppressed whenever any property-panel input, number field, or modal is focused. Camera fly is only active while the viewport is focused and RMB is held.
+- **Proposed approach:** Introduce an explicit input context / state machine that tracks viewport focus, RMB state, and text-input focus; route keys through it.
+- **Status:** Decision documented (RMB+WASD for camera fly). Code implementation pending.

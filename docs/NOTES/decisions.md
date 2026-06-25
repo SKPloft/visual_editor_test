@@ -28,11 +28,11 @@ Informal decisions made during implementation that are not formal ADRs. Use this
 - **Consequences:** Adds repo size. They are not yet wired into the build or linked from code.
 - **Follow-up:** Decide whether to integrate or remove before PoC evaluation; see `docs/NOTES/bugs-debt.md#M0-05`.
 
-## 2026-06-24 — Keyboard shortcuts follow Unity/Blender convention
-- **Context:** Reconciling editor interaction model during M1 planning.
-- **Decision:** `Q` Select, `W` Move, `E` Rotate, `R` Scale.
-- **Consequences:** WASD camera navigation must be suppressed when text inputs are focused.
-- **Follow-up:** Verify focus handling; see `docs/NOTES/bugs-debt.md#M0-04`.
+## 2026-06-25 — WASD camera fly disambiguated by RMB
+- **Context:** `W` is used by both the Move tool shortcut (`Q/W/E/R`) and traditional WASD camera navigation, creating a conflict. M1 needs both tool switching and camera movement.
+- **Decision:** Camera fly is triggered by holding the right mouse button while pressing `WASD` (`Hold RMB + WASD`). `Q/W/E/R` tool shortcuts remain active when RMB is not held. Both are suppressed when a text input, property field, or modal is focused.
+- **Consequences:** Users can keep the Unity/Blender tool convention while gaining a standard DCC-style fly camera. A future input state machine must enforce the RMB-gate and focus-gate consistently.
+- **Follow-up:** Implement `Hold RMB + WASD` camera fly in `editor/src/main.ts`; revisit default viewport bindings in M4+; see `docs/NOTES/bugs-debt.md#M0-04`.
 
 ## 2026-06-24 — Provisional middle-mouse orbit binding
 - **Context:** M1 viewport controls need a usable default while full keybinding design is deferred.

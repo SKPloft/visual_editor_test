@@ -125,10 +125,10 @@ These decisions affect multiple milestones and should be revisited if scope chan
 1. **Renderer:** Three.js is locked for the technology prototype.
 2. **Scene graph representation:** Inline `children` arrays only.
 3. **Shortcuts:** Unity/Blender convention (`Q` Select, `W` Move, `E` Rotate, `R` Scale).
-4. **WASD navigation:** Disabled when any text input is focused.
+4. **WASD camera fly:** Hold right mouse button + `WASD` to fly the camera. Disabled when any text input, property field, or modal is focused so `W` is unambiguously the Move tool shortcut.
 5. **Unity JSON parser:** Use Newtonsoft.Json for the real implementation.
 6. **Templates:** Template gallery and template variables are Post-PoC (M4+).
-7. **M1 viewport binding:** Middle-mouse drag for orbit is provisional and will be revisited in M4+.
+7. **M1 viewport binding:** Middle-mouse drag for orbit is provisional; hold-RMB camera fly will be revisited alongside default viewport bindings in M4+.
 
 ---
 

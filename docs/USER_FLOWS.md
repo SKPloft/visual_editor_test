@@ -96,8 +96,8 @@ stateDiagram-v2
 
     note right of Idle
         Default state when editor opens.
-        Camera can be orbited (RMB).
-        WASD moves camera.
+        Camera can be orbited (RMB drag) or flown (hold RMB + WASD).
+        QWER switches tools when the viewport is focused.
     end note
 
     note right of Select
@@ -175,11 +175,11 @@ flowchart TD
 
 ## Keyboard Shortcuts Reference
 
-> **Scope note:** WASD camera movement is active only when no text input or property field is focused. When an input is focused, `W`/`A`/`S`/`D` are treated as text entry.
+> **Scope note:** Camera fly is active only while the viewport is focused and the right mouse button is held. When an input or modal is focused, `W`/`A`/`S`/`D` and `Q`/`W`/`E`/`R` are treated as text entry.
 
 | Shortcut | Action | State |
 |----------|--------|-------|
-| `WASD` | Move camera | Idle, Select, Transform |
+| `Hold RMB + WASD` | Fly camera | Idle, Select, Transform |
 | `RMB + Drag` | Orbit camera | Idle, Select, Transform |
 | `Scroll` | Zoom camera | Idle, Select, Transform |
 | `Q` | Select tool | Any -> Select |

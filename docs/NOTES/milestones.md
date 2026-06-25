@@ -50,8 +50,8 @@ Milestone is **✅ Completed**. Usability blockers from `bugs-debt.md` (syntheti
   - `W` Move
   - `E` Rotate
   - `R` Scale
-- WASD camera movement must be disabled when any text input is focused. Fixed: Keyboard shortcuts are suppressed when inputs are active.
-- **Provisional viewport binding:** Middle-mouse drag for orbit is acceptable for M1; default bindings will be revisited in M4+.
+- `WASD` camera movement conflicts with `W` for Move. Resolution: camera fly requires holding the right mouse button (`Hold RMB + WASD`) when the viewport is focused.
+- `Hold RMB + WASD` camera fly and `Q/W/E/R` tool shortcuts must be disabled when any text input is focused. Current implementation only suppresses `Q/W/E/R` while an `INPUT` is focused; full RMB+WASD camera fly is not yet implemented.
 
 ### Open questions
 - Can browser gestures be fully suppressed on the canvas in Vivaldi/other Chromium browsers, or will this become a documented limitation? (Answer: Yes, `touch-action: none` resolved the gestures).
