@@ -27,7 +27,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
   - `CANONICAL_FORMAT.md` — engine-agnostic JSON scene format
   - `UNITY_EXPORT.md` — Unity Editor script exporter spec
   - `ADR/` — accepted architectural decision records
-  - `threejs/` — legacy Three.js API docs imported as a coding reference (not yet integrated)
+  - `threejs/` — legacy Three.js API docs imported as offline reference; not integrated into the build or workflow
 - `design/` — UX source files and exported mockups
   - `visual-editor.pen` — Pencil design file
   - `exports/` — PNG mockups
@@ -96,12 +96,14 @@ bun run preview  # Preview production build locally
 
 ### Legacy
 
-The legacy setup in `_legacy/` can be run independently for reference only:
+The legacy setup in `_legacy/` is kept on npm for reference only:
 
 ```bash
 cd _legacy
 npm install
 npm run build
 ```
+
+The active `editor/` uses `bun` (see M0 tooling notes).
 
 The new `adapters/` directory will get its own build setup as M3 implementation begins.

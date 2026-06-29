@@ -22,7 +22,7 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 ### M1-05 — Provisional middle-mouse orbit
 - **Severity:** Note
 - **Acceptance:** Middle-mouse drag for orbit is acceptable for M1.
-- **Proposed approach:** Revisit default viewport bindings in M4+ input/shortcut milestone.
+- **Proposed approach:** Revisit default viewport bindings in M4+ input/shortcut milestone. Right-drag currently pans; hold RMB + WASD flies the camera.
 
 ---
 
@@ -36,7 +36,7 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 ### M0-05 — Legacy three.js docs imported
 - **Severity:** Note
 - **Acceptance:** Legacy docs are either wired into the build/reference workflow or removed before PoC evaluation.
-- **Proposed approach:** Currently unused; decide whether to integrate or delete.
+- **Proposed approach:** Keep as offline reference material under `docs/threejs/API/`. Not wired into the build; remove only if repo size becomes a concern.
 
 ### M0-06 — npm → bun migration
 - **Severity:** Note
@@ -46,7 +46,7 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 ### M0-07 — Branch-heavy functions
 - **Severity:** Low
 - **Acceptance:** Helper functions with excessive branching are simplified before M2 adds save/load complexity.
-- **Proposed approach:** Refactor candidate helpers to reduce nesting and clarify data flow.
+- **Proposed approach:** Deferred. Review before M2 implementation starts; refactor any helper that save/load or prefab work will directly touch. Broad cleanup is scheduled for M4+ unless a specific bottleneck is measured.
 
 ---
 
@@ -95,3 +95,4 @@ _Move items here when fixed, with the date and commit/PR reference._
 - **Acceptance:** `Q/W/E/R` tool shortcuts and `Hold RMB + WASD` camera fly are suppressed whenever any property-panel input, number field, or modal is focused. Camera fly is only active while the viewport is focused and RMB is held.
 - **Proposed approach:** Introduce an explicit input context / state machine that tracks viewport focus, RMB state, and text-input focus; route keys through it.
 - **Status:** Decision documented (RMB+WASD for camera fly). Code implementation pending.
+- Fixed 2026-06-29: Implemented RMB-gated WASD fly camera and focus-aware `Q/W/E/R` suppression in `editor/src/main.ts`.

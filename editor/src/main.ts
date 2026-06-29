@@ -76,8 +76,9 @@ function selectObject(obj: THREE.Object3D | null) {
 }
 
 viewport.addEventListener('pointerdown', (event) => {
+  if (event.button !== 0) return; // Only left-click selects; right/middle are reserved for camera
   if (transformControl.dragging) return;
-  
+
   const rect = renderer.domElement.getBoundingClientRect();
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -153,15 +154,90 @@ tools.translate.addEventListener('click', () => setTool('translate'));
 tools.rotate.addEventListener('click', () => setTool('rotate'));
 tools.scale.addEventListener('click', () => setTool('scale'));
 
+// Input State Machine & Camera Fly
+let isRMBHeld = false;
+const keyState = { w: false, a: false, s: false, d: false };
+
+viewport.addEventListener('contextmenu', (e) => e.preventDefault());
+
+viewport.addEventListener('pointerdown', (e) => {
+  if (e.button === 2) isRMBHeld = true;
+});
+
+window.addEventListener('pointerup', (e) => {
+  if (e.button === 2) isRMBHeld = false;
+});
+
+window.addEventListener('pointercancel', () => {
+  isRMBHeld = false;
+});
+
+window.addEventListener('blur', () => {
+  isRMBHeld = false;
+  for (const k in keyState) keyState[k as keyof typeof keyState] = false;
+});
+
+function isInputFocused() {
+  const active = document.activeElement;
+  if (!active) return false;
+  const tag = active.tagName.toLowerCase();
+  return tag === 'input' || tag === 'textarea' || tag === 'select' || (active as HTMLElement).isContentEditable;
+}
+
 window.addEventListener('keydown', (event) => {
-  if (document.activeElement?.tagName === 'INPUT') return;
-  switch (event.key.toLowerCase()) {
-    case 'q': setTool('select'); break;
-    case 'w': setTool('translate'); break;
-    case 'e': setTool('rotate'); break;
-    case 'r': setTool('scale'); break;
+  if (isInputFocused()) return;
+
+  const key = event.key.toLowerCase();
+  if (key in keyState) {
+    keyState[key as keyof typeof keyState] = true;
+  }
+
+  if (!isRMBHeld) {
+    switch (key) {
+      case 'q': setTool('select'); break;
+      case 'w': setTool('translate'); break;
+      case 'e': setTool('rotate'); break;
+      case 'r': setTool('scale'); break;
+    }
   }
 });
+
+window.addEventListener('keyup', (event) => {
+  const key = event.key.toLowerCase();
+  if (key in keyState) {
+    keyState[key as keyof typeof keyState] = false;
+  }
+});
+
+let lastTime = performance.now();
+function updateFlyCamera() {
+  requestAnimationFrame(updateFlyCamera);
+  const now = performance.now();
+  const dt = (now - lastTime) / 1000;
+  lastTime = now;
+
+  if (isRMBHeld && !isInputFocused()) {
+    const speed = 10 * dt;
+    const move = new THREE.Vector3();
+    const forward = new THREE.Vector3();
+    const right = new THREE.Vector3();
+
+    camera.getWorldDirection(forward);
+    right.crossVectors(forward, camera.up).normalize();
+
+    if (keyState.w) move.add(forward);
+    if (keyState.s) move.sub(forward);
+    if (keyState.a) move.sub(right);
+    if (keyState.d) move.add(right);
+
+    if (move.lengthSq() > 0) {
+      move.normalize().multiplyScalar(speed);
+      camera.position.add(move);
+      controls.target.add(move);
+    }
+  }
+}
+updateFlyCamera();
 
 function addPrimitive(type: string) {
   let geometry: THREE.BufferGeometry;

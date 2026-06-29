@@ -42,6 +42,20 @@ Informal decisions made during implementation that are not formal ADRs. Use this
 
 ---
 
+## 2026-06-29 — Keep legacy three.js docs as offline reference
+- **Context:** `docs/threejs/API/` was imported for AI/offline reference but is not wired into the build.
+- **Decision:** Retain `docs/threejs/API/` as offline reference material. Do not integrate it into the build or link it from code at this time.
+- **Consequences:** Repo size is slightly larger, but contributors have an offline Three.js reference. If repo size becomes a concern before PoC evaluation, remove it.
+- **Follow-up:** Revisit before PoC evaluation; see `docs/NOTES/bugs-debt.md#M0-05`.
+
+## 2026-06-29 — Defer branch-heavy helper refactor
+- **Context:** `docs/NOTES/bugs-debt.md#M0-07` flagged helper functions with excessive branching in `editor/src/`.
+- **Decision:** Do not refactor broadly now. When M2 work begins, refactor any helper directly touched by save/load or prefab implementation. Leave broad cleanup for M4+ unless a specific bottleneck is measured.
+- **Consequences:** Some functions remain nested for the PoC, but effort is not spent on speculative cleanup.
+- **Follow-up:** Revisit during M2 planning kickoff.
+
+---
+
 ## Promotion candidates
 
 _Move items here when they look like they deserve an ADR._

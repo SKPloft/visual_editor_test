@@ -151,6 +151,12 @@ export function createEditor(container: HTMLElement): { scene: THREE.Scene; came
   controls.dampingFactor = 0.05;
   controls.target.set(0, 1, 0);
 
+  controls.mouseButtons = {
+    LEFT: null as any,
+    MIDDLE: THREE.MOUSE.ROTATE,
+    RIGHT: THREE.MOUSE.PAN
+  };
+
   const onResize = () => {
     const w = container.clientWidth;
     const h = container.clientHeight;
