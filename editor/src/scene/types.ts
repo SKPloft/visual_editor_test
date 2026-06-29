@@ -39,6 +39,8 @@ export interface AvatarPlaceholderComponent {
   type: "avatar";
   avatarType: "npc" | "player";
   modelRef?: string;
+  spawnPosition?: Vector3;
+  spawnRotation?: Quaternion;
   displayName?: string;
 }
 
@@ -82,13 +84,29 @@ export interface MeshAsset {
   type: "mesh";
   name: string;
   source: string;
+  generateColliders?: boolean;
+  importScale?: number;
+}
+
+export interface TextureAsset {
+  id: string;
+  type: "texture";
+  name: string;
+  source: string;
+}
+
+export interface PrefabAsset {
+  id: string;
+  type: "prefab";
+  name: string;
+  rootNode: Node;
 }
 
 export interface AssetLibrary {
   meshes: MeshAsset[];
   materials: MaterialAsset[];
-  textures: unknown[];
-  prefabs: unknown[];
+  textures: TextureAsset[];
+  prefabs: PrefabAsset[];
 }
 
 export interface Metadata {

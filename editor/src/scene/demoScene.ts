@@ -16,6 +16,7 @@ export const demoScene: SceneFile = {
       { id: "mesh_plane", type: "mesh", name: "Plane", source: "builtin:plane" },
       { id: "mesh_cube", type: "mesh", name: "Cube", source: "builtin:cube" },
       { id: "mesh_sphere", type: "mesh", name: "Sphere", source: "builtin:sphere" },
+      { id: "mesh_cylinder", type: "mesh", name: "Cylinder", source: "builtin:cylinder" },
     ],
     materials: [
       {
@@ -47,9 +48,180 @@ export const demoScene: SceneFile = {
         albedoColor: "#FFD700",
         roughness: 0.2,
       },
+      {
+        id: "mat_wood",
+        type: "material",
+        name: "Warm Wood",
+        albedoColor: "#8B5A2B",
+        roughness: 0.65,
+      },
+      {
+        id: "mat_lamp_stand",
+        type: "material",
+        name: "Lamp Stand",
+        albedoColor: "#475569",
+        metallic: 0.2,
+        roughness: 0.35,
+      },
     ],
     textures: [],
-    prefabs: [],
+    prefabs: [
+      {
+        id: "prefab_simple_table",
+        type: "prefab",
+        name: "Simple Table",
+        rootNode: {
+          id: "prefab_simple_table_root",
+          name: "Simple Table",
+          transform: {
+            position: [0, 0, 0],
+            rotation: [0, 0, 0, 1],
+            scale: [1, 1, 1],
+          },
+          components: [
+            { type: "prefabRef", prefabRef: "prefab_simple_table" },
+          ],
+          children: [
+            {
+              id: "prefab_simple_table_top",
+              name: "Table Top",
+              transform: {
+                position: [0, 1, 0],
+                rotation: [0, 0, 0, 1],
+                scale: [2.4, 0.18, 1.4],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cube", materialRef: "mat_wood", castShadows: true, receiveShadows: true },
+              ],
+              children: [],
+            },
+            {
+              id: "prefab_simple_table_leg_fl",
+              name: "Front Left Leg",
+              transform: {
+                position: [-0.95, 0.48, 0.5],
+                rotation: [0, 0, 0, 1],
+                scale: [0.18, 0.95, 0.18],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cube", materialRef: "mat_wood", castShadows: true, receiveShadows: true },
+              ],
+              children: [],
+            },
+            {
+              id: "prefab_simple_table_leg_fr",
+              name: "Front Right Leg",
+              transform: {
+                position: [0.95, 0.48, 0.5],
+                rotation: [0, 0, 0, 1],
+                scale: [0.18, 0.95, 0.18],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cube", materialRef: "mat_wood", castShadows: true, receiveShadows: true },
+              ],
+              children: [],
+            },
+            {
+              id: "prefab_simple_table_leg_bl",
+              name: "Back Left Leg",
+              transform: {
+                position: [-0.95, 0.48, -0.5],
+                rotation: [0, 0, 0, 1],
+                scale: [0.18, 0.95, 0.18],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cube", materialRef: "mat_wood", castShadows: true, receiveShadows: true },
+              ],
+              children: [],
+            },
+            {
+              id: "prefab_simple_table_leg_br",
+              name: "Back Right Leg",
+              transform: {
+                position: [0.95, 0.48, -0.5],
+                rotation: [0, 0, 0, 1],
+                scale: [0.18, 0.95, 0.18],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cube", materialRef: "mat_wood", castShadows: true, receiveShadows: true },
+              ],
+              children: [],
+            },
+          ],
+        },
+      },
+      {
+        id: "prefab_floor_lamp",
+        type: "prefab",
+        name: "Floor Lamp",
+        rootNode: {
+          id: "prefab_floor_lamp_root",
+          name: "Floor Lamp",
+          transform: {
+            position: [0, 0, 0],
+            rotation: [0, 0, 0, 1],
+            scale: [1, 1, 1],
+          },
+          components: [
+            { type: "prefabRef", prefabRef: "prefab_floor_lamp" },
+          ],
+          children: [
+            {
+              id: "prefab_floor_lamp_base",
+              name: "Lamp Base",
+              transform: {
+                position: [0, 0.05, 0],
+                rotation: [0, 0, 0, 1],
+                scale: [0.75, 0.1, 0.75],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cylinder", materialRef: "mat_lamp_stand", castShadows: true, receiveShadows: true },
+              ],
+              children: [],
+            },
+            {
+              id: "prefab_floor_lamp_pole",
+              name: "Lamp Pole",
+              transform: {
+                position: [0, 1.15, 0],
+                rotation: [0, 0, 0, 1],
+                scale: [0.16, 2.2, 0.16],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cylinder", materialRef: "mat_lamp_stand", castShadows: true, receiveShadows: true },
+              ],
+              children: [],
+            },
+            {
+              id: "prefab_floor_lamp_shade",
+              name: "Lamp Shade",
+              transform: {
+                position: [0, 2.35, 0],
+                rotation: [0, 0, 0, 1],
+                scale: [0.9, 0.45, 0.9],
+              },
+              components: [
+                { type: "mesh", meshRef: "mesh_cylinder", materialRef: "mat_light", castShadows: true, receiveShadows: false },
+              ],
+              children: [],
+            },
+            {
+              id: "prefab_floor_lamp_light",
+              name: "Lamp Light",
+              transform: {
+                position: [0, 2.35, 0],
+                rotation: [0, 0, 0, 1],
+                scale: [1, 1, 1],
+              },
+              components: [
+                { type: "light", lightType: "point", color: "#FFD700", intensity: 7, range: 8, castShadows: true },
+              ],
+              children: [],
+            },
+          ],
+        },
+      },
+    ],
   },
   sceneGraph: {
     root: {

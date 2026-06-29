@@ -28,10 +28,10 @@ World Creator is a browser-based 3D editor that lets non-technical creators asse
 - Save / load scene to a canonical JSON format
 - Prefab instancing from a built-in library
 - Export to Unity Editor C# script that reconstructs the scene
+- Basic lighting (directional, point, spot) and flat-color materials
 
 ### Out of Scope (Technology Prototype)
 
-- Basic lighting (directional, point, spot) and flat-color materials are included in the technology prototype.
 - Custom asset upload or import (only built-in primitives and prefabs)
 - Real-time collaboration / multiplayer editing
 - Visual scripting or behavior authoring

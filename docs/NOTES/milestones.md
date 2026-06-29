@@ -58,6 +58,15 @@ Milestone is **✅ Completed**. Usability blockers from `bugs-debt.md` (syntheti
 
 ---
 
-## M2–M6
+## M2: Save / Load + Prefabs
+
+### Status
+M2 is **✅ Completed**. Save/load uses canonical JSON, and built-in prefabs are represented as `PrefabAsset` definitions plus `prefabRef` scene nodes.
+
+### Discoveries
+- The editor now keeps a canonical scene document indexed by node ID in `editor/src/main.ts`; Three.js objects carry their canonical node ID in `userData` for O(1) selection-to-node updates.
+- Prefab internals render from the prefab asset but are not individually selectable/editable in M2. Users transform the placed prefab reference node; overrides remain out of scope.
+
+## M3–M6
 
 No running notes yet. Add discoveries here as work starts.

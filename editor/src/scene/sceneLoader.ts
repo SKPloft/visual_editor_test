@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type { Component, MaterialAsset, MeshAsset, Node, SceneFile } from "./types.ts";
+import type { Component, MaterialAsset, MeshAsset, Node, PrefabAsset, SceneFile } from "./types.ts";
 
 const materialCache = new Map<string, THREE.Material>();
+export const CANONICAL_NODE_ID = "canonicalNodeId";
 
 function getBuiltinMeshGeometry(source: string): THREE.BufferGeometry {
   const primitive = source.split(":")[1];
@@ -70,9 +71,18 @@ function addLight(object: THREE.Object3D, component: Extract<Component, { type: 
   object.add(light);
 }
 
-function buildNode(node: Node, assets: { meshes: Map<string, MeshAsset>; materials: Map<string, MaterialAsset> }): THREE.Object3D {
+interface AssetMaps {
+  meshes: Map<string, MeshAsset>;
+  materials: Map<string, MaterialAsset>;
+  prefabs: Map<string, PrefabAsset>;
+}
+
+function buildNode(node: Node, assets: AssetMaps, prefabStack = new Set<string>(), tagNode = true): THREE.Object3D {
   const object = new THREE.Group();
   object.name = node.name;
+  if (tagNode) {
+    object.userData[CANONICAL_NODE_ID] = node.id;
+  }
   applyTransform(object, node.transform);
 
   for (const component of node.components) {
@@ -91,9 +101,25 @@ function buildNode(node: Node, assets: { meshes: Map<string, MeshAsset>; materia
         addLight(object, component);
         break;
       }
+      case "prefabRef": {
+        const prefab = assets.prefabs.get(component.prefabRef);
+        if (!prefab) {
+          console.warn(`Unknown prefab reference: ${component.prefabRef}`);
+          break;
+        }
+        if (prefabStack.has(prefab.id)) {
+          console.warn(`Skipping recursive prefab reference: ${prefab.id}`);
+          break;
+        }
+        const nextPrefabStack = new Set(prefabStack);
+        nextPrefabStack.add(prefab.id);
+        for (const child of prefab.rootNode.children) {
+          object.add(buildNode(child, assets, nextPrefabStack, false));
+        }
+        break;
+      }
       case "collider":
       case "avatar":
-      case "prefabRef":
         // Not visualized in the M0 viewport.
         break;
       default:
@@ -102,7 +128,7 @@ function buildNode(node: Node, assets: { meshes: Map<string, MeshAsset>; materia
   }
 
   for (const child of node.children) {
-    object.add(buildNode(child, assets));
+    object.add(buildNode(child, assets, prefabStack, tagNode));
   }
 
   return object;
@@ -120,10 +146,12 @@ export function loadSceneInto(scene: THREE.Scene, sceneFile: SceneFile): void {
 
   const meshMap = new Map(sceneFile.assetLibrary.meshes.map((m) => [m.id, m]));
   const materialMap = new Map(sceneFile.assetLibrary.materials.map((m) => [m.id, m]));
+  const prefabMap = new Map(sceneFile.assetLibrary.prefabs.map((p) => [p.id, p]));
 
   const root = buildNode(sceneFile.sceneGraph.root, {
     meshes: meshMap,
     materials: materialMap,
+    prefabs: prefabMap,
   });
   scene.add(root);
 }

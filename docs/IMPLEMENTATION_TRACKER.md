@@ -46,16 +46,17 @@ This document tracks the implementation status of each World Creator milestone. 
 
 ## M2: Save / Load + Prefabs
 
-**Status:** ⏳ Not started
+**Status:** ✅ Completed
 
 **Deliverables:**
-- ⏳ Save scene to canonical JSON and load it back
-- ⏳ Prefab definition format (a scene subgraph that can be instanced)
-- ⏳ Built-in prefab library panel (e.g., a simple table, a lamp)
-- ⏳ Instancing a prefab into the scene
+- ✅ Save scene to canonical JSON and load it back
+- ✅ Prefab definition format (a scene subgraph that can be instanced)
+- ✅ Built-in prefab library panel (Simple Table, Floor Lamp)
+- ✅ Instancing a prefab into the scene
 
 **Current notes:**
-- The canonical format supports `PrefabReferenceComponent` but transform/component overrides are out of scope for the technology prototype. See `docs/CANONICAL_FORMAT.md`.
+- The canonical format supports `PrefabReferenceComponent`; transform/component overrides remain out of scope for the technology prototype. See `docs/CANONICAL_FORMAT.md`.
+- The editor now keeps an ID-indexed canonical scene document in memory so added primitives, transform edits, and prefab instances round-trip through saved JSON.
 
 ---
 
@@ -141,4 +142,4 @@ These decisions affect multiple milestones and should be revisited if scope chan
 | Informal decisions not worth an ADR | `docs/NOTES/decisions.md` |
 | Formal architecture/product decisions | `docs/ADR/` |
 
-*Last updated: 2026-06-24*
+*Last updated: 2026-06-29*

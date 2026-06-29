@@ -42,6 +42,7 @@ header#topbar {
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--panel-border);
   z-index: 10;
+  gap: 12px;
 }
 
 .logo {
@@ -117,13 +118,46 @@ aside#property-panel {
   z-index: 10;
 }
 
-aside#property-panel h2 {
+aside#asset-panel {
+  width: 220px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid var(--panel-border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+aside#property-panel h2,
+aside#asset-panel h2 {
   margin-top: 0;
   font-size: 1rem;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 20px;
+}
+
+.prefab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prefab-button {
+  width: 100%;
+  min-height: 40px;
+  text-align: left;
+  background: var(--input-bg);
+  border-color: var(--panel-border);
+}
+
+.prefab-button:hover {
+  border-color: rgba(59, 130, 246, 0.45);
 }
 
 #no-selection-msg {

@@ -17,6 +17,12 @@
           <button id="btn-add-plane" title="Add Plane">Plane</button>
           <button id="btn-add-light" title="Add Point Light">Light</button>
         </div>
+        <div class="toolbar-group">
+          <button id="btn-save-scene" title="Save Scene JSON">Save</button>
+          <button id="btn-load-scene" title="Load Scene JSON">Load</button>
+          <button id="btn-reset-scene" title="Reset Demo Scene">Reset</button>
+          <input id="scene-file-input" type="file" accept="application/json,.json" hidden />
+        </div>
         <div class="toolbar-group" id="gizmo-tools">
           <button id="btn-tool-select" title="Select (Q)" class="active">Select</button>
           <button id="btn-tool-translate" title="Move (W)">Move</button>
@@ -25,6 +31,13 @@
         </div>
       </header>
       <div id="main-area">
+        <aside id="asset-panel" class="panel">
+          <h2>Prefabs</h2>
+          <div class="prefab-list">
+            <button class="prefab-button" data-prefab-id="prefab_simple_table" title="Add Simple Table">Simple Table</button>
+            <button class="prefab-button" data-prefab-id="prefab_floor_lamp" title="Add Floor Lamp">Floor Lamp</button>
+          </div>
+        </aside>
         <div id="viewport"></div>
         <aside id="property-panel" class="panel">
           <h2>Properties</h2>
