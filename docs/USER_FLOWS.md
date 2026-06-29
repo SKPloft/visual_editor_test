@@ -96,7 +96,7 @@ stateDiagram-v2
 
     note right of Idle
         Default state when editor opens.
-        Camera can be orbited (RMB drag) or flown (hold RMB + WASD).
+        Camera can be orbited (RMB drag), panned (MMB drag), zoomed (scroll), or flown (hold RMB + WASD).
         QWER switches tools when the viewport is focused.
     end note
 
@@ -181,6 +181,7 @@ flowchart TD
 |----------|--------|-------|
 | `Hold RMB + WASD` | Fly camera | Idle, Select, Transform |
 | `RMB + Drag` | Orbit camera | Idle, Select, Transform |
+| `MMB + Drag` | Pan camera | Idle, Select, Transform |
 | `Scroll` | Zoom camera | Idle, Select, Transform |
 | `Q` | Select tool | Any -> Select |
 | `W` | Move tool | Any -> Transform (Move) |

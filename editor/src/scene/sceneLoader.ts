@@ -153,8 +153,8 @@ export function createEditor(container: HTMLElement): { scene: THREE.Scene; came
 
   controls.mouseButtons = {
     LEFT: null as any,
-    MIDDLE: THREE.MOUSE.ROTATE,
-    RIGHT: THREE.MOUSE.PAN
+    MIDDLE: THREE.MOUSE.PAN,
+    RIGHT: THREE.MOUSE.ROTATE
   };
 
   const onResize = () => {

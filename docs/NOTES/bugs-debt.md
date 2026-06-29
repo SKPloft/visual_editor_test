@@ -21,8 +21,8 @@ Known bugs, performance hotspots, refactor candidates, and “review later” it
 
 ### M1-05 — Provisional middle-mouse orbit
 - **Severity:** Note
-- **Acceptance:** Middle-mouse drag for orbit is acceptable for M1.
-- **Proposed approach:** Revisit default viewport bindings in M4+ input/shortcut milestone. Right-drag currently pans; hold RMB + WASD flies the camera.
+- **Acceptance:** Middle-mouse drag for pan is acceptable for M1.
+- **Proposed approach:** Match Unity Scene View defaults: right-drag orbits, middle-drag pans, scroll zooms, hold RMB + WASD flies. Add Alt + left-drag orbit as an accessibility alternative in M4+ input milestone.
 
 ---
 

@@ -56,6 +56,14 @@ Informal decisions made during implementation that are not formal ADRs. Use this
 
 ---
 
+## 2026-06-29 — Adopt Unity Scene View navigation defaults
+- **Context:** The existing provisional middle-mouse orbit binding conflicted with standard DCC navigation and felt off. Unity Scene View navigation is the reference for our target user base.
+- **Decision:** Match Unity Scene View defaults: left-click selects, right-drag orbits, middle-drag pans, scroll zooms, and hold right + WASD flies the camera. Tool shortcuts (`Q/W/E/R`) are suppressed while an input/modal is focused and while the right mouse button is held.
+- **Consequences:** Users familiar with Unity/Blender/Unreal will have immediate muscle-memory alignment. Trackpad users without a middle button will need an alternative pan modifier later.
+- **Follow-up:** Add Alt + left-drag orbit as an accessibility alternative in M4+ input milestone; see `docs/NOTES/bugs-debt.md#M1-05`.
+
+---
+
 ## Promotion candidates
 
 _Move items here when they look like they deserve an ADR._
