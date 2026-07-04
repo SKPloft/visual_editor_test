@@ -27,6 +27,14 @@ export const demoScene: SceneFile = {
         roughness: 0.8,
       },
       {
+        id: "mat_missing_placeholder",
+        type: "material",
+        name: "Missing Material",
+        albedoColor: "#FF00FF",
+        metallic: 0,
+        roughness: 0.5,
+      },
+      {
         id: "mat_wall",
         type: "material",
         name: "Wall Material",
@@ -235,6 +243,32 @@ export const demoScene: SceneFile = {
       components: [],
       children: [
         {
+          id: "node_sun",
+          name: "Sun",
+          transform: {
+            position: [5, 10, 5],
+            rotation: [-0.27, 0.5, -0.16, 0.81],
+            scale: [1, 1, 1],
+          },
+          components: [
+            { type: "light", lightType: "directional", color: "#FFFFFF", intensity: 1.5, castShadows: false },
+          ],
+          children: [],
+        },
+        {
+          id: "node_ambient",
+          name: "Ambient",
+          transform: {
+            position: [0, 0, 0],
+            rotation: [0, 0, 0, 1],
+            scale: [1, 1, 1],
+          },
+          components: [
+            { type: "light", lightType: "ambient", color: "#404040", intensity: 1.0 },
+          ],
+          children: [],
+        },
+        {
           id: "node_floor",
           name: "Floor",
           transform: {
@@ -334,7 +368,7 @@ export const demoScene: SceneFile = {
             scale: [1, 1, 1],
           },
           components: [
-            { type: "light", lightType: "point", color: "#FFD700", intensity: 10, range: 15, castShadows: true },
+            { type: "light", lightType: "point", color: "#FFD700", intensity: 10, range: 15, castShadows: false },
           ],
           children: [],
         },

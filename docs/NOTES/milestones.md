@@ -78,6 +78,26 @@ M3 is **✅ Completed**. The browser exports a mini Unity package; the Unity Edi
 - Z positions are negated for Unity's left-handed space; rotation quaternions are passed through unchanged.
 - Visual lighting fidelity is acceptable for a runnable PoC but needs calibration in M4 (ambient contribution, intensity units, shadow settings).
 
-## M4–M6
+## M4: Lights + Materials
+
+### Status
+Milestone is **✅ Completed**. Shared material assets, a materials panel, light creation/editing, and Unity export parity are implemented.
+
+### Scope clarification
+- Ambient light is added as a canonical `lightType: "ambient"` node and rendered with `THREE.AmbientLight` in the browser.
+- Unity export maps the ambient node to a low-intensity directional fill light for now. True ambient/sky calibration is intentionally deferred to the alignment phase.
+
+### Discoveries
+- The renderer and Unity exporter already consumed shared `MaterialAsset` and `LightComponent`, so M4 was mostly editor UI work.
+- `renderCurrentScene()` rebuilds the whole Three.js scene on changes, which is acceptable for the PoC but may need optimization later.
+- The placeholder material (`mat_missing_placeholder`, magenta) makes missing material references obvious without breaking the scene.
+
+### Open questions
+- What is the correct mapping of ambient light to Unity? Options: `RenderSettings.ambientLight`, a skybox workflow, or keep it as a fill directional light. Deferred to alignment phase.
+- Should light intensity adopt photometric units (lux/candela/lumen) later, or stay as abstract units? Deferred to alignment phase.
+
+---
+
+## M5–M6
 
 No running notes yet. Add discoveries here as work starts.

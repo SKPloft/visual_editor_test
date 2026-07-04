@@ -679,6 +679,13 @@ namespace WorldCreator.Editor
             {
                 renderer.sharedMaterial = materialCache[comp.MaterialRef];
             }
+            else
+            {
+                Material missingMat = new Material(Shader.Find("Standard"));
+                missingMat.name = "Missing Material";
+                missingMat.color = Color.magenta;
+                renderer.sharedMaterial = missingMat;
+            }
 
             // Shadow flags
             if (comp.CastShadows.HasValue)
@@ -700,6 +707,12 @@ namespace WorldCreator.Editor
 
             switch (comp.LightType)
             {
+                case "ambient":
+                    // Placeholder for a proper ambient/sky workflow.
+                    // Creates a low-intensity directional fill light without shadows.
+                    light.type = LightType.Directional;
+                    light.shadows = LightShadows.None;
+                    break;
                 case "directional":
                     light.type = LightType.Directional;
                     break;
@@ -722,6 +735,7 @@ namespace WorldCreator.Editor
 
             if (comp.Intensity.HasValue)
             {
+                // Intensity convention: mapped 1:1 to Unity's intensity units for the PoC.
                 light.intensity = comp.Intensity.Value;
             }
 

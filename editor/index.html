@@ -15,7 +15,9 @@
           <button id="btn-add-sphere" title="Add Sphere">Sphere</button>
           <button id="btn-add-cylinder" title="Add Cylinder">Cylinder</button>
           <button id="btn-add-plane" title="Add Plane">Plane</button>
-          <button id="btn-add-light" title="Add Point Light">Light</button>
+          <button id="btn-add-directional" title="Add Directional Light">Directional</button>
+          <button id="btn-add-point" title="Add Point Light">Point</button>
+          <button id="btn-add-spot" title="Add Spot Light">Spot</button>
         </div>
         <div class="toolbar-group">
           <button id="btn-save-scene" title="Save Scene JSON">Save</button>
@@ -38,6 +40,9 @@
             <button class="prefab-button" data-prefab-id="prefab_simple_table" title="Add Simple Table">Simple Table</button>
             <button class="prefab-button" data-prefab-id="prefab_floor_lamp" title="Add Floor Lamp">Floor Lamp</button>
           </div>
+          <h2 style="margin-top: 20px;">Materials</h2>
+          <div id="material-list" class="material-list"></div>
+          <button id="btn-add-material" style="margin-top: 10px;">+ New Material</button>
         </aside>
         <div id="viewport"></div>
         <aside id="property-panel" class="panel">
@@ -70,6 +75,51 @@
                 <input type="number" id="prop-scale-x" step="0.1" />
                 <input type="number" id="prop-scale-y" step="0.1" />
                 <input type="number" id="prop-scale-z" step="0.1" />
+              </div>
+            </div>
+            <div id="prop-panel-mesh" style="display: none; border-top: 1px solid var(--panel-border); margin-top: 16px; padding-top: 16px;">
+              <div class="prop-group">
+                <label>Material</label>
+                <select id="prop-mesh-material"></select>
+              </div>
+              <div class="prop-group checkbox-group">
+                <input type="checkbox" id="prop-mesh-cast-shadows" />
+                <label for="prop-mesh-cast-shadows">Cast Shadows</label>
+              </div>
+              <div class="prop-group checkbox-group">
+                <input type="checkbox" id="prop-mesh-receive-shadows" />
+                <label for="prop-mesh-receive-shadows">Receive Shadows</label>
+              </div>
+            </div>
+            <div id="prop-panel-light" style="display: none; border-top: 1px solid var(--panel-border); margin-top: 16px; padding-top: 16px;">
+              <div class="prop-group">
+                <label>Light Type</label>
+                <select id="prop-light-type">
+                  <option value="directional">Directional</option>
+                  <option value="point">Point</option>
+                  <option value="spot">Spot</option>
+                  <option value="ambient">Ambient</option>
+                </select>
+              </div>
+              <div class="prop-group">
+                <label>Color</label>
+                <input type="color" id="prop-light-color" />
+              </div>
+              <div class="prop-group">
+                <label>Intensity</label>
+                <input type="number" id="prop-light-intensity" step="0.1" />
+              </div>
+              <div class="prop-group" id="prop-group-light-range">
+                <label>Range</label>
+                <input type="number" id="prop-light-range" step="0.1" />
+              </div>
+              <div class="prop-group" id="prop-group-light-angle">
+                <label>Spot Angle</label>
+                <input type="number" id="prop-light-angle" step="1" />
+              </div>
+              <div class="prop-group checkbox-group" id="prop-group-light-shadows">
+                <input type="checkbox" id="prop-light-cast-shadows" />
+                <label for="prop-light-cast-shadows">Cast Shadows</label>
               </div>
             </div>
           </div>

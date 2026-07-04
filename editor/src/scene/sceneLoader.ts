@@ -32,13 +32,19 @@ function buildMaterial(asset: MaterialAsset): THREE.Material {
   return material;
 }
 
+const fallbackMaterial = new THREE.MeshStandardMaterial({ color: 0xff00ff, name: "Missing Material" });
+
 function resolveMaterial(id: string | undefined, assetMap: Map<string, MaterialAsset>): THREE.Material {
-  if (!id) return new THREE.MeshStandardMaterial({ color: 0xffffff });
+  if (!id) return fallbackMaterial;
   if (materialCache.has(id)) return materialCache.get(id)!;
   const asset = assetMap.get(id);
-  const material = asset ? buildMaterial(asset) : new THREE.MeshStandardMaterial({ color: 0xffffff });
+  const material = asset ? buildMaterial(asset) : fallbackMaterial;
   if (asset) materialCache.set(id, material);
   return material;
+}
+
+export function invalidateMaterialCache(id: string): void {
+  materialCache.delete(id);
 }
 
 function applyTransform(object: THREE.Object3D, transform: Node["transform"]): void {
@@ -54,6 +60,9 @@ function addLight(object: THREE.Object3D, component: Extract<Component, { type: 
   const lightColor = new THREE.Color(component.color);
   let light: THREE.Light;
   switch (component.lightType) {
+    case "ambient":
+      light = new THREE.AmbientLight(lightColor, component.intensity);
+      break;
     case "directional":
       light = new THREE.DirectionalLight(lightColor, component.intensity);
       light.castShadow = component.castShadows ?? false;
@@ -138,8 +147,6 @@ export function loadSceneInto(scene: THREE.Scene, sceneFile: SceneFile): void {
   scene.clear();
   materialCache.clear();
 
-  // Ambient light so unlit faces are visible.
-  scene.add(new THREE.AmbientLight(0x404040, 1.5));
 
   // A subtle grid for spatial reference.
   scene.add(new THREE.GridHelper(20, 20, 0x334155, 0x1e293b));

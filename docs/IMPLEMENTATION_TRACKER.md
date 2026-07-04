@@ -78,15 +78,21 @@ This document tracks the implementation status of each World Creator milestone. 
 
 ## M4: Lights + Materials
 
-**Status:** ⏳ Not started
+**Status:** ✅ Completed
 
 **Deliverables:**
-- ⏳ Add and configure directional, point, and spot lights
-- ⏳ Basic material editor (color, metallic, roughness)
-- ⏳ Export lights and materials to Unity script
+- ✅ Add and configure directional, point, and spot lights
+- ✅ Basic material editor (color, metallic, roughness)
+- ✅ Export lights and materials to Unity script
 
 **Current notes:**
-- Basic lighting and flat-color materials are already representable in the canonical format and render in the browser viewport. M4 is about making them user-editable in the editor UI and fully round-tripping through Unity export.
+- Shared material assets are now editable in a dedicated Materials panel and assignable to meshes via the property panel.
+- Deleting an in-use material falls back to a magenta placeholder material in both the editor and Unity import.
+- Directional, point, and spot lights can be added from the toolbar and configured in the property panel.
+- New scenes start with a default directional "Sun" light and an ambient light node.
+- Per-light shadow toggle defaults to off.
+- Light and material settings round-trip through save/load and Unity export.
+- Ambient light is represented as a node with `lightType: "ambient"` but is mapped to a low-intensity directional fill in Unity; true ambient/sky calibration is deferred to the alignment phase.
 
 ---
 

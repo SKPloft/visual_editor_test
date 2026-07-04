@@ -165,7 +165,7 @@ interface MeshComponent {
 ```typescript
 interface LightComponent {
   type: "light";
-  lightType: "directional" | "point" | "spot";
+  lightType: "directional" | "point" | "spot" | "ambient";
   color: string;            // Hex color, e.g. "#FFFFFF"
   intensity: number;        // Candela or lux, depending on lightType
   range?: number;           // Meters. Relevant for point and spot
@@ -664,7 +664,7 @@ A formal JSON Schema for validation and auto-completion.
       "required": ["type", "lightType", "color", "intensity"],
       "properties": {
         "type": { "const": "light" },
-        "lightType": { "type": "string", "enum": ["directional", "point", "spot"] },
+        "lightType": { "type": "string", "enum": ["directional", "point", "spot", "ambient"] },
         "color": { "type": "string" },
         "intensity": { "type": "number" },
         "range": { "type": "number" },

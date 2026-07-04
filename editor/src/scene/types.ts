@@ -17,7 +17,7 @@ export interface MeshComponent {
 
 export interface LightComponent {
   type: "light";
-  lightType: "directional" | "point" | "spot";
+  lightType: "directional" | "point" | "spot" | "ambient";
   color: string;
   intensity: number;
   range?: number;

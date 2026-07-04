@@ -217,7 +217,19 @@ The following limitations apply to the Proof-of-Concept importer. They are inten
 
 ---
 
-## 6. Path to VRChat
+## 6. M4 Lighting and Material Alignment
+
+- **Units**: 1 canonical unit = 1 meter. `unitScale` defaults to 1.0.
+- **Light intensity**: direct 1:1 mapping to Unity's arbitrary intensity units for the PoC. Directional/point/spot share the same scale for now; photometric units (lux/candela/lumen) may be introduced later.
+- **Color**: hex strings parsed by Unity's `ColorUtility.TryParseHtmlString`.
+- **PBR**: canonical `roughness` maps to Unity Standard `_Smoothness` as `1 - roughness`; canonical `metallic` maps directly to `_Metallic`.
+- **Shadows**: `castShadows: true` → `LightShadows.Soft` and `ShadowCastingMode.On`; default is off.
+- **Ambient light**: represented by an explicit node with `lightType: "ambient"`. In the browser this becomes a `THREE.AmbientLight`. In Unity the current importer maps it to a low-intensity directional fill light; a true ambient/sky calibration is deferred to the alignment phase.
+- **Missing material**: editor shows magenta; Unity importer creates a magenta Standard material named `Missing Material`.
+
+---
+
+## 7. Path to VRChat
 
 The Unity scene produced by this importer is the **foundational layer** for all export targets. To make it VRChat-ready, a future adapter will:
 

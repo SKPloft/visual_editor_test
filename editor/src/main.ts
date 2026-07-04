@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import JSZip from "jszip";
-import { CANONICAL_NODE_ID, createEditor, loadSceneInto } from "./scene/sceneLoader.ts";
+import { CANONICAL_NODE_ID, createEditor, loadSceneInto, invalidateMaterialCache } from "./scene/sceneLoader.ts";
 import { demoScene } from "./scene/demoScene.ts";
 import { generateUnityPackage } from "./export/unityPackageGenerator.ts";
-import type { MaterialAsset, MeshAsset, Node, PrefabAsset, SceneFile } from "./scene/types.ts";
+import type { Component, MaterialAsset, MeshAsset, Node, PrefabAsset, SceneFile } from "./scene/types.ts";
 
 type ToolMode = "translate" | "rotate" | "scale" | "select";
 type PrimitiveType = "cube" | "sphere" | "cylinder" | "plane";
@@ -48,6 +48,25 @@ const rz = requiredElement<HTMLInputElement>("prop-rot-z");
 const sx = requiredElement<HTMLInputElement>("prop-scale-x");
 const sy = requiredElement<HTMLInputElement>("prop-scale-y");
 const sz = requiredElement<HTMLInputElement>("prop-scale-z");
+
+const materialList = requiredElement<HTMLElement>("material-list");
+const btnAddMaterial = requiredElement<HTMLButtonElement>("btn-add-material");
+
+const propPanelMesh = requiredElement<HTMLElement>("prop-panel-mesh");
+const propMeshMaterial = requiredElement<HTMLSelectElement>("prop-mesh-material");
+const propMeshCastShadows = requiredElement<HTMLInputElement>("prop-mesh-cast-shadows");
+const propMeshReceiveShadows = requiredElement<HTMLInputElement>("prop-mesh-receive-shadows");
+
+const propPanelLight = requiredElement<HTMLElement>("prop-panel-light");
+const propLightType = requiredElement<HTMLSelectElement>("prop-light-type");
+const propLightColor = requiredElement<HTMLInputElement>("prop-light-color");
+const propLightIntensity = requiredElement<HTMLInputElement>("prop-light-intensity");
+const propLightRange = requiredElement<HTMLInputElement>("prop-light-range");
+const propLightAngle = requiredElement<HTMLInputElement>("prop-light-angle");
+const propLightCastShadows = requiredElement<HTMLInputElement>("prop-light-cast-shadows");
+const propGroupLightRange = requiredElement<HTMLElement>("prop-group-light-range");
+const propGroupLightAngle = requiredElement<HTMLElement>("prop-group-light-angle");
+const propGroupLightShadows = requiredElement<HTMLElement>("prop-group-light-shadows");
 
 const sceneFileInput = requiredElement<HTMLInputElement>("scene-file-input");
 
@@ -107,11 +126,24 @@ function mergeMissingAssets<T extends { id: string }>(target: T[], builtins: T[]
   }
 }
 
+function ensurePlaceholderMaterial(sceneFile: SceneFile): void {
+  if (sceneFile.assetLibrary.materials.some((m) => m.id === "mat_missing_placeholder")) return;
+  sceneFile.assetLibrary.materials.push({
+    id: "mat_missing_placeholder",
+    type: "material",
+    name: "Missing Material",
+    albedoColor: "#FF00FF",
+    metallic: 0,
+    roughness: 0.5,
+  });
+}
+
 function prepareSceneForEditing(sceneFile: SceneFile): SceneFile {
   mergeMissingAssets(sceneFile.assetLibrary.meshes, builtinMeshAssets);
   mergeMissingAssets(sceneFile.assetLibrary.materials, builtinMaterialAssets);
   mergeMissingAssets(sceneFile.assetLibrary.prefabs, builtinPrefabAssets);
   sceneFile.assetLibrary.textures ??= [];
+  ensurePlaceholderMaterial(sceneFile);
   return sceneFile;
 }
 
@@ -124,6 +156,145 @@ function renderCurrentScene(): void {
   indexObjects();
   nextNodeId = computeNextNodeId();
   updatePropertyPanel();
+  renderMaterialPanel();
+}
+
+function createMaterialAsset(name: string, color: string): MaterialAsset {
+  const newId = `mat_${Date.now()}`;
+  const mat: MaterialAsset = {
+    id: newId,
+    type: "material",
+    name,
+    albedoColor: color,
+    metallic: 0,
+    roughness: 0.5,
+  };
+  currentScene.assetLibrary.materials.push(mat);
+  markModified();
+  renderMaterialPanel();
+  return mat;
+}
+
+function deleteMaterialAsset(id: string): void {
+  const updateMaterialRefs = (node: Node) => {
+    for (const comp of node.components) {
+      if (comp.type === "mesh" && comp.materialRef === id) {
+        comp.materialRef = "mat_missing_placeholder";
+      }
+    }
+    for (const child of node.children) updateMaterialRefs(child);
+  };
+  updateMaterialRefs(currentScene.sceneGraph.root);
+
+  for (const prefab of currentScene.assetLibrary.prefabs) {
+    updateMaterialRefs(prefab.rootNode);
+  }
+
+  currentScene.assetLibrary.materials = currentScene.assetLibrary.materials.filter(m => m.id !== id);
+  ensurePlaceholderMaterial(currentScene);
+  invalidateMaterialCache(id);
+  markModified();
+  renderMaterialPanel();
+  renderCurrentScene();
+}
+
+function updateMaterialAsset(id: string, patch: Partial<MaterialAsset>): void {
+  const mat = currentScene.assetLibrary.materials.find(m => m.id === id);
+  if (!mat) return;
+  if (patch.name !== undefined) mat.name = patch.name;
+  if (patch.albedoColor !== undefined) mat.albedoColor = patch.albedoColor;
+  if (patch.metallic !== undefined) mat.metallic = Math.max(0, Math.min(1, patch.metallic));
+  if (patch.roughness !== undefined) mat.roughness = Math.max(0, Math.min(1, patch.roughness));
+  
+  markModified();
+  invalidateMaterialCache(id);
+  renderMaterialPanel();
+  renderCurrentScene();
+}
+
+function renderMaterialPanel(): void {
+  materialList.innerHTML = "";
+  for (const mat of currentScene.assetLibrary.materials) {
+    const isPlaceholder = mat.id === "mat_missing_placeholder";
+    const item = document.createElement("div");
+    item.className = "material-item";
+
+    const header = document.createElement("div");
+    header.className = "material-item-header";
+    
+    const swatch = document.createElement("div");
+    swatch.className = "material-swatch";
+    swatch.style.backgroundColor = mat.albedoColor || "#ffffff";
+    header.appendChild(swatch);
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.value = isPlaceholder ? "Missing Material Placeholder" : mat.name;
+    nameInput.readOnly = isPlaceholder;
+    if (!isPlaceholder) {
+      nameInput.addEventListener("change", () => updateMaterialAsset(mat.id, { name: nameInput.value }));
+    }
+    header.appendChild(nameInput);
+
+    if (!isPlaceholder) {
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = mat.albedoColor || "#ffffff";
+      colorInput.style.width = "30px";
+      colorInput.style.height = "24px";
+      colorInput.style.padding = "0";
+      colorInput.addEventListener("change", () => updateMaterialAsset(mat.id, { albedoColor: colorInput.value }));
+      header.appendChild(colorInput);
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "X";
+      delBtn.style.color = "var(--danger-color)";
+      delBtn.addEventListener("click", () => deleteMaterialAsset(mat.id));
+      header.appendChild(delBtn);
+    }
+    item.appendChild(header);
+
+    if (!isPlaceholder) {
+      const sliders = document.createElement("div");
+      sliders.className = "material-item-sliders";
+
+      const metallicLabel = document.createElement("label");
+      metallicLabel.textContent = `Metallic: ${(mat.metallic ?? 0).toFixed(2)}`;
+      sliders.appendChild(metallicLabel);
+
+      const metallicInput = document.createElement("input");
+      metallicInput.type = "range";
+      metallicInput.min = "0";
+      metallicInput.max = "1";
+      metallicInput.step = "0.01";
+      metallicInput.value = (mat.metallic ?? 0).toString();
+      metallicInput.addEventListener("input", () => {
+        metallicLabel.textContent = `Metallic: ${Number(metallicInput.value).toFixed(2)}`;
+      });
+      metallicInput.addEventListener("change", () => updateMaterialAsset(mat.id, { metallic: Number(metallicInput.value) }));
+      sliders.appendChild(metallicInput);
+
+      const roughnessLabel = document.createElement("label");
+      roughnessLabel.textContent = `Roughness: ${(mat.roughness ?? 0.5).toFixed(2)}`;
+      sliders.appendChild(roughnessLabel);
+
+      const roughnessInput = document.createElement("input");
+      roughnessInput.type = "range";
+      roughnessInput.min = "0";
+      roughnessInput.max = "1";
+      roughnessInput.step = "0.01";
+      roughnessInput.value = (mat.roughness ?? 0.5).toString();
+      roughnessInput.addEventListener("input", () => {
+        roughnessLabel.textContent = `Roughness: ${Number(roughnessInput.value).toFixed(2)}`;
+      });
+      roughnessInput.addEventListener("change", () => updateMaterialAsset(mat.id, { roughness: Number(roughnessInput.value) }));
+      sliders.appendChild(roughnessInput);
+
+      item.appendChild(sliders);
+    }
+
+    materialList.appendChild(item);
+  }
 }
 
 function computeNextNodeId(): number {
@@ -202,6 +373,95 @@ function updatePropertyPanel(): void {
   sx.value = selectedObject.scale.x.toFixed(2);
   sy.value = selectedObject.scale.y.toFixed(2);
   sz.value = selectedObject.scale.z.toFixed(2);
+
+  updateComponentPropertyPanel();
+}
+
+function updateComponentPropertyPanel(): void {
+  propPanelMesh.style.display = "none";
+  propPanelLight.style.display = "none";
+
+  const node = findSelectedNode();
+  if (!node) return;
+
+  const meshComp = node.components.find((c) => c.type === "mesh") as Extract<Component, { type: "mesh" }> | undefined;
+  if (meshComp) {
+    propPanelMesh.style.display = "block";
+    propMeshMaterial.innerHTML = "";
+    for (const mat of currentScene.assetLibrary.materials) {
+      const opt = document.createElement("option");
+      opt.value = mat.id;
+      opt.textContent = mat.name;
+      opt.selected = mat.id === meshComp.materialRef;
+      propMeshMaterial.appendChild(opt);
+    }
+    propMeshCastShadows.checked = meshComp.castShadows ?? false;
+    propMeshReceiveShadows.checked = meshComp.receiveShadows ?? false;
+  }
+
+  const lightComp = node.components.find((c) => c.type === "light") as Extract<Component, { type: "light" }> | undefined;
+  if (lightComp) {
+    propPanelLight.style.display = "block";
+    propLightType.value = lightComp.lightType;
+    propLightColor.value = lightComp.color;
+    propLightIntensity.value = lightComp.intensity.toString();
+    
+    if (lightComp.lightType === "directional" || lightComp.lightType === "ambient") {
+      propGroupLightRange.style.display = "none";
+    } else {
+      propGroupLightRange.style.display = "flex";
+      propLightRange.value = (lightComp.range ?? 10).toString();
+    }
+
+    if (lightComp.lightType === "spot") {
+      propGroupLightAngle.style.display = "flex";
+      propLightAngle.value = (lightComp.angle ?? 30).toString();
+    } else {
+      propGroupLightAngle.style.display = "none";
+    }
+
+    if (lightComp.lightType === "ambient") {
+      propGroupLightShadows.style.display = "none";
+    } else {
+      propGroupLightShadows.style.display = "flex";
+      propLightCastShadows.checked = lightComp.castShadows ?? false;
+    }
+  }
+}
+
+function updateComponentFromUI(): void {
+  const node = findSelectedNode();
+  if (!node) return;
+
+  const meshComp = node.components.find((c) => c.type === "mesh") as Extract<Component, { type: "mesh" }> | undefined;
+  if (meshComp && propPanelMesh.style.display !== "none") {
+    meshComp.materialRef = propMeshMaterial.value;
+    meshComp.castShadows = propMeshCastShadows.checked;
+    meshComp.receiveShadows = propMeshReceiveShadows.checked;
+  }
+
+  const lightComp = node.components.find((c) => c.type === "light") as Extract<Component, { type: "light" }> | undefined;
+  if (lightComp && propPanelLight.style.display !== "none") {
+    lightComp.lightType = propLightType.value as any;
+    lightComp.color = propLightColor.value;
+    lightComp.intensity = parseNumber(propLightIntensity, lightComp.intensity);
+    if (lightComp.lightType === "point" || lightComp.lightType === "spot") {
+      lightComp.range = parseNumber(propLightRange, lightComp.range ?? 10);
+    }
+    if (lightComp.lightType === "spot") {
+      lightComp.angle = parseNumber(propLightAngle, lightComp.angle ?? 30);
+    }
+    if (lightComp.lightType !== "ambient") {
+      lightComp.castShadows = propLightCastShadows.checked;
+    }
+  }
+
+  markModified();
+  renderCurrentScene();
+  const object = objectIndex.get(node.id);
+  if (object) {
+    selectObject(object);
+  }
 }
 
 function selectObject(obj: THREE.Object3D | null): void {
@@ -284,6 +544,11 @@ function updateTransformFromUI(): void {
 
 for (const input of [px, py, pz, rx, ry, rz, sx, sy, sz, propName]) {
   input.addEventListener("change", updateTransformFromUI);
+  input.addEventListener("keydown", (event) => event.stopPropagation());
+}
+
+for (const input of [propMeshMaterial, propMeshCastShadows, propMeshReceiveShadows, propLightType, propLightColor, propLightIntensity, propLightRange, propLightAngle, propLightCastShadows]) {
+  input.addEventListener("change", updateComponentFromUI);
   input.addEventListener("keydown", (event) => event.stopPropagation());
 }
 
@@ -437,20 +702,36 @@ function createPrimitiveNode(type: PrimitiveType): Node {
   };
 }
 
-function createPointLightNode(): Node {
-  return {
+function createLightNode(type: Extract<Component, { type: "light" }>["lightType"]): Node {
+  const node: Node = {
     id: createNodeId("light"),
-    name: "New Point Light",
-    transform: {
-      position: [0, 5, 0],
-      rotation: [0, 0, 0, 1],
-      scale: [1, 1, 1],
-    },
-    components: [
-      { type: "light", lightType: "point", color: "#FFFFFF", intensity: 10, range: 10, castShadows: true },
-    ],
+    name: `New ${capitalize(type)} Light`,
+    transform: { position: [0, 5, 0], rotation: [0, 0, 0, 1], scale: [1, 1, 1] },
+    components: [],
     children: [],
   };
+
+  switch (type) {
+    case "directional":
+      node.transform.position = [5, 10, 5];
+      node.components.push({ type: "light", lightType: "directional", color: "#FFFFFF", intensity: 1.5, castShadows: false });
+      break;
+    case "point":
+      node.components.push({ type: "light", lightType: "point", color: "#FFFFFF", intensity: 10, range: 10, castShadows: false });
+      break;
+    case "spot":
+      node.components.push({ type: "light", lightType: "spot", color: "#FFFFFF", intensity: 10, range: 20, angle: 30, castShadows: false });
+      break;
+    case "ambient":
+      node.transform.position = [0, 0, 0];
+      node.components.push({ type: "light", lightType: "ambient", color: "#404040", intensity: 1.0 });
+      break;
+  }
+  return node;
+}
+
+function addLight(type: Extract<Component, { type: "light" }>["lightType"]): void {
+  addNodeToScene(createLightNode(type));
 }
 
 function createPrefabInstanceNode(prefab: PrefabAsset): Node {
@@ -631,7 +912,10 @@ requiredElement<HTMLButtonElement>("btn-add-cube").addEventListener("click", () 
 requiredElement<HTMLButtonElement>("btn-add-sphere").addEventListener("click", () => addPrimitive("sphere"));
 requiredElement<HTMLButtonElement>("btn-add-cylinder").addEventListener("click", () => addPrimitive("cylinder"));
 requiredElement<HTMLButtonElement>("btn-add-plane").addEventListener("click", () => addPrimitive("plane"));
-requiredElement<HTMLButtonElement>("btn-add-light").addEventListener("click", () => addNodeToScene(createPointLightNode()));
+requiredElement<HTMLButtonElement>("btn-add-directional").addEventListener("click", () => addLight("directional"));
+requiredElement<HTMLButtonElement>("btn-add-point").addEventListener("click", () => addLight("point"));
+requiredElement<HTMLButtonElement>("btn-add-spot").addEventListener("click", () => addLight("spot"));
+btnAddMaterial.addEventListener("click", () => createMaterialAsset("New Material", "#ffffff"));
 requiredElement<HTMLButtonElement>("btn-save-scene").addEventListener("click", saveScene);
 requiredElement<HTMLButtonElement>("btn-load-scene").addEventListener("click", () => sceneFileInput.click());
 requiredElement<HTMLButtonElement>("btn-export-unity").addEventListener("click", () => void exportUnity());

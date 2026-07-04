@@ -80,12 +80,19 @@
 
 ## M4: Lights + Materials
 
+**Status:** ✅ Completed
+
 **What it proves:** The editor can handle visual fidelity beyond flat primitives.
 
 **Deliverables:**
-- Add and configure directional, point, and spot lights
-- Basic material editor (color, metallic, roughness)
-- Export lights and materials to Unity script
+- ✅ Add and configure directional, point, and spot lights
+- ✅ Basic material editor (color, metallic, roughness)
+- ✅ Export lights and materials to Unity script
+
+**Current notes:**
+- Shared material assets are editable in a dedicated Materials panel and assignable to meshes via the property panel.
+- New scenes include a default directional "Sun" light and an ambient light node.
+- Ambient light mapping to Unity is intentionally simple (low-intensity directional fill) and will be revisited in the alignment phase.
 
 **Approximate sequencing:** 2–3 weeks (after M3)
 
