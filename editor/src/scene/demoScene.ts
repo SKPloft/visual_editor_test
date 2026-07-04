@@ -27,14 +27,6 @@ export const demoScene: SceneFile = {
         roughness: 0.8,
       },
       {
-        id: "mat_missing_placeholder",
-        type: "material",
-        name: "Missing Material",
-        albedoColor: "#FF00FF",
-        metallic: 0,
-        roughness: 0.5,
-      },
-      {
         id: "mat_wall",
         type: "material",
         name: "Wall Material",

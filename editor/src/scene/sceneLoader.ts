@@ -32,13 +32,13 @@ function buildMaterial(asset: MaterialAsset): THREE.Material {
   return material;
 }
 
-const fallbackMaterial = new THREE.MeshStandardMaterial({ color: 0xff00ff, name: "Missing Material" });
+const missingMaterial = new THREE.MeshStandardMaterial({ color: 0xff00ff, name: "Missing Material" });
 
 function resolveMaterial(id: string | undefined, assetMap: Map<string, MaterialAsset>): THREE.Material {
-  if (!id) return fallbackMaterial;
+  if (!id) return missingMaterial;
   if (materialCache.has(id)) return materialCache.get(id)!;
   const asset = assetMap.get(id);
-  const material = asset ? buildMaterial(asset) : fallbackMaterial;
+  const material = asset ? buildMaterial(asset) : missingMaterial;
   if (asset) materialCache.set(id, material);
   return material;
 }

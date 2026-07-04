@@ -465,26 +465,39 @@ namespace WorldCreator.Editor
 
             foreach (MaterialAssetData matData in materials)
             {
-                Material mat = new Material(Shader.Find("Standard"));
+                if (matData == null || string.IsNullOrEmpty(matData.Id))
+                    continue;
 
-                if (!string.IsNullOrEmpty(matData.AlbedoColor))
+                // Skip placeholder/missing material sentinel; it should never become a real asset.
+                if (matData.Id == "mat_missing_placeholder")
+                    continue;
+
+                Shader standardShader = Shader.Find("Standard");
+                if (standardShader == null)
                 {
-                    Color color;
-                    if (ColorUtility.TryParseHtmlString(matData.AlbedoColor, out color))
-                    {
-                        mat.SetColor("_Color", color);
-                    }
+                    Debug.LogError("World Creator: Standard shader not found. Cannot build materials.");
+                    break;
                 }
 
-                if (matData.Metallic.HasValue)
+                Material mat = new Material(standardShader);
+
+                string colorString = matData.AlbedoColor ?? "#FFFFFF";
+                if (!colorString.StartsWith("#"))
+                    colorString = "#" + colorString;
+
+                Color color;
+                if (ColorUtility.TryParseHtmlString(colorString, out color))
                 {
-                    mat.SetFloat("_Metallic", matData.Metallic.Value);
+                    mat.SetColor("_Color", color);
+                }
+                else
+                {
+                    Debug.LogWarning($"World Creator: failed to parse color '{matData.AlbedoColor}' for material '{matData.Name}'. Using white.");
+                    mat.SetColor("_Color", Color.white);
                 }
 
-                if (matData.Roughness.HasValue)
-                {
-                    mat.SetFloat("_Smoothness", 1f - matData.Roughness.Value);
-                }
+                mat.SetFloat("_Metallic", matData.Metallic ?? 0f);
+                mat.SetFloat("_Smoothness", 1f - (matData.Roughness ?? 0.5f));
 
                 string safeName = string.IsNullOrEmpty(matData.Name) ? matData.Id : matData.Name;
                 string assetPath = $"{folder}/{safeName}.mat";

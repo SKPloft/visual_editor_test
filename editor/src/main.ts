@@ -126,24 +126,11 @@ function mergeMissingAssets<T extends { id: string }>(target: T[], builtins: T[]
   }
 }
 
-function ensurePlaceholderMaterial(sceneFile: SceneFile): void {
-  if (sceneFile.assetLibrary.materials.some((m) => m.id === "mat_missing_placeholder")) return;
-  sceneFile.assetLibrary.materials.push({
-    id: "mat_missing_placeholder",
-    type: "material",
-    name: "Missing Material",
-    albedoColor: "#FF00FF",
-    metallic: 0,
-    roughness: 0.5,
-  });
-}
-
 function prepareSceneForEditing(sceneFile: SceneFile): SceneFile {
   mergeMissingAssets(sceneFile.assetLibrary.meshes, builtinMeshAssets);
   mergeMissingAssets(sceneFile.assetLibrary.materials, builtinMaterialAssets);
   mergeMissingAssets(sceneFile.assetLibrary.prefabs, builtinPrefabAssets);
   sceneFile.assetLibrary.textures ??= [];
-  ensurePlaceholderMaterial(sceneFile);
   return sceneFile;
 }
 
@@ -179,7 +166,7 @@ function deleteMaterialAsset(id: string): void {
   const updateMaterialRefs = (node: Node) => {
     for (const comp of node.components) {
       if (comp.type === "mesh" && comp.materialRef === id) {
-        comp.materialRef = "mat_missing_placeholder";
+        comp.materialRef = undefined;
       }
     }
     for (const child of node.children) updateMaterialRefs(child);
@@ -191,7 +178,6 @@ function deleteMaterialAsset(id: string): void {
   }
 
   currentScene.assetLibrary.materials = currentScene.assetLibrary.materials.filter(m => m.id !== id);
-  ensurePlaceholderMaterial(currentScene);
   invalidateMaterialCache(id);
   markModified();
   renderMaterialPanel();
@@ -215,13 +201,12 @@ function updateMaterialAsset(id: string, patch: Partial<MaterialAsset>): void {
 function renderMaterialPanel(): void {
   materialList.innerHTML = "";
   for (const mat of currentScene.assetLibrary.materials) {
-    const isPlaceholder = mat.id === "mat_missing_placeholder";
     const item = document.createElement("div");
     item.className = "material-item";
 
     const header = document.createElement("div");
     header.className = "material-item-header";
-    
+
     const swatch = document.createElement("div");
     swatch.className = "material-swatch";
     swatch.style.backgroundColor = mat.albedoColor || "#ffffff";
@@ -229,70 +214,63 @@ function renderMaterialPanel(): void {
 
     const nameInput = document.createElement("input");
     nameInput.type = "text";
-    nameInput.value = isPlaceholder ? "Missing Material Placeholder" : mat.name;
-    nameInput.readOnly = isPlaceholder;
-    if (!isPlaceholder) {
-      nameInput.addEventListener("change", () => updateMaterialAsset(mat.id, { name: nameInput.value }));
-    }
+    nameInput.value = mat.name;
+    nameInput.addEventListener("change", () => updateMaterialAsset(mat.id, { name: nameInput.value }));
     header.appendChild(nameInput);
 
-    if (!isPlaceholder) {
-      const colorInput = document.createElement("input");
-      colorInput.type = "color";
-      colorInput.value = mat.albedoColor || "#ffffff";
-      colorInput.style.width = "30px";
-      colorInput.style.height = "24px";
-      colorInput.style.padding = "0";
-      colorInput.addEventListener("change", () => updateMaterialAsset(mat.id, { albedoColor: colorInput.value }));
-      header.appendChild(colorInput);
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.value = mat.albedoColor || "#ffffff";
+    colorInput.style.width = "30px";
+    colorInput.style.height = "24px";
+    colorInput.style.padding = "0";
+    colorInput.addEventListener("change", () => updateMaterialAsset(mat.id, { albedoColor: colorInput.value }));
+    header.appendChild(colorInput);
 
-      const delBtn = document.createElement("button");
-      delBtn.textContent = "X";
-      delBtn.style.color = "var(--danger-color)";
-      delBtn.addEventListener("click", () => deleteMaterialAsset(mat.id));
-      header.appendChild(delBtn);
-    }
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "X";
+    delBtn.style.color = "var(--danger-color)";
+    delBtn.addEventListener("click", () => deleteMaterialAsset(mat.id));
+    header.appendChild(delBtn);
+
     item.appendChild(header);
 
-    if (!isPlaceholder) {
-      const sliders = document.createElement("div");
-      sliders.className = "material-item-sliders";
+    const sliders = document.createElement("div");
+    sliders.className = "material-item-sliders";
 
-      const metallicLabel = document.createElement("label");
-      metallicLabel.textContent = `Metallic: ${(mat.metallic ?? 0).toFixed(2)}`;
-      sliders.appendChild(metallicLabel);
+    const metallicLabel = document.createElement("label");
+    metallicLabel.textContent = `Metallic: ${(mat.metallic ?? 0).toFixed(2)}`;
+    sliders.appendChild(metallicLabel);
 
-      const metallicInput = document.createElement("input");
-      metallicInput.type = "range";
-      metallicInput.min = "0";
-      metallicInput.max = "1";
-      metallicInput.step = "0.01";
-      metallicInput.value = (mat.metallic ?? 0).toString();
-      metallicInput.addEventListener("input", () => {
-        metallicLabel.textContent = `Metallic: ${Number(metallicInput.value).toFixed(2)}`;
-      });
-      metallicInput.addEventListener("change", () => updateMaterialAsset(mat.id, { metallic: Number(metallicInput.value) }));
-      sliders.appendChild(metallicInput);
+    const metallicInput = document.createElement("input");
+    metallicInput.type = "range";
+    metallicInput.min = "0";
+    metallicInput.max = "1";
+    metallicInput.step = "0.01";
+    metallicInput.value = (mat.metallic ?? 0).toString();
+    metallicInput.addEventListener("input", () => {
+      metallicLabel.textContent = `Metallic: ${Number(metallicInput.value).toFixed(2)}`;
+    });
+    metallicInput.addEventListener("change", () => updateMaterialAsset(mat.id, { metallic: Number(metallicInput.value) }));
+    sliders.appendChild(metallicInput);
 
-      const roughnessLabel = document.createElement("label");
-      roughnessLabel.textContent = `Roughness: ${(mat.roughness ?? 0.5).toFixed(2)}`;
-      sliders.appendChild(roughnessLabel);
+    const roughnessLabel = document.createElement("label");
+    roughnessLabel.textContent = `Roughness: ${(mat.roughness ?? 0.5).toFixed(2)}`;
+    sliders.appendChild(roughnessLabel);
 
-      const roughnessInput = document.createElement("input");
-      roughnessInput.type = "range";
-      roughnessInput.min = "0";
-      roughnessInput.max = "1";
-      roughnessInput.step = "0.01";
-      roughnessInput.value = (mat.roughness ?? 0.5).toString();
-      roughnessInput.addEventListener("input", () => {
-        roughnessLabel.textContent = `Roughness: ${Number(roughnessInput.value).toFixed(2)}`;
-      });
-      roughnessInput.addEventListener("change", () => updateMaterialAsset(mat.id, { roughness: Number(roughnessInput.value) }));
-      sliders.appendChild(roughnessInput);
+    const roughnessInput = document.createElement("input");
+    roughnessInput.type = "range";
+    roughnessInput.min = "0";
+    roughnessInput.max = "1";
+    roughnessInput.step = "0.01";
+    roughnessInput.value = (mat.roughness ?? 0.5).toString();
+    roughnessInput.addEventListener("input", () => {
+      roughnessLabel.textContent = `Roughness: ${Number(roughnessInput.value).toFixed(2)}`;
+    });
+    roughnessInput.addEventListener("change", () => updateMaterialAsset(mat.id, { roughness: Number(roughnessInput.value) }));
+    sliders.appendChild(roughnessInput);
 
-      item.appendChild(sliders);
-    }
-
+    item.appendChild(sliders);
     materialList.appendChild(item);
   }
 }
@@ -388,6 +366,13 @@ function updateComponentPropertyPanel(): void {
   if (meshComp) {
     propPanelMesh.style.display = "block";
     propMeshMaterial.innerHTML = "";
+
+    const noneOpt = document.createElement("option");
+    noneOpt.value = "";
+    noneOpt.textContent = "Missing Material";
+    noneOpt.selected = !meshComp.materialRef;
+    propMeshMaterial.appendChild(noneOpt);
+
     for (const mat of currentScene.assetLibrary.materials) {
       const opt = document.createElement("option");
       opt.value = mat.id;
@@ -435,7 +420,8 @@ function updateComponentFromUI(): void {
 
   const meshComp = node.components.find((c) => c.type === "mesh") as Extract<Component, { type: "mesh" }> | undefined;
   if (meshComp && propPanelMesh.style.display !== "none") {
-    meshComp.materialRef = propMeshMaterial.value;
+    const selectedMaterial = propMeshMaterial.value;
+    meshComp.materialRef = selectedMaterial || undefined;
     meshComp.castShadows = propMeshCastShadows.checked;
     meshComp.receiveShadows = propMeshReceiveShadows.checked;
   }
@@ -869,11 +855,24 @@ function isNumberTuple(value: unknown, length: number): boolean {
 }
 
 function normalizeLoadedScene(sceneFile: SceneFile): SceneFile {
+  const stripPlaceholderRef = (node: Node) => {
+    for (const comp of node.components) {
+      if (comp.type === "mesh" && comp.materialRef === "mat_missing_placeholder") {
+        comp.materialRef = undefined;
+      }
+    }
+    for (const child of node.children) stripPlaceholderRef(child);
+  };
+  stripPlaceholderRef(sceneFile.sceneGraph.root);
+  for (const prefab of sceneFile.assetLibrary.prefabs) {
+    stripPlaceholderRef(prefab.rootNode);
+  }
+
   return {
     ...sceneFile,
     assetLibrary: {
       meshes: sceneFile.assetLibrary.meshes as MeshAsset[],
-      materials: sceneFile.assetLibrary.materials as MaterialAsset[],
+      materials: sceneFile.assetLibrary.materials.filter((m) => m.id !== "mat_missing_placeholder") as MaterialAsset[],
       textures: sceneFile.assetLibrary.textures,
       prefabs: sceneFile.assetLibrary.prefabs,
     },

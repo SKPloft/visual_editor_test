@@ -90,7 +90,7 @@ Milestone is **✅ Completed**. Shared material assets, a materials panel, light
 ### Discoveries
 - The renderer and Unity exporter already consumed shared `MaterialAsset` and `LightComponent`, so M4 was mostly editor UI work.
 - `renderCurrentScene()` rebuilds the whole Three.js scene on changes, which is acceptable for the PoC but may need optimization later.
-- The placeholder material (`mat_missing_placeholder`, magenta) makes missing material references obvious without breaking the scene.
+- Missing material references are rendered with a magenta fallback material in both the browser and Unity. The fallback is not a real asset; it is stripped from saved scenes and not exported as a `.mat` file.
 
 ### Open questions
 - What is the correct mapping of ambient light to Unity? Options: `RenderSettings.ambientLight`, a skybox workflow, or keep it as a fill directional light. Deferred to alignment phase.
