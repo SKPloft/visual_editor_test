@@ -11,7 +11,7 @@ A VRChat regular who has ideas for custom hangout worlds but no Unity or coding 
 
 ## Value Proposition
 
-World Creator is a browser-based 3D editor that lets non-technical creators assemble VRChat worlds using drag-and-drop primitives and prefabs without installing Unity or writing code. By exporting directly to a Unity Editor script, it collapses days of environment setup and manual scene building into minutes of in-browser composition.
+World Creator is a browser-based 3D editor that lets non-technical creators assemble VRChat worlds using drag-and-drop primitives and prefabs without installing Unity or writing code. By exporting directly to a Unity Editor package, it collapses days of environment setup and manual scene building into minutes of in-browser composition.
 
 ## Success Metric (Technology Prototype)
 
@@ -27,7 +27,7 @@ World Creator is a browser-based 3D editor that lets non-technical creators asse
 - Place, move, rotate, and scale primitives (cube, sphere, cylinder, plane)
 - Save / load scene to a canonical JSON format
 - Prefab instancing from a built-in library
-- Export to Unity Editor C# script that reconstructs the scene
+- Export to a Unity Editor package that reconstructs the scene
 - Basic lighting (directional, point, spot) and flat-color materials
 
 ### Out of Scope (Technology Prototype)

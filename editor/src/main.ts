@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
+import JSZip from "jszip";
 import { CANONICAL_NODE_ID, createEditor, loadSceneInto } from "./scene/sceneLoader.ts";
 import { demoScene } from "./scene/demoScene.ts";
+import { generateUnityPackage } from "./export/unityPackageGenerator.ts";
 import type { MaterialAsset, MeshAsset, Node, PrefabAsset, SceneFile } from "./scene/types.ts";
 
 type ToolMode = "translate" | "rotate" | "scale" | "select";
@@ -526,6 +528,26 @@ function sanitizeFileName(value: string): string {
   return sanitized || "world-creator-scene";
 }
 
+async function exportUnity(): Promise<void> {
+  try {
+    const files = generateUnityPackage(currentScene);
+    const zip = new JSZip();
+    for (const [filePath, content] of Object.entries(files)) {
+      zip.file(filePath, content);
+    }
+    const blob = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = `${sanitizeFileName(currentScene.metadata.name || "world-creator-scene")}-unity-package.zip`;
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Unity export failed:", error);
+    alert("Unity export failed. Check the browser console for details.");
+  }
+}
+
 function isSceneFile(value: unknown): value is SceneFile {
   if (!value || typeof value !== "object") return false;
   const sceneFile = value as SceneFile;
@@ -612,6 +634,7 @@ requiredElement<HTMLButtonElement>("btn-add-plane").addEventListener("click", ()
 requiredElement<HTMLButtonElement>("btn-add-light").addEventListener("click", () => addNodeToScene(createPointLightNode()));
 requiredElement<HTMLButtonElement>("btn-save-scene").addEventListener("click", saveScene);
 requiredElement<HTMLButtonElement>("btn-load-scene").addEventListener("click", () => sceneFileInput.click());
+requiredElement<HTMLButtonElement>("btn-export-unity").addEventListener("click", () => void exportUnity());
 requiredElement<HTMLButtonElement>("btn-reset-scene").addEventListener("click", resetScene);
 
 sceneFileInput.addEventListener("change", () => {

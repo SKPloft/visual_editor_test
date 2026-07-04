@@ -67,6 +67,17 @@ M2 is **✅ Completed**. Save/load uses canonical JSON, and built-in prefabs are
 - The editor now keeps a canonical scene document indexed by node ID in `editor/src/main.ts`; Three.js objects carry their canonical node ID in `userData` for O(1) selection-to-node updates.
 - Prefab internals render from the prefab asset but are not individually selectable/editable in M2. Users transform the placed prefab reference node; overrides remain out of scope.
 
-## M3–M6
+## M3: Unity Export (Minimum Viable PoC)
+
+### Status
+M3 is **✅ Completed**. The browser exports a mini Unity package; the Unity Editor importer reconstructs GameObjects, transforms, materials, lights, colliders, prefabs, and avatar placeholders from canonical JSON.
+
+### Discoveries
+- The generated package uses Editor + Runtime assembly definitions and Newtonsoft.Json for deserialization.
+- Prefabs are exported as real `.prefab` assets via `PrefabUtility.SaveAsPrefabAsset` and instantiated with `PrefabUtility.InstantiatePrefab`.
+- Z positions are negated for Unity's left-handed space; rotation quaternions are passed through unchanged.
+- Visual lighting fidelity is acceptable for a runnable PoC but needs calibration in M4 (ambient contribution, intensity units, shadow settings).
+
+## M4–M6
 
 No running notes yet. Add discoveries here as work starts.

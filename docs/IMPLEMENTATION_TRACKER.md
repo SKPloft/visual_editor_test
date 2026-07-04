@@ -62,17 +62,17 @@ This document tracks the implementation status of each World Creator milestone. 
 
 ## M3: Unity Export (Minimum Viable PoC)
 
-**Status:** ⏳ Not started
+**Status:** ✅ Completed
 
 **Deliverables:**
-- ⏳ Generator that turns canonical JSON into a Unity Editor C# script
-- ⏳ Script recreates GameObjects, transforms, and prefabs in Unity
-- ⏳ End-to-end test: browser scene → Unity project → world loads in Unity Editor
+- ✅ Generator that turns canonical JSON into a Unity Editor C# script
+- ✅ Script recreates GameObjects, transforms, and prefabs in Unity
+- ✅ End-to-end test: browser scene → Unity project → world loads in Unity Editor
 
 **Current notes:**
-- Success metric for M3 is "produces a runnable Unity scene," not "loads in VRChat without manual changes." VRChat-zero-manual-changes is deferred to M6.
-- Coordinate conversion: Z positions are negated for Unity's left-handed space. Rotation handedness conversion for non-trivial orientations is deferred to M6 unless needed sooner.
-- The real Unity importer should use **Newtonsoft.Json** rather than `JsonUtility`. The sample script in `docs/UNITY_EXPORT.md` still uses `JsonUtility` and should be treated as a temporary reference.
+- M3 success metric was "produces a runnable Unity scene" — achieved. The browser exports a mini Unity package (Editor + Runtime assembly definitions) that imports the canonical JSON via Newtonsoft.Json.
+- Coordinate conversion: Z positions are negated for Unity's left-handed space. Rotation handedness conversion for non-trivial orientations remains deferred to M6 unless needed sooner.
+- Lights and materials are exported at the data level, but visual lighting fidelity (baking, ambient contribution, intensity calibration) is intentionally rough in M3 and will be hardened in M4.
 
 ---
 
@@ -142,4 +142,4 @@ These decisions affect multiple milestones and should be revisited if scope chan
 | Informal decisions not worth an ADR | `docs/NOTES/decisions.md` |
 | Formal architecture/product decisions | `docs/ADR/` |
 
-*Last updated: 2026-06-29*
+*Last updated: 2026-07-04*

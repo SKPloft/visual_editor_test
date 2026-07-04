@@ -61,12 +61,18 @@
 
 ## M3: Unity Export (Minimum Viable PoC)
 
+**Status:** ✅ Completed
+
 **What it proves:** The browser editor can produce a runnable Unity scene without manual C# work.
 
 **Deliverables:**
-- Generator that turns canonical JSON into a Unity Editor C# script
-- Script recreates GameObjects, transforms, and prefabs in Unity
-- End-to-end test: browser scene → Unity project → VRChat world loads
+- ✅ Generator that turns canonical JSON into a Unity Editor package
+- ✅ Package recreates GameObjects, transforms, materials, lights, colliders, prefabs, and avatar placeholders in Unity
+- ✅ End-to-end test: browser scene → Unity project → scene loads in Unity Editor
+
+**Current notes:**
+- The deliverable is a mini Unity package (Editor + Runtime asmdefs), not a single script. It is installed by extracting the ZIP into the Unity project.
+- Visual lighting is intentionally rough and will be calibrated in M4.
 
 **Approximate sequencing:** 3–4 weeks (after M2)
 
