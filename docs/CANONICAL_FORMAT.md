@@ -725,7 +725,7 @@ A formal JSON Schema for validation and auto-completion.
 
 ### 6. Notes for the Unity Editor Script Exporter
 
-- **Coordinate System**: The format uses a Y-up, right-handed coordinate system by default. The Unity exporter converts positions to Unity's Y-up, left-handed system by negating the Z component. Rotation handedness conversion for non-trivial orientations is deferred to the VRChat adapter (M6) unless needed sooner.
+- **Coordinate System**: The format uses a Y-up, right-handed coordinate system by default. The Unity exporter converts positions to Unity's Y-up, left-handed system by negating the Z component. Rotation handedness conversion for non-trivial orientations is deferred to the VRChat adapter (M7) unless needed sooner.
 - **Asset Resolution**: The exporter should map `assetLibrary` entries to Unity `AssetDatabase` imports or runtime loads. `builtin:*` sources can be mapped to Unity primitives (Cube, Plane, Sphere, etc.).
 - **Prefab Instancing**: `prefabRef` components should be instantiated using `PrefabUtility` or `Object.Instantiate` in editor scripts.
 - **Collider Generation**: If a mesh has `generateColliders: true` or a node has a `collider` component, the exporter should add the corresponding `MeshCollider`, `BoxCollider`, etc.

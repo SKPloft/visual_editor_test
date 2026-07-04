@@ -89,7 +89,7 @@ Milestone is **✅ Completed**. Shared material assets, a materials panel, light
 
 ### Discoveries
 - The renderer and Unity exporter already consumed shared `MaterialAsset` and `LightComponent`, so M4 was mostly editor UI work.
-- `renderCurrentScene()` rebuilds the whole Three.js scene on changes, which is acceptable for the PoC but may need optimization later.
+- `renderCurrentScene()` rebuilds the whole Three.js scene on changes, which is acceptable for the basic prototype but may need optimization later.
 - Missing material references are rendered with a magenta fallback material in both the browser and Unity. The fallback is not a real asset; it is stripped from saved scenes and not exported as a `.mat` file.
 
 ### Open questions
@@ -98,6 +98,49 @@ Milestone is **✅ Completed**. Shared material assets, a materials panel, light
 
 ---
 
-## M5–M6
+## M5: Pickables / Interactables
 
-No running notes yet. Add discoveries here as work starts.
+### Status
+⏳ Not started.
+
+### Scope clarification
+- Add a pickup/interactable component to the browser editor.
+- Export maps `ColliderComponent.isPickable` to a VRChat-compatible component (`VRC_Pickup` / `VRC_ObjectSync`).
+
+### Open questions
+- What pickable properties need a UI (weight, respawn, physics material)?
+- Should the editor visualize pickables with a distinct icon or gizmo color?
+
+---
+
+## M6: NPC Avatar Placeholders
+
+### Status
+⏳ Not started.
+
+### Scope clarification
+- Add NPC and player spawn placeholder components.
+- Add sit/stand/lie marker placement UI.
+- Export maps `AvatarPlaceholderComponent` to VRChat spawn/station components.
+
+### Open questions
+- What is the minimum visual placeholder (capsule, imported avatar, simple icon)?
+- Do markers need orientation gizmos independent of the node transform?
+
+---
+
+## M7: VRChat Adapter
+
+### Status
+⏳ Not started.
+
+### Scope clarification
+- Wrap the Unity export into a VRChat world descriptor.
+- Generate spawn points, reflection probes, and collision proxies automatically.
+- Document the one-click publish workflow.
+
+### Open questions
+- Can the adapter run headlessly, or does it still require the Unity Editor to be open once?
+- What is the earliest Unity / VRChat SDK version we target?
+
+---

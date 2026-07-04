@@ -10,9 +10,10 @@
 | M1 | 3D editor basics | Technology Prototype |
 | M2 | Save / load + prefabs | Technology Prototype |
 | M3 | Unity export (minimum viable PoC) | Technology Prototype |
-| M4 | Lights + materials | Post-PoC |
-| M5 | Pickables + NPC avatar | Post-PoC |
-| M6 | VRChat adapter | Post-PoC |
+| M4 | Lights + materials | Visual Pass |
+| M5 | Pickables / interactables | World Prototype |
+| M6 | NPC avatar placeholders | Social Prototype |
+| M7 | VRChat adapter | Publish Prototype |
 
 ---
 
@@ -72,7 +73,7 @@
 
 **Current notes:**
 - The deliverable is a mini Unity package (Editor + Runtime asmdefs), not a single script. It is installed by extracting the ZIP into the Unity project.
-- Visual lighting is intentionally rough and will be calibrated in M4.
+- Visual lighting is intentionally rough and calibrated in M4.
 
 **Approximate sequencing:** 3–4 weeks (after M2)
 
@@ -98,20 +99,40 @@
 
 ---
 
-## M5: Pickables + NPC Avatar
+## M5: Pickables / Interactables
 
-**What it proves:** The editor can place interactive objects and avatars that behave in VRChat.
+**What it proves:** A non-technical user can place interactive objects that behave in VRChat.
 
 **Deliverables:**
-- Pickup object component and placement UI
-- NPC avatar placeholder with basic sit/stand markers
-- Export pickables and NPC markers to Unity script with VRChat-compatible components
+- Pickup object component and placement UI in the browser editor
+- Property panel for pickable settings (weight, physics material, respawn)
+- Export pickables to Unity script with VRChat-compatible components (`VRC_Pickup` / `VRC_ObjectSync`)
+
+**Current notes:**
+- `ColliderComponent` already exists in the canonical format with an `isPickable` flag, but it is not visualized or exported beyond a placeholder marker yet.
 
 **Approximate sequencing:** 3–4 weeks (after M4)
 
 ---
 
-## M6: VRChat Adapter
+## M6: NPC Avatar Placeholders
+
+**What it proves:** A non-technical user can place avatar spawn points and social affordances for a VRChat world.
+
+**Deliverables:**
+- NPC avatar placeholder with basic sit/stand/lie markers
+- Player spawn point configuration
+- Export NPC markers and player spawns to Unity script with VRChat-compatible components
+
+**Current notes:**
+- `AvatarPlaceholderComponent` already exists in the canonical format but is not visualized or exported beyond a placeholder marker yet.
+- Actual avatar models, AI behavior, and animation controllers remain out of scope.
+
+**Approximate sequencing:** 2–3 weeks (after M5)
+
+---
+
+## M7: VRChat Adapter
 
 **What it proves:** The export pipeline can target VRChat directly without requiring the user to open Unity.
 
@@ -120,4 +141,22 @@
 - Automatic spawn point, reflection probe, and collision proxy generation
 - Documentation for one-click publish workflow
 
-**Approximate sequencing:** 3–4 weeks (after M5)
+**Current notes:**
+- This milestone requires a working Unity export first (M3).
+- Rotation handedness conversion for non-trivial orientations may be addressed here if it was deferred from M3.
+
+**Approximate sequencing:** 3–4 weeks (after M6)
+
+---
+
+## Phase Summary
+
+| Phase | Milestones | Definition of done |
+|-------|-----------|--------------------|
+| Technology Prototype | M0–M3 | Non-technical user builds a 5-object scene and exports to runnable Unity within 30 minutes. |
+| Visual Pass | M4 | Lights and materials round-trip through save/load and Unity export. |
+| World Prototype | M5 | Interactive pickable objects work end-to-end in VRChat. |
+| Social Prototype | M6 | NPC/player spawn and sit/stand affordances work end-to-end in VRChat. |
+| Publish Prototype | M7 | A world can be published to VRChat without opening Unity. |
+
+*The product is considered a "basic prototype" (not yet a complete solution) once the Publish Prototype (M7) is done and a non-technical user believes the technical loop works.*

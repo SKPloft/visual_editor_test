@@ -116,7 +116,7 @@ Prefab creation uses `PrefabUtility.SaveAsPrefabAsset` at editor-time, which gen
 Additional mappings:
 
 - `color` -> `Light.color` (parsed from hex)
-- `intensity` -> `Light.intensity` (no unit conversion for PoC; documented as "abstract units")
+- `intensity` -> `Light.intensity` (no unit conversion for the basic prototype; documented as "abstract units")
 - `range` -> `Light.range` (point and spot only)
 - `angle` -> `Light.spotAngle` (spot only)
 - `castShadows` -> `Light.shadows = LightShadows.Soft` if true, else `LightShadows.None`
@@ -135,7 +135,7 @@ Additional mappings:
 - `isTrigger` -> `Collider.isTrigger`
 - `isPickable` -> A custom `WorldCreatorPickable` MonoBehaviour is added, and the GameObject is tagged with `WorldCreatorPickable`. This marker is used by the editor and future VR interactions.
 
-> **TODO / FOR REVIEW:** Decide whether the pickable marker is needed for the PoC, and whether it should be a tag, a component, or both.
+> **TODO / FOR REVIEW:** Decide whether the pickable marker is needed for the basic prototype, and whether it should be a tag, a component, or both.
 
 Size overrides (`size`, `radius`, `height`) are applied directly. If omitted, the collider size is derived from the node's `transform.scale`.
 
@@ -150,7 +150,7 @@ Size overrides (`size`, `radius`, `height`) are applied directly. If omitted, th
   - `modelRef` (for future model binding)
   - `spawnPosition` and `spawnRotation` (defaulting to the node transform)
 
-This is intentionally a placeholder. No AI behavior, animation, or actual avatar model is instantiated during the PoC phase.
+This is intentionally a placeholder. No AI behavior, animation, or actual avatar model is instantiated during the basic prototype phase.
 
 ---
 
@@ -183,7 +183,7 @@ WorldCreator/
 ### Key Classes
 
 | Class | Assembly | Responsibility |
-|-------|----------|----------------|
+|-------|----------|--------------|
 | `WorldCreatorSceneImporter` | Editor | Entry point. Registers the `World Creator -> Import Scene from JSON` menu item, opens a file dialog, orchestrates the import pipeline. |
 | `SceneBuilder` | Editor | Walks the `sceneGraph.root` array recursively, creating GameObjects, applying transforms (Z negated), and delegating to component-specific builders. |
 | `MaterialBuilder` | Editor | Iterates `assetLibrary.materials`, creates `Standard` shader materials, and saves them as `.mat` assets under the scene's `Materials/` folder. |
@@ -200,18 +200,18 @@ WorldCreator/
 
 ---
 
-## 5. Limitations and Assumptions (PoC)
+## 5. Limitations and Assumptions (Basic Prototype)
 
-The following limitations apply to the Proof-of-Concept importer. They are intentional scope boundaries, not bugs.
+The following limitations apply to the basic prototype importer. They are intentional scope boundaries, not bugs.
 
 | Limitation | Rationale |
 |-----------|-----------|
-| **No lightmap baking** | The PoC uses real-time lighting only. Baked lighting requires a secondary UV channel and a bake step that is out of scope. |
+| **No lightmap baking** | The basic prototype uses real-time lighting only. Baked lighting requires a secondary UV channel and a bake step that is out of scope. |
 | **No custom shaders** | All materials use Unity's built-in `Standard` shader. Custom shader graphs or SRP shaders are not supported. |
 | **No animations** | The canonical format does not define animation clips, states, or controllers. Animated objects are treated as static meshes. |
 | **No texture import** | Texture assets are parsed but not imported into the Unity AssetDatabase. Only albedo color and scalar material properties are applied. |
 | **Builtin meshes only** | External mesh files (`.obj`, `.fbx`, `.gltf`) are not resolved. Only `builtin:plane`, `builtin:cube`, `builtin:sphere`, and `builtin:cylinder` are mapped to Unity primitives. |
-| **Coordinate system conversion** | Z positions are negated when importing into Unity's left-handed space. Rotation handedness conversion for non-trivial orientations is deferred to the VRChat adapter (M6). |
+| **Coordinate system conversion** | Z positions are negated when importing into Unity's left-handed space. Rotation handedness conversion for non-trivial orientations is deferred to the VRChat adapter (M7). |
 | **No nested parenting by `parent` ID** | The `parent` field on nodes is not part of the canonical format; only the `children` array defines hierarchy. |
 | **No scene cleanup on re-import** | Re-importing a scene creates a second root GameObject. Manual deletion of the old root is required. |
 
@@ -220,7 +220,7 @@ The following limitations apply to the Proof-of-Concept importer. They are inten
 ## 6. M4 Lighting and Material Alignment
 
 - **Units**: 1 canonical unit = 1 meter. `unitScale` defaults to 1.0.
-- **Light intensity**: direct 1:1 mapping to Unity's arbitrary intensity units for the PoC. Directional/point/spot share the same scale for now; photometric units (lux/candela/lumen) may be introduced later.
+- **Light intensity**: direct 1:1 mapping to Unity's arbitrary intensity units for the basic prototype. Directional/point/spot share the same scale for now; photometric units (lux/candela/lumen) may be introduced later.
 - **Color**: hex strings parsed by Unity's `ColorUtility.TryParseHtmlString`.
 - **PBR**: canonical `roughness` maps to Unity Standard `_Smoothness` as `1 - roughness`; canonical `metallic` maps directly to `_Metallic`. This is a linear approximation because Unity's built-in Standard shader uses the metallic-smoothness workflow. A more accurate BRDF match, or switching to a metallic-roughness shader, is deferred to the adapter phase.
 - **Shadows**: `castShadows: true` → `LightShadows.Soft` and `ShadowCastingMode.On`; default is off.

@@ -8,6 +8,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
 - **Target user:** "Hobbyist World Builder" — a VRChat regular with ideas for custom hangout worlds, no Unity or coding experience, and a high tolerance for rough edges if it means a faster path from idea to published world.
 - **Value prop:** World Creator lets creators compose VRChat worlds in a browser using drag-and-drop primitives and prefabs, then export directly to a Unity Editor script — collapsing days of environment setup into minutes of in-browser composition.
 - **Success metric (technology prototype):** A non-technical user can build a scene with at least 5 distinct objects and export it to a runnable Unity project within 30 minutes of first opening the editor.
+- **Success metric (basic prototype):** A non-technical user can build a lit scene with pickable objects and NPC/player spawn points, and produce a VRChat-compatible Unity package that feels technically complete.
 
 ## Tech stack
 
@@ -22,7 +23,7 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
 
 - `docs/` — product decisions, ADRs, roadmap, and specifications
   - `PRODUCT.md` — problem, persona, value proposition, and scope
-  - `ROADMAP.md` — milestones M0–M6
+  - `ROADMAP.md` — milestones M0–M7
   - `USER_FLOWS.md` — happy path, state machine, and shortcuts
   - `CANONICAL_FORMAT.md` — engine-agnostic JSON scene format
   - `UNITY_EXPORT.md` — Unity Editor script exporter spec
@@ -56,16 +57,15 @@ See `docs/ADR/` for full rationale. Key decisions:
 
 ## Current phase
 
-**Technology Prototype (M0–M3)**
+**Visual Pass (M4)** — completed.
 
-| Milestone | Goal |
-|-----------|------|
-| M0 | Canonical format + scene graph |
-| M1 | 3D editor basics |
-| M2 | Save / load + prefabs |
-| M3 | Unity export (minimum viable PoC) |
-
-Post-PoC work (lights, materials, pickables, NPC avatars, VRChat adapter) is documented in `docs/ROADMAP.md` and intentionally out of scope until M3 is proven.
+| Phase | Milestones | Goal |
+|-----------|-----------|------|
+| Technology Prototype | M0–M3 | Canonical format, editor basics, save/load, prefabs, Unity export |
+| Visual Pass | M4 | Lights + materials |
+| World Prototype | M5 | Pickables / interactables |
+| Social Prototype | M6 | NPC avatar placeholders |
+| Publish Prototype | M7 | VRChat adapter / one-click publish |
 
 ## Conventions
 

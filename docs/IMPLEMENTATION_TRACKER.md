@@ -71,7 +71,7 @@ This document tracks the implementation status of each World Creator milestone. 
 
 **Current notes:**
 - M3 success metric was "produces a runnable Unity scene" — achieved. The browser exports a mini Unity package (Editor + Runtime assembly definitions) that imports the canonical JSON via Newtonsoft.Json.
-- Coordinate conversion: Z positions are negated for Unity's left-handed space. Rotation handedness conversion for non-trivial orientations remains deferred to M6 unless needed sooner.
+- Coordinate conversion: Z positions are negated for Unity's left-handed space. Rotation handedness conversion for non-trivial orientations remains deferred to M7 unless needed sooner.
 - Lights and materials are exported at the data level, but visual lighting fidelity (baking, ambient contribution, intensity calibration) is intentionally rough in M3 and will be hardened in M4.
 
 ---
@@ -96,21 +96,35 @@ This document tracks the implementation status of each World Creator milestone. 
 
 ---
 
-## M5: Pickables + NPC Avatar
+## M5: Pickables / Interactables
 
 **Status:** ⏳ Not started
 
 **Deliverables:**
 - ⏳ Pickup object component and placement UI
-- ⏳ NPC avatar placeholder with basic sit/stand markers
-- ⏳ Export pickables and NPC markers to Unity script with VRChat-compatible components
+- ⏳ Property panel for pickable settings
+- ⏳ Export pickables to Unity script with VRChat-compatible components
 
 **Current notes:**
-- `ColliderComponent` and `AvatarPlaceholderComponent` already exist in the canonical format but are not visualized or exported beyond placeholder markers during the PoC.
+- `ColliderComponent` and `AvatarPlaceholderComponent` already exist in the canonical format but are not visualized or exported beyond placeholder markers during the basic prototype phase.
 
 ---
 
-## M6: VRChat Adapter
+## M6: NPC Avatar Placeholders
+
+**Status:** ⏳ Not started
+
+**Deliverables:**
+- ⏳ NPC avatar placeholder with basic sit/stand/lie markers
+- ⏳ Player spawn point configuration
+- ⏳ Export NPC markers and player spawns to Unity script with VRChat-compatible components
+
+**Current notes:**
+- `AvatarPlaceholderComponent` already exists in the canonical format but is not visualized or exported beyond a placeholder marker yet.
+
+---
+
+## M7: VRChat Adapter
 
 **Status:** ⏳ Not started
 
@@ -134,8 +148,8 @@ These decisions affect multiple milestones and should be revisited if scope chan
 3. **Shortcuts:** Unity/Blender convention (`Q` Select, `W` Move, `E` Rotate, `R` Scale).
 4. **WASD camera fly:** Hold right mouse button + `WASD` to fly the camera. Disabled when any text input, property field, or modal is focused so `W` is unambiguously the Move tool shortcut.
 5. **Unity JSON parser:** Use Newtonsoft.Json for the real implementation.
-6. **Templates:** Template gallery and template variables are Post-PoC (M4+).
-7. **M1 viewport binding:** Middle-mouse drag for orbit is provisional; hold-RMB camera fly will be revisited alongside default viewport bindings in M4+.
+6. **Templates:** Template gallery and template variables are part of the Publish Prototype (M7+) or later.
+7. **M1 viewport binding:** Middle-mouse drag for orbit is provisional; hold-RMB camera fly will be revisited alongside default viewport bindings in the Visual Pass or later.
 
 ---
 

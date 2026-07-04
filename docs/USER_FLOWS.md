@@ -2,7 +2,7 @@
 
 This document describes the primary user flows and state machine for the World Creator 3D world editor.
 
-> **Scope note:** The happy path covers the full product vision, but the technology prototype (M0–M3) implements the editor and export flow only. The **template gallery / template variables** steps are Post-PoC (M4+). Basic lighting configuration is included in M0–M3.
+> **Scope note:** The happy path covers the full product vision, but the technology prototype (M0–M3) implements the editor and export flow only. The **template gallery / template variables** steps are part of the Publish Prototype (M7+) or later. Basic lighting configuration is included in M0–M3.
 
 ---
 
@@ -32,7 +32,7 @@ flowchart TD
 
 ### Scope for Technology Prototype (M0–M3)
 
-The editor entry point for the technology prototype is a **"New Empty World"** button on the home screen. Template browsing, template detail, and variable configuration are deferred to Post-PoC (M4+). The M0–M3 happy path is therefore:
+The editor entry point for the technology prototype is a **"New Empty World"** button on the home screen. Template browsing, template detail, and variable configuration are deferred to the Publish Prototype (M7+) or later. The M0–M3 happy path is therefore:
 
 ```mermaid
 flowchart TD
