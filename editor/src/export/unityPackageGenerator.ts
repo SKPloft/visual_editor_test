@@ -561,7 +561,8 @@ namespace WorldCreator.Editor
 }
 
 function generateComponentMappers(): string {
-  return `using System.Collections.Generic;
+  return `using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using WorldCreator.Runtime;
@@ -834,6 +835,30 @@ namespace WorldCreator.Editor
             if (comp.IsPickable.HasValue && comp.IsPickable.Value)
             {
                 go.AddComponent<WorldCreatorPickable>();
+
+                System.Type pickupType = null;
+                foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    if (!asm.GetName().Name.StartsWith("VRC")) continue;
+                    if (pickupType != null) break;
+                    try
+                    {
+                        foreach (var t in asm.GetTypes())
+                        {
+                            if (t.IsAbstract) continue;
+                            if (t.Name == "VRC_Pickup" || t.Name == "VRCPickup")
+                            {
+                                pickupType = t;
+                                break;
+                            }
+                        }
+                    }
+                    catch { }
+                }
+                if (pickupType != null)
+                {
+                    go.AddComponent(pickupType);
+                }
             }
         }
 

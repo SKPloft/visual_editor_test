@@ -101,15 +101,19 @@ Milestone is **✅ Completed**. Shared material assets, a materials panel, light
 ## M5: Pickables / Interactables
 
 ### Status
-⏳ Not started.
+Milestone is **✅ Completed**. A single Pickable checkbox covers the Minimal M5 scope.
 
 ### Scope clarification
-- Add a pickup/interactable component to the browser editor.
-- Export maps `ColliderComponent.isPickable` to a VRChat-compatible component (`VRC_Pickup` / `VRC_ObjectSync`).
+- M5 is intentionally minimal: the existing `ColliderComponent` is reused, and only `isPickable` is exposed in the mesh property panel (no pickup weight, respawn, or physics material fields).
+- When the checkbox is checked and no collider exists, a default `box` collider with `isTrigger: false` is created. When unchecked, `isPickable` is set to `false` on the existing collider (the collider is not deleted, to avoid heuristic risk).
+
+### Discoveries
+- Pickability is rendered with a green `THREE.LineSegments` wireframe overlay parented to the mesh, so it inherits the mesh transform and is skipped by the existing raycast guard (`hit.object.type === "Line"`).
+- The overlay shows the mesh bounds, not the actual collider bounds. This is acceptable for Minimal M5.
+- Unity export keeps the `WorldCreatorPickable` marker as a fallback and additionally adds `VRC_Pickup` via reflection when the VRChat SDK (SDK2/SDK3) is present, so the generated package still compiles without the SDK. `ComponentMappers.cs` now has `using System;` for `System.Type`.
 
 ### Open questions
-- What pickable properties need a UI (weight, respawn, physics material)?
-- Should the editor visualize pickables with a distinct icon or gizmo color?
+- VRChat SDK type names may vary by SDK version; refine the type strings once the target SDK version is locked.
 
 ---
 

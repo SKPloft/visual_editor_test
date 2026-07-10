@@ -335,6 +335,7 @@ export const demoScene: SceneFile = {
           },
           components: [
             { type: "mesh", meshRef: "mesh_cube", materialRef: "mat_cube", castShadows: true, receiveShadows: true },
+            { type: "collider", shape: "box", isTrigger: false, isPickable: true },
           ],
           children: [],
         },

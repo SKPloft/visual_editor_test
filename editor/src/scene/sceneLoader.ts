@@ -94,6 +94,11 @@ function buildNode(node: Node, assets: AssetMaps, prefabStack = new Set<string>(
   }
   applyTransform(object, node.transform);
 
+  const isPickable = node.components.some(
+    (c): c is Extract<Component, { type: "collider" }> =>
+      c.type === "collider" && c.isPickable === true
+  );
+
   for (const component of node.components) {
     switch (component.type) {
       case "mesh": {
@@ -104,6 +109,15 @@ function buildNode(node: Node, assets: AssetMaps, prefabStack = new Set<string>(
         mesh.castShadow = component.castShadows ?? false;
         mesh.receiveShadow = component.receiveShadows ?? false;
         object.add(mesh);
+
+        if (isPickable) {
+          const edges = new THREE.EdgesGeometry(geometry);
+          const line = new THREE.LineSegments(
+            edges,
+            new THREE.LineBasicMaterial({ color: 0x22c55e })
+          );
+          mesh.add(line);
+        }
         break;
       }
       case "light": {

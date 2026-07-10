@@ -133,9 +133,7 @@ Additional mappings:
 | `mesh`           | `MeshCollider` |
 
 - `isTrigger` -> `Collider.isTrigger`
-- `isPickable` -> A custom `WorldCreatorPickable` MonoBehaviour is added, and the GameObject is tagged with `WorldCreatorPickable`. This marker is used by the editor and future VR interactions.
-
-> **TODO / FOR REVIEW:** Decide whether the pickable marker is needed for the basic prototype, and whether it should be a tag, a component, or both.
+- `isPickable` -> A custom `WorldCreatorPickable` MonoBehaviour is added as a marker. Additionally, when the VRChat SDK is present in the Unity project, a `VRC_Pickup` component is attached via runtime reflection so the package compiles either with or without the SDK installed. The type lookup tries `VRC.SDKBase.VRC_Pickup, VRCSDKBase` first, then `VRC.SDK3.Components.VRC_Pickup, VRCSDK3`; if neither resolves, only the `WorldCreatorPickable` marker remains.
 
 Size overrides (`size`, `radius`, `height`) are applied directly. If omitted, the collider size is derived from the node's `transform.scale`.
 
@@ -236,7 +234,7 @@ The Unity scene produced by this importer is the **foundational layer** for all 
 1. Add a `VRC_SceneDescriptor` component to the root.
 2. Configure spawn points from `AvatarPlaceholderComponent` nodes with `avatarType: "player"`.
 3. Set up collision layers and occlusion culling.
-4. Replace `WorldCreatorPickable` markers with VRChat's `VRC_Pickup` or `VRC_ObjectSync` components.
+4. Replace `WorldCreatorPickable` markers with VRChat's `VRC_Pickup` or `VRC_ObjectSync` components. As of M5, the importer already attaches `VRC_Pickup` via reflection when the SDK is available, so this step becomes a refinement (configure pickup fields, add `VRC_ObjectSync`) rather than a from-scratch mapping.
 5. Bake lightmaps and reflection probes if the user opts into static lighting.
 6. Resolve external avatar models and animation controllers.
 

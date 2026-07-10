@@ -56,6 +56,7 @@ const propPanelMesh = requiredElement<HTMLElement>("prop-panel-mesh");
 const propMeshMaterial = requiredElement<HTMLSelectElement>("prop-mesh-material");
 const propMeshCastShadows = requiredElement<HTMLInputElement>("prop-mesh-cast-shadows");
 const propMeshReceiveShadows = requiredElement<HTMLInputElement>("prop-mesh-receive-shadows");
+const propMeshPickable = requiredElement<HTMLInputElement>("prop-mesh-pickable");
 
 const propPanelLight = requiredElement<HTMLElement>("prop-panel-light");
 const propLightType = requiredElement<HTMLSelectElement>("prop-light-type");
@@ -382,6 +383,11 @@ function updateComponentPropertyPanel(): void {
     }
     propMeshCastShadows.checked = meshComp.castShadows ?? false;
     propMeshReceiveShadows.checked = meshComp.receiveShadows ?? false;
+
+    const colliderComp = node.components.find(
+      (c): c is Extract<Component, { type: "collider" }> => c.type === "collider"
+    );
+    propMeshPickable.checked = colliderComp?.isPickable ?? false;
   }
 
   const lightComp = node.components.find((c) => c.type === "light") as Extract<Component, { type: "light" }> | undefined;
@@ -424,6 +430,27 @@ function updateComponentFromUI(): void {
     meshComp.materialRef = selectedMaterial || undefined;
     meshComp.castShadows = propMeshCastShadows.checked;
     meshComp.receiveShadows = propMeshReceiveShadows.checked;
+
+    const colliderIndex = node.components.findIndex((c) => c.type === "collider");
+    let colliderComp =
+      colliderIndex >= 0
+        ? (node.components[colliderIndex] as Extract<Component, { type: "collider" }>)
+        : undefined;
+
+    if (propMeshPickable.checked) {
+      if (colliderComp) {
+        colliderComp.isPickable = true;
+      } else {
+        node.components.push({
+          type: "collider",
+          shape: "box",
+          isTrigger: false,
+          isPickable: true,
+        });
+      }
+    } else if (colliderComp) {
+      colliderComp.isPickable = false;
+    }
   }
 
   const lightComp = node.components.find((c) => c.type === "light") as Extract<Component, { type: "light" }> | undefined;
@@ -533,7 +560,7 @@ for (const input of [px, py, pz, rx, ry, rz, sx, sy, sz, propName]) {
   input.addEventListener("keydown", (event) => event.stopPropagation());
 }
 
-for (const input of [propMeshMaterial, propMeshCastShadows, propMeshReceiveShadows, propLightType, propLightColor, propLightIntensity, propLightRange, propLightAngle, propLightCastShadows]) {
+for (const input of [propMeshMaterial, propMeshCastShadows, propMeshReceiveShadows, propMeshPickable, propLightType, propLightColor, propLightIntensity, propLightRange, propLightAngle, propLightCastShadows]) {
   input.addEventListener("change", updateComponentFromUI);
   input.addEventListener("keydown", (event) => event.stopPropagation());
 }

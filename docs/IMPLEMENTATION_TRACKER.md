@@ -98,15 +98,17 @@ This document tracks the implementation status of each World Creator milestone. 
 
 ## M5: Pickables / Interactables
 
-**Status:** ⏳ Not started
+**Status:** ✅ Completed
 
 **Deliverables:**
-- ⏳ Pickup object component and placement UI
-- ⏳ Property panel for pickable settings
-- ⏳ Export pickables to Unity script with VRChat-compatible components
+- ✅ Pickup object component and placement UI
+- ✅ Property panel for pickable settings
+- ✅ Export pickables to Unity script with VRChat-compatible components
 
 **Current notes:**
-- `ColliderComponent` and `AvatarPlaceholderComponent` already exist in the canonical format but are not visualized or exported beyond placeholder markers during the basic prototype phase.
+- A single **Pickable** checkbox in the mesh property panel toggles `ColliderComponent.isPickable`. The collider is reused (a `box` collider is created if absent) rather than introducing a new component.
+- Pickable meshes render a green `THREE.LineSegments` wireframe overlay (a child of the mesh) in the viewport. The existing raycast guard already skips `Line` objects, so clicking the overlay selects the parent mesh.
+- Unity export keeps the `WorldCreatorPickable` marker and, when the VRChat SDK is present, also adds a `VRC_Pickup` component via reflection. The package still compiles without the SDK.
 
 ---
 
@@ -162,4 +164,4 @@ These decisions affect multiple milestones and should be revisited if scope chan
 | Informal decisions not worth an ADR | `docs/NOTES/decisions.md` |
 | Formal architecture/product decisions | `docs/ADR/` |
 
-*Last updated: 2026-07-04*
+*Last updated: 2026-07-10*
