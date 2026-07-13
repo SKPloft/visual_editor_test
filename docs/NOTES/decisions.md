@@ -64,6 +64,15 @@ Informal decisions made during implementation that are not formal ADRs. Use this
 
 ---
 
+## 2026-07-13 — M6 NPC Avatar Placeholder scope trimmed
+- **Context:** M6 (Social Prototype) was about to start. The original deliverables listed "NPC avatar placeholder with basic sit/stand/lie markers" alongside player spawn configuration, but the canonical format only had `AvatarPlaceholderComponent` with no pose field, and the sit/stand/lie mapping to `VRC_Station` would have introduced a new format extension plus a distinct property UI flow.
+- **Decision:** Trim M6 to NPC + player placeholder placement, visualization, and SDK3 export. Pose markers (sit / stand / lie) move to a new M6-stretch milestone. Canonical format unchanged.
+- **Details:** Viewport visualization = wireframe capsule (~1.8m) + facing arrow, colored by `avatarType` (blue=player, orange=NPC), childed `LineSegments` overlay reused from M5 pattern. Placement UI = two toolbar buttons. Property panel = `avatarType` radio + `displayName`. Export = SDK3 only; `avatarType: "player"` → `VRC_SpawnPoint` via reflection with `WorldCreatorAvatarPlaceholder` marker retained; `avatarType: "npc"` → only the marker (no SDK NPC equivalent; NPC behavior is custom Udon, out of scope).
+- **Consequences:** M6 ships a working social room (spawn + pickables + interactables). Sit / stand / lie is the next natural step after M6 base. SDK3 reflection strings and the M5 `VRC_Pickup` strings may need name parity revisit when implementation begins. KEEP doc & roadmap trimmed in sync.
+- **Follow-up:** During M6 implementation — pin exact SDK3 `VRC_SpawnPoint` type strings and log them in `docs/NOTES/milestones.md` (M6 decisions). At M7 (Publish Prototype) — revisit whether NPC markers get a custom Udon template or stay external.
+
+---
+
 ## Promotion candidates
 
 _Move items here when they look like they deserve an ADR._

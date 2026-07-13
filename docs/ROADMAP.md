@@ -13,6 +13,7 @@
 | M4 | Lights + materials | Visual Pass |
 | M5 | Pickables / interactables | World Prototype |
 | M6 | NPC avatar placeholders | Social Prototype |
+| M6-stretch | Sit / stand / lie pose markers | Social Prototype (stretch) |
 | M7 | VRChat adapter | Publish Prototype |
 
 ---
@@ -117,18 +118,35 @@
 
 ## M6: NPC Avatar Placeholders
 
-**What it proves:** A non-technical user can place avatar spawn points and social affordances for a VRChat world.
+**What it proves:** A non-technical user can place avatar spawn points and NPC placeholders for a VRChat world.
 
 **Deliverables:**
-- NPC avatar placeholder with basic sit/stand/lie markers
-- Player spawn point configuration
-- Export NPC markers and player spawns to Unity script with VRChat-compatible components
+- NPC and player avatar placeholder placement UI in the browser editor
+- Property panel for placeholder type (NPC / Player) and display name
+- Export avatar placeholders to Unity script with VRChat-compatible components (SDK3 only)
 
 **Current notes:**
 - `AvatarPlaceholderComponent` already exists in the canonical format but is not visualized or exported beyond a placeholder marker yet.
 - Actual avatar models, AI behavior, and animation controllers remain out of scope.
+- Pose markers (sit / stand / lie → VRChat stations) are intentionally deferred; see M6-stretch below.
+- SDK3 (UdonSharp) is the only export target. Player spawns map to `VRC_SpawnPoint` via reflection; NPC placeholders keep a `WorldCreatorAvatarPlaceholder` marker (no SDK equivalent — NPCs are custom Udon scripts).
 
 **Approximate sequencing:** 2–3 weeks (after M5)
+
+---
+
+## M6-stretch: Sit / Stand / Lie Pose Markers
+
+Deferred from M6 to keep the Social Prototype scope tight. Adds VRChat station components (sit / stand / lie) so creators can build seating and reclining affordances into social worlds.
+
+**Deliverables:**
+- Extend `AvatarPlaceholderComponent` with a `pose` field (or introduce a separate station component)
+- Property UI for pose selection
+- Export maps pose to `VRC_Station` / SDK3 equivalent via reflection
+
+**Prerequisite:** M6 (NPC Avatar Placeholders) complete.
+
+**Approximate sequencing:** TBD (manual review)
 
 ---
 
@@ -156,7 +174,7 @@
 | Technology Prototype | M0–M3 | Non-technical user builds a 5-object scene and exports to runnable Unity within 30 minutes. |
 | Visual Pass | M4 | Lights and materials round-trip through save/load and Unity export. |
 | World Prototype | M5 | Interactive pickable objects work end-to-end in VRChat. |
-| Social Prototype | M6 | NPC/player spawn and sit/stand affordances work end-to-end in VRChat. |
+| Social Prototype | M6 | NPC/player spawn points and avatar placeholders work end-to-end in VRChat. |
 | Publish Prototype | M7 | A world can be published to VRChat without opening Unity. |
 
 *The product is considered a "basic prototype" (not yet a complete solution) once the Publish Prototype (M7) is done and a non-technical user believes the technical loop works.*

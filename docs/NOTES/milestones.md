@@ -120,16 +120,43 @@ Milestone is **✅ Completed**. A single Pickable checkbox covers the Minimal M5
 ## M6: NPC Avatar Placeholders
 
 ### Status
-⏳ Not started.
+⏳ Not started. Scope locked in during planning discussion on 2026-07-13.
 
 ### Scope clarification
-- Add NPC and player spawn placeholder components.
-- Add sit/stand/lie marker placement UI.
-- Export maps `AvatarPlaceholderComponent` to VRChat spawn/station components.
+- Canonical format unchanged — `AvatarPlaceholderComponent` stays as defined in `editor/src/scene/types.ts:38` (no new `pose` field).
+- Pose markers (sit / stand / lie → VRChat `VRC_Station`) deferred to M6-stretch; see below.
+- Add NPC and player spawn placeholder placement UI and viewport visualization.
+- Export maps `AvatarPlaceholderComponent` to `VRC_SpawnPoint` (player) and the existing `WorldCreatorAvatarPlaceholder` marker (NPC). SDK3 only.
+
+### Discoveries
+- `AvatarPlaceholderComponent` and the current Unity `MapAvatar` implementation already exist (`editor/src/export/unityPackageGenerator.ts:881`) — they only add the `WorldCreatorAvatarPlaceholder` mono-behaviour marker; no VRChat SDK type is added yet.
+- The scene loader skips avatar components at `editor/src/scene/sceneLoader.ts:145` (`// Not visualized in the M0 viewport.` — shared no-op with collider), so adding the capsule + arrow visualization is a fresh codepath that mirrors the existing M5 wireframe overlay approach.
+- The M5 pickable overlay already established the pattern: childed `LineSegments` overlay → inherits transform, skipped by raycast guard (`hit.object.type === "Line"`). Avatar visualization will reuse this contract.
+
+### Decisions
+- **Viewport visualization:** Wireframe capsule (~1.8m tall) + arrow showing facing direction (forward vector from `spawnRotation`). Color by `avatarType`: blue = player, orange = NPC.
+- **Placement UI:** Two new toolbar buttons — "Add Player Spawn" and "Add NPC Avatar". Each creates a node with `AvatarPlaceholderComponent` of the matching type.
+- **Property panel:** Show `avatarType` radio (NPC / Player) and `displayName` text input. `spawnPosition` / `spawnRotation` are not surfaced; they default to the node transform via the existing `MapAvatar` fallback in `unityPackageGenerator.ts`. The marker follows the node transform as a childed `LineSegments` so it tracks edits anyway.
+- **Export target:** SDK3 only (UdonSharp). `avatarType: "player"` → `VRC_SpawnPoint` via reflection. The existing `WorldCreatorAvatarPlaceholder` marker is retained alongside `VRC_SpawnPoint` on player spawns. `avatarType: "npc"` → only the `WorldCreatorAvatarPlaceholder` marker (no SDK NPC equivalent; NPC behavior is a custom Udon script, out of scope).
+- **Reflection pattern:** Mirrors M5 — reflection with guarded `Type.GetType` calls so the generated package still compiles without the VRChat SDK present. SDK3 component type strings will be documented here as discovered during implementation.
 
 ### Open questions
-- What is the minimum visual placeholder (capsule, imported avatar, simple icon)?
-- Do markers need orientation gizmos independent of the node transform?
+- Exact `VRC_SpawnPoint` SDK3 type name(s) — refine when implementation begins and a reference SDK is checked. Earlier M5 reflection string (`VRC_Pickup`) may need to be revisited for SDK3 naming parity.
+
+---
+
+## M6-stretch: Sit / Stand / Lie Pose Markers
+
+### Status
+⏳ Stretch milestone; not started. Deferred from M6.
+
+### Scope clarification
+- Adds VRChat station components (sit / stand / lie) for seating-style social affordances (chairs, beds, leaning spots).
+- Requires introducing either a `pose?: "stand" | "sit" | "lie"` field on `AvatarPlaceholderComponent` or a separate `StationComponent` — to be revisited when M6 base is shipped.
+
+### Open questions
+- Pose as a field on `AvatarPlaceholderComponent` vs. a separate station component — design call to make when starting this stretch.
+- Real mapping target: `VRC_Station` with `StationType` enum? Pin during implementation.
 
 ---
 

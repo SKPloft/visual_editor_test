@@ -117,12 +117,19 @@ This document tracks the implementation status of each World Creator milestone. 
 **Status:** ⏳ Not started
 
 **Deliverables:**
-- ⏳ NPC avatar placeholder with basic sit/stand/lie markers
-- ⏳ Player spawn point configuration
-- ⏳ Export NPC markers and player spawns to Unity script with VRChat-compatible components
+- ⏳ NPC and player avatar placeholder placement UI in the browser editor
+- ⏳ Property panel for placeholder type (NPC / Player) and display name
+- ⏳ Export avatar placeholders to Unity script with VRChat-compatible components (SDK3 only)
 
 **Current notes:**
 - `AvatarPlaceholderComponent` already exists in the canonical format but is not visualized or exported beyond a placeholder marker yet.
+- Scope decisions locked in during M6 planning discussion (2026-07-13):
+  - Canonical format unchanged — no `pose` field added yet (deferred to M6-stretch).
+  - Viewport visualization: wireframe capsule (~1.8m tall) + arrow showing facing direction. Color by `avatarType` (blue = player, orange = NPC). Parented to the avatar node like the M5 pickable overlay, so it inherits transform and is skipped by the existing raycast guard.
+  - Placement UI: two toolbar buttons — "Add Player Spawn" and "Add NPC Avatar".
+  - Property panel: `avatarType` radio (NPC / Player) and `displayName` text input. `spawnPosition` / `spawnRotation` are not surfaced (default to node transform via existing `MapAvatar` fallback).
+  - Export: SDK3 (UdonSharp) only, via reflection. `avatarType: "player"` → `VRC_SpawnPoint`, with the existing `WorldCreatorAvatarPlaceholder` marker retained. `avatarType: "npc"` → only the `WorldCreatorAvatarPlaceholder` marker (VRChat has no SDK NPC placeholder; NPCs are authored as custom Udon scripts, out of scope).
+- Pose markers (sit / stand / lie → VRChat stations) moved to M6-stretch; see `docs/ROADMAP.md` and `docs/NOTES/milestones.md`.
 
 ---
 
@@ -164,4 +171,4 @@ These decisions affect multiple milestones and should be revisited if scope chan
 | Informal decisions not worth an ADR | `docs/NOTES/decisions.md` |
 | Formal architecture/product decisions | `docs/ADR/` |
 
-*Last updated: 2026-07-10*
+*Last updated: 2026-07-13*
