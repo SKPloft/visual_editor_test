@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by [ADR-005](005-generated-unity-importer-package.md).
 
 ## Context
 

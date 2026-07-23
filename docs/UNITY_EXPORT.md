@@ -1,10 +1,10 @@
 # World Creator — Unity Export Specification
 
-> **Status:** M3 implemented. The browser-side generator is `editor/src/export/unityPackageGenerator.ts`. The generated mini Unity package imports canonical JSON into Unity via `World Creator → Import Scene from JSON`.
+> **Status:** Implemented. The browser-side generator is `src/export/unityPackageGenerator.ts`. The generated mini Unity package imports canonical JSON into Unity via `World Creator → Import Scene from JSON`.
 
 ## 1. Overview
 
-This document specifies how the canonical JSON scene format (defined in `docs/CANONICAL_FORMAT.md`) is imported into Unity for World Creator. The chosen approach is a **mini Unity package** containing Editor and Runtime assembly definitions that reads the canonical JSON and constructs GameObjects in the active scene. The browser-side generator emits all C# sources, assembly definitions, and the canonical JSON into a ZIP file. The user extracts this ZIP into their Unity project to install the importer.
+This document specifies how the canonical JSON scene format (defined in `docs/CANONICAL_FORMAT.md`) is imported into Unity for World Creator. The chosen approach is a **mini Unity package** containing Editor and Runtime assembly definitions that reads the canonical JSON and constructs GameObjects in the active scene. The browser-side generator emits the package manifest, C# sources, and assembly definitions into a ZIP file. The user extracts this ZIP into their Unity project, then selects a separately exported canonical JSON scene through the importer.
 
 The package uses **Newtonsoft.Json** (included with modern Unity via the `com.unity.nuget.newtonsoft-json` package) for polymorphic component deserialization, replacing the earlier `JsonUtility` approach.
 
@@ -27,16 +27,17 @@ The package is installed by extracting the downloaded ZIP into the Unity project
 - **Option A (recommended):** Extract into the project's `Assets/WorldCreator/` folder. Unity will detect the `.asmdef` files and compile the package automatically.
 - **Option B:** Extract into `Packages/com.worldcreator.importer/` as a local package (requires adding an entry in `Packages/manifest.json`).
 
-The ZIP contains a `package.json`, Editor and Runtime assembly definitions, all C# sources, and the canonical scene JSON file.
+The ZIP contains a `package.json`, Editor and Runtime assembly definitions, and the generated C# sources. Export the canonical scene JSON separately with the editor's scene export action.
 
 ### Workflow
 
-1. Export the scene from the World Creator browser editor (downloads a ZIP).
-2. Extract the ZIP into the Unity project's `Assets/WorldCreator/` folder.
-3. Open the target Unity project. Unity compiles the package.
-4. Select `World Creator -> Import Scene from JSON` from the menu bar.
-5. A file dialog opens. Select the `.json` file (included in the extracted ZIP, or any other exported scene).
-6. The script parses the JSON, validates the version, and builds the scene under a single root GameObject named after the scene metadata.
+1. Export the canonical scene JSON from the World Creator browser editor.
+2. Export the Unity package ZIP from the editor.
+3. Extract the ZIP into the Unity project's `Assets/WorldCreator/` folder.
+4. Open the target Unity project. Unity compiles the package.
+5. Select `World Creator -> Import Scene from JSON` from the menu bar.
+6. A file dialog opens. Select the exported `.json` file.
+7. The importer parses the JSON, validates the version, and builds the scene under a single root GameObject named after the scene metadata.
 
 ### Expected JSON Path
 
@@ -101,7 +102,7 @@ Assets/WorldCreatorScenes/<scene-name>/Prefabs/
   └── <PrefabName>.prefab
 ```
 
-Prefab creation uses `PrefabUtility.SaveAsPrefabAsset` at editor-time, which generates a fully functional Unity prefab. When a node contains a `prefabRef` component, the importer instantiates the matching prefab via `PrefabUtility.InstantiatePrefab`, maintaining the prefab link in the scene. Any `transformOverride` or `componentOverrides` are applied after instantiation.
+Prefab creation uses `PrefabUtility.SaveAsPrefabAsset` at editor-time, which generates a fully functional Unity prefab. When a node contains a `prefabRef` component, the importer instantiates the matching prefab via `PrefabUtility.InstantiatePrefab` as a child of that node, maintaining the prefab link in the scene. Prefab transform and component overrides are not part of canonical format version 1.
 
 ### 3.4 Lights
 
@@ -133,7 +134,7 @@ Additional mappings:
 | `mesh`           | `MeshCollider` |
 
 - `isTrigger` -> `Collider.isTrigger`
-- `isPickable` -> A custom `WorldCreatorPickable` MonoBehaviour is added as a marker. Additionally, when the VRChat SDK is present in the Unity project, a `VRC_Pickup` component is attached via runtime reflection so the package compiles either with or without the SDK installed. The type lookup tries `VRC.SDKBase.VRC_Pickup, VRCSDKBase` first, then `VRC.SDK3.Components.VRC_Pickup, VRCSDK3`; if neither resolves, only the `WorldCreatorPickable` marker remains.
+- `isPickable` -> A custom `WorldCreatorPickable` MonoBehaviour is added as a marker. Additionally, when the VRChat SDK is present, the importer scans loaded assemblies whose names begin with `VRC` for a non-abstract type named `VRC_Pickup` or `VRCPickup`, then attaches it via reflection. If no matching type resolves, only the `WorldCreatorPickable` marker remains.
 
 Size overrides (`size`, `radius`, `height`) are applied directly. If omitted, the collider size is derived from the node's `transform.scale`.
 
@@ -154,42 +155,37 @@ This is intentionally a placeholder. No AI behavior, animation, or actual avatar
 
 ## 4. Unity Package Structure
 
-The importer is delivered as a multi-file Unity package rather than a single monolithic script. The browser-side generator (`editor/src/export/unityPackageGenerator.ts`) emits the following file tree into the downloaded ZIP:
+The importer is delivered as a multi-file Unity package rather than a single monolithic script. The browser-side generator (`src/export/unityPackageGenerator.ts`) emits the following file tree into the downloaded ZIP:
 
 ```
-WorldCreator/
-├── package.json                          # UPM package manifest
+WorldCreatorUnityPackage/
+├── package.json                                      # UPM package manifest
 ├── Editor/
-│   ├── WorldCreator.Editor.asmdef        # Editor assembly definition
-│   ├── WorldCreatorSceneImporter.cs      # Menu item + import orchestration
-│   ├── SceneBuilder.cs                   # Builds GameObjects from parsed nodes
-│   ├── MaterialBuilder.cs               # Creates Material assets from MaterialAsset entries
-│   ├── PrefabBuilder.cs                  # Creates .prefab assets via PrefabUtility
-│   └── MeshResolver.cs                   # Maps mesh refs to Unity builtin meshes
-├── Runtime/
-│   ├── WorldCreator.Runtime.asmdef       # Runtime assembly definition
-│   ├── Models/
-│   │   ├── SceneFile.cs                  # Root deserialization model
-│   │   ├── NodeData.cs                   # Node, TransformData
-│   │   └── ComponentData.cs              # Polymorphic component models
-│   ├── WorldCreatorPickable.cs           # MonoBehaviour marker for pickable objects
-│   └── WorldCreatorAvatarPlaceholder.cs  # MonoBehaviour for avatar placeholders
-└── Scenes/
-    └── <scene-name>.json                 # The exported canonical JSON
+│   ├── WorldCreatorUnityPackage.Editor.asmdef        # Editor assembly definition
+│   ├── DataModels.cs                                 # Canonical JSON models
+│   ├── WorldCreatorSceneImporter.cs                  # Menu item + import orchestration
+│   ├── MaterialBuilder.cs                            # Creates Unity materials
+│   ├── PrefabBuilder.cs                              # Creates and instantiates prefabs
+│   └── ComponentMappers.cs                           # Maps canonical components to Unity
+└── Runtime/
+    ├── WorldCreatorUnityPackage.Runtime.asmdef       # Runtime assembly definition
+    ├── WorldCreatorPickable.cs                       # Pickable marker
+    └── WorldCreatorAvatarPlaceholder.cs              # Avatar placeholder data
 ```
+
+The canonical scene JSON is exported separately by the editor and selected through the importer's file dialog; it is not embedded in the Unity package ZIP.
 
 ### Key Classes
 
 | Class | Assembly | Responsibility |
 |-------|----------|--------------|
-| `WorldCreatorSceneImporter` | Editor | Entry point. Registers the `World Creator -> Import Scene from JSON` menu item, opens a file dialog, orchestrates the import pipeline. |
-| `SceneBuilder` | Editor | Walks the `sceneGraph.root` array recursively, creating GameObjects, applying transforms (Z negated), and delegating to component-specific builders. |
-| `MaterialBuilder` | Editor | Iterates `assetLibrary.materials`, creates `Standard` shader materials, and saves them as `.mat` assets under the scene's `Materials/` folder. |
-| `PrefabBuilder` | Editor | Iterates `assetLibrary.prefabs`, builds each prefab's node subgraph, saves it via `PrefabUtility.SaveAsPrefabAsset`, and provides a cache for `prefabRef` lookups. When a node references a prefab, instantiation uses `PrefabUtility.InstantiatePrefab` to preserve the prefab link. |
-| `MeshResolver` | Editor | Resolves canonical mesh references (e.g., `builtin:cube`, `builtin:sphere`, `builtin:cylinder`, `builtin:plane`) to Unity's built-in mesh resources. Falls back to a cube for unrecognised references. |
-| `SceneFile` / `NodeData` / `ComponentData` | Runtime | Data models deserialised from the canonical JSON via **Newtonsoft.Json**. These live in the Runtime assembly so they can be referenced by both Editor scripts and future runtime loaders. |
-| `WorldCreatorPickable` | Runtime | Empty `MonoBehaviour` marker attached to pickable GameObjects. |
-| `WorldCreatorAvatarPlaceholder` | Runtime | `MonoBehaviour` storing `avatarType`, `displayName`, and `modelRef` for NPC/player spawn placeholders. |
+| `WorldCreatorSceneImporter` | Editor | Registers the `World Creator -> Import Scene from JSON` menu item, opens a file dialog, validates version 1 JSON, creates output folders, and orchestrates import. |
+| `DataModels` | Editor | Defines the Newtonsoft.Json models used to deserialize canonical scene data. |
+| `MaterialBuilder` | Editor | Creates `Standard` shader materials under the imported scene's `Materials/` folder. |
+| `PrefabBuilder` | Editor | Builds each prefab's node subgraph, saves it via `PrefabUtility.SaveAsPrefabAsset`, and caches it for `prefabRef` instantiation. |
+| `ComponentMappers` | Editor | Creates node GameObjects, resolves builtin meshes, applies transforms, and maps lights, colliders, prefab references, and avatar placeholders. |
+| `WorldCreatorPickable` | Runtime | `MonoBehaviour` marker attached to pickable GameObjects. |
+| `WorldCreatorAvatarPlaceholder` | Runtime | `MonoBehaviour` storing avatar placeholder data. |
 
 ### Dependencies
 
@@ -209,7 +205,7 @@ The following limitations apply to the basic prototype importer. They are intent
 | **No animations** | The canonical format does not define animation clips, states, or controllers. Animated objects are treated as static meshes. |
 | **No texture import** | Texture assets are parsed but not imported into the Unity AssetDatabase. Only albedo color and scalar material properties are applied. |
 | **Builtin meshes only** | External mesh files (`.obj`, `.fbx`, `.gltf`) are not resolved. Only `builtin:plane`, `builtin:cube`, `builtin:sphere`, and `builtin:cylinder` are mapped to Unity primitives. |
-| **Coordinate system conversion** | Z positions are negated when importing into Unity's left-handed space. Rotation handedness conversion for non-trivial orientations is deferred to the VRChat adapter (M7). |
+| **Coordinate system conversion** | Z positions are negated when importing into Unity's left-handed space. Rotation handedness conversion for non-trivial orientations is unresolved technical debt; see `docs/TECHNICAL_DEBT.md`. |
 | **No nested parenting by `parent` ID** | The `parent` field on nodes is not part of the canonical format; only the `children` array defines hierarchy. |
 | **No scene cleanup on re-import** | Re-importing a scene creates a second root GameObject. Manual deletion of the old root is required. |
 

@@ -10,7 +10,7 @@ This repository originated from a broader "Rogue Engine" vision that included a 
 
 ## Decision
 
-Do not build or maintain a Rogue Engine adapter during the technology prototype (M0–M3). All export and runtime targets are limited to Unity via C# Editor script. A Rogue Engine adapter may be revisited after M3 if the product direction expands to a standalone runtime.
+Do not build or maintain a Rogue Engine adapter. The active export target is Unity through the generated importer package described by ADR-005. Reintroducing a Rogue Engine or standalone-runtime target requires a new product decision in Lark and a superseding ADR; completion of the former M0–M3 roadmap does not reopen this scope automatically.
 
 ## Consequences
 

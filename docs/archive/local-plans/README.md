@@ -20,13 +20,14 @@ When these archived files conflict with Lark, follow Lark for product decisions.
 
 ## What remains authoritative in this repository
 
-The repository remains the source of truth for implemented technical behavior and engineering contracts, including:
+See `docs/README.md` for the current engineering documentation map. In summary:
 
-- `editor/` — active implementation
-- `docs/IMPLEMENTATION_TRACKER.md` — implementation status as last reconciled with the code
+- `openspec/` — approved engineering changes and accepted behavioral specifications
+- `src/`, `index.html`, and root package manifests — active implementation
 - `docs/CANONICAL_FORMAT.md` — canonical scene-data contract
 - `docs/UNITY_EXPORT.md` — Unity export behavior and constraints
 - `docs/ADR/` — accepted architecture decisions
-- `docs/NOTES/` — implementation observations, technical decisions, bugs, and debt
 
-Do not silently update these archived files to reflect new plans. Add current product work to Lark and update active technical documents only when implementation or engineering contracts change.
+The former milestone tracker and implementation notes are preserved separately under `docs/archive/implementation-history/`.
+
+Do not silently update these archived files to reflect new plans. Add current product work to Lark; use OpenSpec for approved engineering changes, and update active contracts when accepted behavior changes.
