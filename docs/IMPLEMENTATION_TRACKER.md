@@ -129,7 +129,7 @@ This document tracks the implementation status of each World Creator milestone. 
   - Placement UI: two toolbar buttons — "Add Player Spawn" and "Add NPC Avatar".
   - Property panel: `avatarType` radio (NPC / Player) and `displayName` text input. `spawnPosition` / `spawnRotation` are not surfaced (default to node transform via existing `MapAvatar` fallback).
   - Export: SDK3 (UdonSharp) only, via reflection. `avatarType: "player"` → `VRC_SpawnPoint`, with the existing `WorldCreatorAvatarPlaceholder` marker retained. `avatarType: "npc"` → only the `WorldCreatorAvatarPlaceholder` marker (VRChat has no SDK NPC placeholder; NPCs are authored as custom Udon scripts, out of scope).
-- Pose markers (sit / stand / lie → VRChat stations) moved to M6-stretch; see `docs/ROADMAP.md` and `docs/NOTES/milestones.md`.
+- Pose markers (sit / stand / lie → VRChat stations) moved to M6-stretch under the former milestone plan; see `docs/archive/local-plans/ROADMAP.md` and `docs/NOTES/milestones.md`. Current product priority is set in Lark.
 
 ---
 

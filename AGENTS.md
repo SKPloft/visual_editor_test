@@ -2,13 +2,14 @@
 
 A browser-based 3D world editor for non-technical VRChat/Resonite creators.
 
-## Product snapshot
+## Product planning authority
 
-- **Problem:** Making a simple VRChat world still requires installing Unity, learning a complex editor, and wrestling with asset pipelines — a barrier that stops many creators before they place their first object.
-- **Target user:** "Hobbyist World Builder" — a VRChat regular with ideas for custom hangout worlds, no Unity or coding experience, and a high tolerance for rough edges if it means a faster path from idea to published world.
-- **Value prop:** World Creator lets creators compose VRChat worlds in a browser using drag-and-drop primitives and prefabs, then export directly to a Unity Editor script — collapsing days of environment setup into minutes of in-browser composition.
-- **Success metric (technology prototype):** A non-technical user can build a scene with at least 5 distinct objects and export it to a runnable Unity project within 30 minutes of first opening the editor.
-- **Success metric (basic prototype):** A non-technical user can build a lit scene with pickable objects and NPC/player spawn points, and produce a VRChat-compatible Unity package that feels technically complete.
+Current product direction, UX work, collaboration context, MVP scope, and success criteria are maintained in Lark:
+
+- [项目：Nook](https://vrcd-community.feishu.cn/wiki/ILvDwglemixrBekqtDFc4b6Rnwb)
+- [MVP前工作图](https://vrcd-community.feishu.cn/wiki/HTrmwgVa5i31JSkP6bDcoJWinId)
+
+Use Lark for current product decisions. The repository is authoritative for implemented behavior, technical specifications, ADRs, and implementation status. Earlier local product plans are preserved under `docs/archive/local-plans/` and must not be treated as current requirements.
 
 ## Tech stack
 
@@ -21,13 +22,12 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
 
 ## Project structure
 
-- `docs/` — product decisions, ADRs, roadmap, and specifications
-  - `PRODUCT.md` — problem, persona, value proposition, and scope
-  - `ROADMAP.md` — milestones M0–M7
-  - `USER_FLOWS.md` — happy path, state machine, and shortcuts
+- `docs/` — active engineering decisions, implementation tracking, and specifications
   - `CANONICAL_FORMAT.md` — engine-agnostic JSON scene format
   - `UNITY_EXPORT.md` — Unity Editor script exporter spec
   - `ADR/` — accepted architectural decision records
+  - `NOTES/` — implementation observations, informal technical decisions, bugs, and debt
+  - `archive/local-plans/` — superseded local product, roadmap, flow, and MVP drafts; Lark is authoritative instead
   - `threejs/` — legacy Three.js API docs imported as offline reference; not integrated into the build or workflow
 - `design/` — UX source files and exported mockups
   - `visual-editor.pen` — Pencil design file
@@ -44,7 +44,6 @@ A browser-based 3D world editor for non-technical VRChat/Resonite creators.
   - `docs/NOTES/milestones.md` — per-milestone observations, discoveries, and post-mortems
   - `docs/NOTES/bugs-debt.md` — known bugs, performance debt, and refactor candidates
   - `docs/NOTES/decisions.md` — informal decisions not worth a full ADR
-- `DRAFT.md` — raw MVP methodology notes and early brainstorming
 
 ## Architecture decisions
 
@@ -55,17 +54,9 @@ See `docs/ADR/` for full rationale. Key decisions:
 3. **Unity Editor script export** (ADR-003) — export generates a runnable C# script instead of a `.unitypackage`.
 4. **No Rogue Engine adapter** (ADR-004) — technology prototype focuses on Unity/VRChat only; Rogue Engine code is archived.
 
-## Current phase
+## Current work
 
-**Visual Pass (M4)** — completed.
-
-| Phase | Milestones | Goal |
-|-----------|-----------|------|
-| Technology Prototype | M0–M3 | Canonical format, editor basics, save/load, prefabs, Unity export |
-| Visual Pass | M4 | Lights + materials |
-| World Prototype | M5 | Pickables / interactables |
-| Social Prototype | M6 | NPC avatar placeholders |
-| Publish Prototype | M7 | VRChat adapter / one-click publish |
+Use Lark for the current product and UX workstream. Use `docs/IMPLEMENTATION_TRACKER.md` and the active code for technical implementation status; the archived M0–M7 roadmap is historical context only.
 
 ## Conventions
 
@@ -76,8 +67,9 @@ See `docs/ADR/` for full rationale. Key decisions:
 - Update ADRs when making architectural changes that affect scope, format, or export targets.
 - Log informal decisions, discovered bugs/debt, and milestone observations in `docs/NOTES/` rather than in `docs/IMPLEMENTATION_TRACKER.md`.
 - Do not restructure `docs/NOTES/` files or `docs/IMPLEMENTATION_TRACKER.md` without proposing the change first. Format changes affect how the team reads project state.
-- Add TODO/FOR REVIEW markers in planning docs for decisions that need manual validation before coding begins.
-- Update AGENTS.md when project structure, build tooling, or milestone status changes.
+- Record current product planning, UX direction, MVP scope, and collaboration decisions in Lark rather than adding new local product-plan documents.
+- Add TODO/FOR REVIEW markers to active technical documents for engineering decisions that need manual validation before coding begins.
+- Update AGENTS.md when project structure, build tooling, documentation authority, or implementation status changes.
 - Review viewport controls and existing implementations for performance (data structures, algorithms) before expanding M1 features.
 
 ## Build & run

@@ -1,6 +1,6 @@
 # NOTES folder
 
-This folder holds operational notes that change frequently during implementation. The files here are intentionally lightweight; formal architecture and product decisions still belong in `docs/ADR/` and `docs/PRODUCT.md`.
+This folder holds operational notes that change frequently during implementation. The files here are intentionally lightweight; formal architecture decisions belong in `docs/ADR/`, while current product and UX decisions live in the Nook Lark documents linked from `AGENTS.md`. The former local product plans are archived under `docs/archive/local-plans/`.
 
 ## Files
 
