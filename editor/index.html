@@ -3,99 +3,148 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>World Creator Editor</title>
+    <title>Nook World Editor</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='6' height='6' x='1' y='1' rx='1' fill='%23c7ff4a'/%3E%3Crect width='6' height='6' x='9' y='1' rx='1' fill='%23c7ff4a'/%3E%3Crect width='6' height='6' x='1' y='9' rx='1' fill='%23c7ff4a'/%3E%3Crect width='6' height='6' x='9' y='9' rx='1' fill='%23c7ff4a'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="/src/index.css" />
   </head>
   <body>
     <div id="editor-container">
       <header id="topbar">
-        <div class="logo">World Creator</div>
-        <div class="toolbar-group">
-          <button id="btn-add-cube" title="Add Cube">Cube</button>
-          <button id="btn-add-sphere" title="Add Sphere">Sphere</button>
-          <button id="btn-add-cylinder" title="Add Cylinder">Cylinder</button>
-          <button id="btn-add-plane" title="Add Plane">Plane</button>
-          <button id="btn-add-directional" title="Add Directional Light">Directional</button>
-          <button id="btn-add-point" title="Add Point Light">Point</button>
-          <button id="btn-add-spot" title="Add Spot Light">Spot</button>
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <div>
+            <div class="logo">NOOK</div>
+            <div class="project-label">World editor draft</div>
+          </div>
         </div>
-        <div class="toolbar-group">
+
+        <div class="topbar-center">
+          <div class="toolbar-group creation-tools" aria-label="Add objects">
+            <span class="toolbar-label">Add</span>
+            <button id="btn-add-cube" title="Add Cube"><span class="tool-icon">□</span>Cube</button>
+            <button id="btn-add-sphere" title="Add Sphere"><span class="tool-icon">○</span>Sphere</button>
+            <button id="btn-add-cylinder" title="Add Cylinder"><span class="tool-icon">◉</span>Cylinder</button>
+            <button id="btn-add-plane" title="Add Plane"><span class="tool-icon">◇</span>Plane</button>
+            <span class="toolbar-divider"></span>
+            <button id="btn-add-directional" title="Add Directional Light"><span class="tool-icon">☀</span>Sun</button>
+            <button id="btn-add-point" title="Add Point Light"><span class="tool-icon">●</span>Point</button>
+            <button id="btn-add-spot" title="Add Spot Light"><span class="tool-icon">◒</span>Spot</button>
+          </div>
+
+          <div class="toolbar-group" id="gizmo-tools" aria-label="Transform tools">
+            <button id="btn-tool-select" title="Select (Q)" class="active"><span class="tool-icon">↖</span></button>
+            <button id="btn-tool-translate" title="Move (W)"><span class="tool-icon">✣</span></button>
+            <button id="btn-tool-rotate" title="Rotate (E)"><span class="tool-icon">↻</span></button>
+            <button id="btn-tool-scale" title="Scale (R)"><span class="tool-icon">⤢</span></button>
+          </div>
+        </div>
+
+        <div class="toolbar-group file-tools" aria-label="Project actions">
           <button id="btn-save-scene" title="Save Scene JSON">Save</button>
-          <button id="btn-load-scene" title="Load Scene JSON">Load</button>
-          <button id="btn-export-unity" title="Export Unity Package">Unity</button>
-          <button id="btn-reset-scene" title="Reset Demo Scene">Reset</button>
+          <button id="btn-load-scene" title="Load Scene JSON">Open</button>
+          <button id="btn-export-unity" class="primary-action" title="Export Unity Package">Export</button>
+          <button id="btn-reset-scene" class="icon-button" title="Reset Demo Scene">↺</button>
           <input id="scene-file-input" type="file" accept="application/json,.json" hidden />
-        </div>
-        <div class="toolbar-group" id="gizmo-tools">
-          <button id="btn-tool-select" title="Select (Q)" class="active">Select</button>
-          <button id="btn-tool-translate" title="Move (W)">Move</button>
-          <button id="btn-tool-rotate" title="Rotate (E)">Rotate</button>
-          <button id="btn-tool-scale" title="Scale (R)">Scale</button>
+          <input id="prefab-file-input" type="file" accept="application/json,.json" hidden />
         </div>
       </header>
-      <div id="main-area">
-        <aside id="asset-panel" class="panel">
-          <h2>Prefabs</h2>
-          <div class="prefab-list">
-            <button class="prefab-button" data-prefab-id="prefab_simple_table" title="Add Simple Table">Simple Table</button>
-            <button class="prefab-button" data-prefab-id="prefab_floor_lamp" title="Add Floor Lamp">Floor Lamp</button>
+
+      <main id="main-area">
+        <aside id="scene-panel" class="panel workspace-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">WORLD</span>
+              <h2 id="scene-title">Demo Room</h2>
+            </div>
+            <button class="panel-icon-button" title="Scene options" disabled>•••</button>
           </div>
-          <h2 style="margin-top: 20px;">Materials</h2>
-          <div id="material-list" class="material-list"></div>
-          <button id="btn-add-material" style="margin-top: 10px;">+ New Material</button>
+          <div class="panel-filter">
+            <span aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Filter scene" aria-label="Filter scene" disabled />
+          </div>
+          <div id="scene-tree" class="scene-tree" aria-label="Scene hierarchy"></div>
+          <div class="panel-footer-note"><span class="status-dot"></span><span id="scene-object-count">0 objects</span></div>
         </aside>
-        <div id="viewport"></div>
-        <aside id="property-panel" class="panel">
-          <h2>Properties</h2>
-          <div id="no-selection-msg">No object selected</div>
+
+        <section id="viewport-shell">
+          <div class="viewport-header">
+            <div class="viewport-breadcrumb"><span id="viewport-scene-name">Demo Room</span><span>/</span><strong>Scene</strong></div>
+            <div class="viewport-state"><span class="status-dot"></span>Editing locally</div>
+          </div>
+          <div id="viewport"></div>
+          <div class="viewport-help">
+            <span><kbd>RMB</kbd> Orbit / fly</span>
+            <span><kbd>MMB</kbd> Pan</span>
+            <span><kbd>Q W E R</kbd> Tools</span>
+          </div>
+          <div class="axis-widget" aria-hidden="true"><span class="axis-y">Y</span><span class="axis-x">X</span><span class="axis-z">Z</span></div>
+        </section>
+
+        <aside id="property-panel" class="panel workspace-panel">
+          <div class="selection-summary">
+            <div class="selection-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+            <div>
+              <span id="selection-kicker" class="eyebrow">INSPECTOR</span>
+              <h2 id="selection-title">Nothing selected</h2>
+            </div>
+          </div>
+          <div id="no-selection-msg">
+            <div class="empty-selection-icon">↖</div>
+            <strong>Select something in the world</strong>
+            <span>Its transform, components, and materials will appear here.</span>
+          </div>
           <div id="properties-content" style="display: none;">
-            <div class="prop-group">
-              <label>Name</label>
-              <input type="text" id="prop-name" />
-            </div>
-            <div class="prop-group">
-              <label>Position</label>
-              <div class="vector3">
-                <input type="number" id="prop-pos-x" step="0.1" />
-                <input type="number" id="prop-pos-y" step="0.1" />
-                <input type="number" id="prop-pos-z" step="0.1" />
+            <section class="inspector-section">
+              <div class="inspector-section-title"><span>✣</span> Transform</div>
+              <div class="prop-group">
+                <label>Name</label>
+                <input type="text" id="prop-name" />
               </div>
-            </div>
-            <div class="prop-group">
-              <label>Rotation</label>
-              <div class="vector3">
-                <input type="number" id="prop-rot-x" step="1" />
-                <input type="number" id="prop-rot-y" step="1" />
-                <input type="number" id="prop-rot-z" step="1" />
+              <div class="prop-group">
+                <label>Position</label>
+                <div class="vector3">
+                  <span class="axis-label axis-x-label">X</span><input type="number" id="prop-pos-x" step="0.1" />
+                  <span class="axis-label axis-y-label">Y</span><input type="number" id="prop-pos-y" step="0.1" />
+                  <span class="axis-label axis-z-label">Z</span><input type="number" id="prop-pos-z" step="0.1" />
+                </div>
               </div>
-            </div>
-            <div class="prop-group">
-              <label>Scale</label>
-              <div class="vector3">
-                <input type="number" id="prop-scale-x" step="0.1" />
-                <input type="number" id="prop-scale-y" step="0.1" />
-                <input type="number" id="prop-scale-z" step="0.1" />
+              <div class="prop-group">
+                <label>Rotation</label>
+                <div class="vector3">
+                  <span class="axis-label axis-x-label">X</span><input type="number" id="prop-rot-x" step="1" />
+                  <span class="axis-label axis-y-label">Y</span><input type="number" id="prop-rot-y" step="1" />
+                  <span class="axis-label axis-z-label">Z</span><input type="number" id="prop-rot-z" step="1" />
+                </div>
               </div>
-            </div>
-            <div id="prop-panel-mesh" style="display: none; border-top: 1px solid var(--panel-border); margin-top: 16px; padding-top: 16px;">
+              <div class="prop-group">
+                <label>Scale</label>
+                <div class="vector3">
+                  <span class="axis-label axis-x-label">X</span><input type="number" id="prop-scale-x" step="0.1" />
+                  <span class="axis-label axis-y-label">Y</span><input type="number" id="prop-scale-y" step="0.1" />
+                  <span class="axis-label axis-z-label">Z</span><input type="number" id="prop-scale-z" step="0.1" />
+                </div>
+              </div>
+            </section>
+
+            <section id="prop-panel-mesh" class="inspector-section" style="display: none;">
+              <div class="inspector-section-title"><span>◇</span> Model</div>
               <div class="prop-group">
                 <label>Material</label>
                 <select id="prop-mesh-material"></select>
               </div>
-              <div class="prop-group checkbox-group">
-                <input type="checkbox" id="prop-mesh-cast-shadows" />
-                <label for="prop-mesh-cast-shadows">Cast Shadows</label>
+              <div class="toggle-row">
+                <span>Cast shadows</span><input type="checkbox" id="prop-mesh-cast-shadows" />
               </div>
-              <div class="prop-group checkbox-group">
-                <input type="checkbox" id="prop-mesh-receive-shadows" />
-                <label for="prop-mesh-receive-shadows">Receive Shadows</label>
+              <div class="toggle-row">
+                <span>Receive shadows</span><input type="checkbox" id="prop-mesh-receive-shadows" />
               </div>
-              <div class="prop-group checkbox-group">
-                <input type="checkbox" id="prop-mesh-pickable" />
-                <label for="prop-mesh-pickable">Pickable</label>
+              <div class="toggle-row">
+                <span>Pickable</span><input type="checkbox" id="prop-mesh-pickable" />
               </div>
-            </div>
-            <div id="prop-panel-light" style="display: none; border-top: 1px solid var(--panel-border); margin-top: 16px; padding-top: 16px;">
+            </section>
+
+            <section id="prop-panel-light" class="inspector-section" style="display: none;">
+              <div class="inspector-section-title"><span>☀</span> Light</div>
               <div class="prop-group">
                 <label>Light Type</label>
                 <select id="prop-light-type">
@@ -105,30 +154,58 @@
                   <option value="ambient">Ambient</option>
                 </select>
               </div>
-              <div class="prop-group">
-                <label>Color</label>
-                <input type="color" id="prop-light-color" />
-              </div>
-              <div class="prop-group">
-                <label>Intensity</label>
-                <input type="number" id="prop-light-intensity" step="0.1" />
-              </div>
-              <div class="prop-group" id="prop-group-light-range">
-                <label>Range</label>
-                <input type="number" id="prop-light-range" step="0.1" />
-              </div>
-              <div class="prop-group" id="prop-group-light-angle">
-                <label>Spot Angle</label>
-                <input type="number" id="prop-light-angle" step="1" />
-              </div>
-              <div class="prop-group checkbox-group" id="prop-group-light-shadows">
-                <input type="checkbox" id="prop-light-cast-shadows" />
-                <label for="prop-light-cast-shadows">Cast Shadows</label>
-              </div>
-            </div>
+              <div class="prop-group"><label>Color</label><input type="color" id="prop-light-color" /></div>
+              <div class="prop-group"><label>Intensity</label><input type="number" id="prop-light-intensity" step="0.1" /></div>
+              <div class="prop-group" id="prop-group-light-range"><label>Range</label><input type="number" id="prop-light-range" step="0.1" /></div>
+              <div class="prop-group" id="prop-group-light-angle"><label>Spot Angle</label><input type="number" id="prop-light-angle" step="1" /></div>
+              <div class="toggle-row" id="prop-group-light-shadows"><span>Cast shadows</span><input type="checkbox" id="prop-light-cast-shadows" /></div>
+            </section>
           </div>
         </aside>
-      </div>
+
+        <section id="asset-panel" class="panel workspace-panel">
+          <div class="asset-library-header">
+            <div>
+              <span class="eyebrow">LIBRARY</span>
+              <h2>Assets</h2>
+            </div>
+            <nav class="asset-tabs" aria-label="Asset sources">
+              <button class="asset-tab active" data-asset-tab="builtin">Built in</button>
+              <button class="asset-tab" data-asset-tab="uploads">Uploads <span class="prototype-badge">Next</span></button>
+            </nav>
+          </div>
+
+          <div id="asset-view-builtin" class="asset-view active">
+            <div class="asset-rail-section world-base-section">
+              <div class="asset-section-heading"><strong>World bases</strong><span>Start with a useful shell</span></div>
+              <button id="btn-world-base-demo" class="asset-card world-base-card" title="Load Starter Room">
+                <span class="asset-preview room-preview"><i></i><i></i><i></i></span>
+                <span class="asset-card-copy"><strong>Starter Room</strong><small>Floor, walls & lighting</small></span>
+                <span class="asset-card-action">Open</span>
+              </button>
+            </div>
+
+            <div class="asset-rail-section">
+              <div class="asset-section-heading"><strong>Prefabs</strong><span>Click to place in the world</span></div>
+              <div id="prefab-list" class="prefab-list"></div>
+            </div>
+
+            <details class="materials-drawer">
+              <summary>Materials <span id="material-count"></span></summary>
+              <div id="material-list" class="material-list"></div>
+              <button id="btn-add-material" class="secondary-action">+ New material</button>
+            </details>
+          </div>
+
+          <div id="asset-view-uploads" class="asset-view">
+            <div class="upload-draft">
+              <div class="upload-icon">⇧</div>
+              <div><strong>Your imported prefabs will live here</strong><span>Choose a Nook scene or prefab JSON to bring its prefabs into this draft.</span></div>
+              <button id="btn-import-prefab">Import prefab</button>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

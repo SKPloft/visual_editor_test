@@ -50,7 +50,15 @@ const sy = requiredElement<HTMLInputElement>("prop-scale-y");
 const sz = requiredElement<HTMLInputElement>("prop-scale-z");
 
 const materialList = requiredElement<HTMLElement>("material-list");
+const materialCount = requiredElement<HTMLElement>("material-count");
 const btnAddMaterial = requiredElement<HTMLButtonElement>("btn-add-material");
+const sceneTree = requiredElement<HTMLElement>("scene-tree");
+const sceneTitle = requiredElement<HTMLElement>("scene-title");
+const viewportSceneName = requiredElement<HTMLElement>("viewport-scene-name");
+const sceneObjectCount = requiredElement<HTMLElement>("scene-object-count");
+const selectionTitle = requiredElement<HTMLElement>("selection-title");
+const selectionKicker = requiredElement<HTMLElement>("selection-kicker");
+const prefabList = requiredElement<HTMLElement>("prefab-list");
 
 const propPanelMesh = requiredElement<HTMLElement>("prop-panel-mesh");
 const propMeshMaterial = requiredElement<HTMLSelectElement>("prop-mesh-material");
@@ -70,6 +78,8 @@ const propGroupLightAngle = requiredElement<HTMLElement>("prop-group-light-angle
 const propGroupLightShadows = requiredElement<HTMLElement>("prop-group-light-shadows");
 
 const sceneFileInput = requiredElement<HTMLInputElement>("scene-file-input");
+const prefabFileInput = requiredElement<HTMLInputElement>("prefab-file-input");
+const btnImportPrefab = requiredElement<HTMLButtonElement>("btn-import-prefab");
 
 const tools = {
   select: requiredElement<HTMLButtonElement>("btn-tool-select"),
@@ -143,8 +153,99 @@ function renderCurrentScene(): void {
   indexNodes(currentScene.sceneGraph.root);
   indexObjects();
   nextNodeId = computeNextNodeId();
+  renderWorkspaceChrome();
   updatePropertyPanel();
   renderMaterialPanel();
+}
+
+function getNodeIcon(node: Node): string {
+  if (node.components.some((component) => component.type === "light")) return "☀";
+  if (node.components.some((component) => component.type === "prefabRef")) return "◆";
+  if (node.components.some((component) => component.type === "mesh")) return "◇";
+  return node.children.length > 0 ? "▱" : "·";
+}
+
+function countSceneNodes(root: Node): number {
+  return root.children.reduce((count, child) => count + countSceneNodes(child), 1);
+}
+
+function renderSceneTree(): void {
+  sceneTree.innerHTML = "";
+
+  const renderNode = (node: Node, depth: number) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = `scene-tree-row${depth === 0 ? " root" : ""}`;
+    row.dataset.nodeId = node.id;
+    row.style.paddingLeft = `${8 + depth * 14}px`;
+
+    const toggle = document.createElement("span");
+    toggle.className = "tree-toggle";
+    toggle.textContent = node.children.length > 0 ? "▾" : "";
+    row.appendChild(toggle);
+
+    const icon = document.createElement("span");
+    icon.className = "tree-icon";
+    icon.textContent = getNodeIcon(node);
+    row.appendChild(icon);
+
+    const label = document.createElement("span");
+    label.className = "tree-label";
+    label.textContent = node.name;
+    row.appendChild(label);
+
+    row.addEventListener("click", () => {
+      const object = objectIndex.get(node.id);
+      if (object) selectObject(object);
+    });
+    sceneTree.appendChild(row);
+
+    for (const child of node.children) renderNode(child, depth + 1);
+  };
+
+  renderNode(currentScene.sceneGraph.root, 0);
+  const objectCount = Math.max(0, countSceneNodes(currentScene.sceneGraph.root) - 1);
+  sceneObjectCount.textContent = `${objectCount} object${objectCount === 1 ? "" : "s"}`;
+}
+
+function renderPrefabLibrary(): void {
+  prefabList.innerHTML = "";
+  for (const prefab of currentScene.assetLibrary.prefabs) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "asset-card prefab-button";
+    button.dataset.prefabId = prefab.id;
+    button.title = `Place ${prefab.name}`;
+
+    const preview = document.createElement("span");
+    preview.className = "asset-preview";
+    const previewIcon = document.createElement("span");
+    previewIcon.className = "asset-preview-icon";
+    previewIcon.textContent = prefab.name.toLowerCase().includes("lamp") ? "♧" : "▰";
+    preview.appendChild(previewIcon);
+    button.appendChild(preview);
+
+    const copy = document.createElement("span");
+    copy.className = "asset-card-copy";
+    const name = document.createElement("strong");
+    name.textContent = prefab.name;
+    copy.appendChild(name);
+    const detail = document.createElement("small");
+    detail.textContent = `${prefab.rootNode.children.length} parts · Built in`;
+    copy.appendChild(detail);
+    button.appendChild(copy);
+
+    button.addEventListener("click", () => addPrefab(prefab.id));
+    prefabList.appendChild(button);
+  }
+}
+
+function renderWorkspaceChrome(): void {
+  const worldName = currentScene.metadata.name || currentScene.sceneGraph.root.name || "Untitled World";
+  sceneTitle.textContent = worldName;
+  viewportSceneName.textContent = worldName;
+  renderSceneTree();
+  renderPrefabLibrary();
 }
 
 function createMaterialAsset(name: string, color: string): MaterialAsset {
@@ -201,6 +302,7 @@ function updateMaterialAsset(id: string, patch: Partial<MaterialAsset>): void {
 
 function renderMaterialPanel(): void {
   materialList.innerHTML = "";
+  materialCount.textContent = `(${currentScene.assetLibrary.materials.length})`;
   for (const mat of currentScene.assetLibrary.materials) {
     const item = document.createElement("div");
     item.className = "material-item";
@@ -330,11 +432,20 @@ function roundForJson(value: number): number {
 }
 
 function updatePropertyPanel(): void {
+  for (const row of sceneTree.querySelectorAll<HTMLElement>(".scene-tree-row")) {
+    row.classList.toggle("selected", Boolean(selectedObject) && row.dataset.nodeId === selectedObject?.userData[CANONICAL_NODE_ID]);
+  }
+
   if (!selectedObject) {
+    selectionKicker.textContent = "INSPECTOR";
+    selectionTitle.textContent = "Nothing selected";
     propPanelContent.style.display = "none";
-    noSelectionMsg.style.display = "block";
+    noSelectionMsg.style.display = "flex";
     return;
   }
+  const selectedNode = findSelectedNode();
+  selectionKicker.textContent = selectedNode?.components.some((component) => component.type === "prefabRef") ? "PREFAB INSTANCE" : "SCENE OBJECT";
+  selectionTitle.textContent = selectedObject.name || "Unnamed Object";
   propPanelContent.style.display = "block";
   noSelectionMsg.style.display = "none";
 
@@ -552,6 +663,9 @@ function updateTransformFromUI(): void {
   if (node) {
     updateNodeFromObject(node, selectedObject);
     markModified();
+    selectionTitle.textContent = node.name;
+    renderSceneTree();
+    updatePropertyPanel();
   }
 }
 
@@ -571,6 +685,7 @@ transformControl.addEventListener("objectChange", () => {
   if (!node) return;
   updateNodeFromObject(node, selectedObject);
   markModified();
+  renderSceneTree();
   updatePropertyPanel();
 });
 
@@ -842,6 +957,71 @@ async function exportUnity(): Promise<void> {
   }
 }
 
+function isPrefabAsset(value: unknown): value is PrefabAsset {
+  if (!value || typeof value !== "object") return false;
+  const prefab = value as PrefabAsset;
+  return prefab.type === "prefab" && typeof prefab.id === "string" && typeof prefab.name === "string" && isNode(prefab.rootNode);
+}
+
+function getImportedPrefabs(value: unknown): PrefabAsset[] {
+  if (isPrefabAsset(value)) return [value];
+  if (isSceneFile(value)) return value.assetLibrary.prefabs.filter(isPrefabAsset);
+  if (value && typeof value === "object") {
+    const candidate = value as { prefab?: unknown; prefabs?: unknown };
+    if (isPrefabAsset(candidate.prefab)) return [candidate.prefab];
+    if (Array.isArray(candidate.prefabs)) return candidate.prefabs.filter(isPrefabAsset);
+  }
+  return [];
+}
+
+function makeImportedPrefabId(prefab: PrefabAsset): string {
+  const base = prefab.id || `prefab_${sanitizeFileName(prefab.name)}`;
+  const existing = new Set(currentScene.assetLibrary.prefabs.map((asset) => asset.id));
+  if (!existing.has(base)) return base;
+  let suffix = 2;
+  while (existing.has(`${base}_${suffix}`)) suffix += 1;
+  return `${base}_${suffix}`;
+}
+
+async function importPrefabFile(file: File): Promise<void> {
+  try {
+    const parsed = JSON.parse(await file.text()) as unknown;
+    const imported = getImportedPrefabs(parsed);
+    if (imported.length === 0) {
+      alert("No supported prefab definitions were found in that JSON file.");
+      return;
+    }
+
+    const importedNames: string[] = [];
+    for (const source of imported) {
+      const prefab = deepClone(source);
+      const originalId = prefab.id;
+      prefab.id = makeImportedPrefabId(prefab);
+      if (prefab.id !== originalId) {
+        const updateSelfReferences = (node: Node) => {
+          for (const component of node.components) {
+            if (component.type === "prefabRef" && component.prefabRef === originalId) component.prefabRef = prefab.id;
+          }
+          for (const child of node.children) updateSelfReferences(child);
+        };
+        updateSelfReferences(prefab.rootNode);
+      }
+      prefab.name = `${prefab.name} · Imported`;
+      currentScene.assetLibrary.prefabs.push(prefab);
+      importedNames.push(prefab.name);
+    }
+
+    markModified();
+    renderPrefabLibrary();
+    alert(`Imported ${importedNames.length} prefab${importedNames.length === 1 ? "" : "s"}: ${importedNames.join(", ")}`);
+  } catch (error) {
+    console.error(error);
+    alert("Could not import that prefab JSON.");
+  } finally {
+    prefabFileInput.value = "";
+  }
+}
+
 function isSceneFile(value: unknown): value is SceneFile {
   if (!value || typeof value !== "object") return false;
   const sceneFile = value as SceneFile;
@@ -952,12 +1132,25 @@ sceneFileInput.addEventListener("change", () => {
   if (file) void loadSceneFile(file);
 });
 
-for (const button of document.querySelectorAll<HTMLButtonElement>(".prefab-button")) {
-  button.addEventListener("click", () => {
-    const prefabId = button.dataset.prefabId;
-    if (prefabId) addPrefab(prefabId);
+btnImportPrefab.addEventListener("click", () => prefabFileInput.click());
+prefabFileInput.addEventListener("change", () => {
+  const file = prefabFileInput.files?.[0];
+  if (file) void importPrefabFile(file);
+});
+
+for (const tab of document.querySelectorAll<HTMLButtonElement>(".asset-tab")) {
+  tab.addEventListener("click", () => {
+    const target = tab.dataset.assetTab;
+    if (!target) return;
+    for (const otherTab of document.querySelectorAll<HTMLElement>(".asset-tab")) {
+      otherTab.classList.toggle("active", otherTab === tab);
+    }
+    requiredElement<HTMLElement>("asset-view-builtin").classList.toggle("active", target === "builtin");
+    requiredElement<HTMLElement>("asset-view-uploads").classList.toggle("active", target === "uploads");
   });
 }
+
+requiredElement<HTMLButtonElement>("btn-world-base-demo").addEventListener("click", resetScene);
 
 renderCurrentScene();
 setTool("select");
