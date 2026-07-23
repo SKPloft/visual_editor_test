@@ -142,3 +142,14 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+
+# Project-local skills installed from skills-lock.json
+.agents/
+.claude/skills/lark-*
+.codex/skills/lark-*
+.gemini/skills/lark-*
+.opencode/skills/lark-*
+.windsurf/skills/lark-*
+
+# Local build archives
+/dist.zip

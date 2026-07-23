@@ -1,0 +1,32 @@
+schema: spec-driven
+
+context: |
+  Product: World Creator, a browser-based 3D world editor.
+  Product authority: Lark owns product direction, user/application flows, UX,
+  priority, MVP scope, and success criteria. OpenSpec begins only after work is
+  approved for engineering. Every change should link its originating Lark page
+  or explicitly state why no Lark decision is required (for example, internal
+  debt that does not alter product behavior).
+  Tech stack: TypeScript, Vite, Bun, and Three.js at the repository root.
+  Stable contracts: docs/CANONICAL_FORMAT.md and docs/UNITY_EXPORT.md.
+  Architecture decisions: docs/ADR/.
+  Legacy boundary: _legacy/ and docs/archive/ are historical, read-only context;
+  unfinished work in them is not a current requirement.
+  Export target: canonical scene JSON plus a generated Unity importer package.
+  Current code and tests represent implemented behavior. Contract drift must be
+  resolved explicitly through the change rather than copied into a new spec.
+
+rules:
+  proposal:
+    - Include a Product origin section with the Lark URL, decision status, and decision date; for behavior-neutral technical debt, explain why no Lark decision is required.
+    - State user-visible outcome, scope, and non-goals without copying Lark discussion history.
+    - Identify affected stable contracts and ADRs.
+  specs:
+    - Write observable requirements and scenarios; do not use former M0-M7 milestones as authority.
+    - Keep canonical-format requirements engine-agnostic and place Unity or VRChat behavior in the appropriate export or adapter capability.
+  design:
+    - Reconcile the proposal against current code and stable contracts before choosing an approach.
+    - Record durable or expensive-to-reverse architecture decisions in an ADR.
+  tasks:
+    - Include contract and test updates alongside implementation tasks.
+    - Include end-to-end verification for changes with runtime behavior.

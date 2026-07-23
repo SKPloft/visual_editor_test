@@ -1,101 +1,62 @@
 # World Creator
 
-A browser-based 3D world editor for non-technical VRChat/Resonite creators.
+Browser-based 3D world editor. The active implementation targets canonical JSON and a generated Unity importer package.
 
-## Product planning authority
+## Authority and workflow
 
-Current product direction, UX work, collaboration context, MVP scope, and success criteria are maintained in Lark:
+Use each system for one purpose:
 
-- [项目：Nook](https://vrcd-community.feishu.cn/wiki/ILvDwglemixrBekqtDFc4b6Rnwb)
-- [MVP前工作图](https://vrcd-community.feishu.cn/wiki/HTrmwgVa5i31JSkP6bDcoJWinId)
+1. **Lark — product authority.** Current product direction, user and application flows, UX, MVP scope, priority, and success criteria live in:
+   - [项目：Nook](https://vrcd-community.feishu.cn/wiki/ILvDwglemixrBekqtDFc4b6Rnwb)
+   - [MVP前工作图](https://vrcd-community.feishu.cn/wiki/HTrmwgVa5i31JSkP6bDcoJWinId)
+2. **OpenSpec — approved engineering changes.** Once work is approved in Lark, create an OpenSpec change for scope, requirements, design, acceptance criteria, and tasks. Link the originating Lark decision. Do not copy the product backlog into OpenSpec.
+3. **Repository contracts — durable technical truth.** `docs/` contains accepted architecture and stable format/export contracts.
+4. **Code and tests — implemented behavior.** If code and a contract disagree, reconcile them explicitly; do not use an archived plan to decide behavior.
 
-Use Lark for current product decisions. The repository is authoritative for implemented behavior, technical specifications, ADRs, and implementation status. Earlier local product plans are preserved under `docs/archive/local-plans/` and must not be treated as current requirements.
+The former M0–M7 roadmap, tracker, and planning notes are historical context only under `docs/archive/`. Do not implement their unfinished items unless Lark approves them as current work and an OpenSpec change is created.
 
-## Tech stack
+## Active project map
 
-- **Runtime:** Browser-first web application (no install for users)
-- **Language:** TypeScript
-- **3D viewport:** Three.js (confirmed for the technology prototype; see ADR-001)
-- **Scene format:** Custom canonical JSON (`docs/CANONICAL_FORMAT.md`)
-- **Export target:** Unity Editor C# script (`docs/UNITY_EXPORT.md`)
-- **Build tooling:** Vite in `editor/` (configured for M0), package management via `bun`. Legacy Webpack/Express setup lives in `_legacy/`.
+- `src/` — TypeScript + Three.js browser editor source
+  - `scene/` — scene types, demo data, and Three.js loading
+  - `export/` — generated Unity importer package
+- `index.html`, `package.json`, `bun.lock`, `tsconfig.json` — root application entrypoint and build manifests
+- `openspec/` — active and accepted engineering change specifications
+- `.agents/skills/` — canonical project-local installed skills; selected agent directories link to these copies
+- `.claude/`, `.codex/`, `.gemini/`, `.opencode/`, `.windsurf/` — supported agent integrations
+- `docs/` — documentation index, technical contracts, and ADRs
+- `design/` — Pencil source and exported mockups; product/UX authority remains Lark
+- `adapters/` — reserved; new adapter work requires Lark approval and an architectural decision
+- `_legacy/` — read-only Rogue Engine archive and offline references
 
-## Project structure
+See `docs/README.md` for the active documentation map.
 
-- `docs/` — active engineering decisions, implementation tracking, and specifications
-  - `CANONICAL_FORMAT.md` — engine-agnostic JSON scene format
-  - `UNITY_EXPORT.md` — Unity Editor script exporter spec
-  - `ADR/` — accepted architectural decision records
-  - `NOTES/` — implementation observations, informal technical decisions, bugs, and debt
-  - `archive/local-plans/` — superseded local product, roadmap, flow, and MVP drafts; Lark is authoritative instead
-  - `threejs/` — legacy Three.js API docs imported as offline reference; not integrated into the build or workflow
-- `design/` — UX source files and exported mockups
-  - `visual-editor.pen` — Pencil design file
-  - `exports/` — PNG mockups
-- `assets/mockups/` — prototype screenshots and related docs
-- `adapters/` — reserved for future engine adapters (currently empty)
-- `editor/` — browser editor source (Vite + TypeScript + Three.js)
-  - `src/scene/` — canonical format types, demo scene, and Three.js scene loader
-  - `index.html` — editor entry point
-  - `package.json` — Vite build scripts and dependencies
-- `_legacy/` — archived Rogue Engine visual editor code and assets
-- `docs/IMPLEMENTATION_TRACKER.md` — milestone completion status dashboard
-  - `docs/NOTES/README.md` — what each NOTES file is for and how to keep formats stable
-  - `docs/NOTES/milestones.md` — per-milestone observations, discoveries, and post-mortems
-  - `docs/NOTES/bugs-debt.md` — known bugs, performance debt, and refactor candidates
-  - `docs/NOTES/decisions.md` — informal decisions not worth a full ADR
+## Engineering conventions
 
-## Architecture decisions
+- Use TypeScript for browser/editor code and match the surrounding style.
+- Keep canonical format contracts engine-agnostic; Unity/VRChat mapping belongs in export or adapter contracts.
+- Treat `_legacy/` and `docs/archive/` as read-only history.
+- Use an ADR for durable or expensive-to-reverse architecture decisions. Do not use ADRs as task trackers.
+- Record future feature behavior in an OpenSpec change, not in `AGENTS.md`, technical contracts, or a new milestone document.
+- Update stable contracts when accepted behavior changes, normally while archiving the responsible OpenSpec change.
+- Do not revive a Rogue Engine/standalone-runtime target without a new Lark decision and superseding ADR.
 
-See `docs/ADR/` for full rationale. Key decisions:
+## Tooling conventions
 
-1. **Browser-first** (ADR-001) — editor runs in the browser; no download or install step.
-2. **JSON canonical format** (ADR-002) — human-readable, versioned scene graph consumed by the browser editor and Unity exporter.
-3. **Unity Editor script export** (ADR-003) — export generates a runnable C# script instead of a `.unitypackage`.
-4. **No Rogue Engine adapter** (ADR-004) — technology prototype focuses on Unity/VRChat only; Rogue Engine code is archived.
+- Run application, OpenSpec, skill-management, and agent commands from the repository root.
+- `skills-lock.json` records project-local external skills; `.agents/skills/` is the canonical installed store.
+- Only Claude Code, Codex, Gemini CLI, OpenCode, and Windsurf integrations are maintained locally. Do not generate every supported agent integration by default.
+- OpenSpec owns its generated commands and skills. Refresh them with `openspec update .`; do not edit generated workflow files by hand.
 
-## Current work
+## Build and run
 
-Use Lark for the current product and UX workstream. Use `docs/IMPLEMENTATION_TRACKER.md` and the active code for technical implementation status; the archived M0–M7 roadmap is historical context only.
-
-## Conventions
-
-- Use TypeScript for all new browser/editor code.
-- Keep the canonical format engine-agnostic — no Unity, VRChat, or Rogue-specific data in `CANONICAL_FORMAT.md`.
-- Export and adapter code lives under `adapters/`; browser editor code lives under `editor/`.
-- Treat `_legacy/` as read-only reference. Do not build new features on top of it.
-- Update ADRs when making architectural changes that affect scope, format, or export targets.
-- Log informal decisions, discovered bugs/debt, and milestone observations in `docs/NOTES/` rather than in `docs/IMPLEMENTATION_TRACKER.md`.
-- Do not restructure `docs/NOTES/` files or `docs/IMPLEMENTATION_TRACKER.md` without proposing the change first. Format changes affect how the team reads project state.
-- Record current product planning, UX direction, MVP scope, and collaboration decisions in Lark rather than adding new local product-plan documents.
-- Add TODO/FOR REVIEW markers to active technical documents for engineering decisions that need manual validation before coding begins.
-- Update AGENTS.md when project structure, build tooling, documentation authority, or implementation status changes.
-- Review viewport controls and existing implementations for performance (data structures, algorithms) before expanding M1 features.
-
-## Build & run
-
-### Editor (M0+)
-
-The editor is a standalone Vite project under `editor/`:
+The active application uses Bun from the repository root:
 
 ```bash
-cd editor
 bun install
-bun run dev      # Start development server with hot reload
-bun run build    # Production build to editor/dist/
-bun run preview  # Preview production build locally
+bun run dev
+bun run build
+bun run preview
 ```
 
-### Legacy
-
-The legacy setup in `_legacy/` is kept on npm for reference only:
-
-```bash
-cd _legacy
-npm install
-npm run build
-```
-
-The active `editor/` uses `bun` (see M0 tooling notes).
-
-The new `adapters/` directory will get its own build setup as M3 implementation begins.
+The `_legacy/` npm project is archival and should not receive new feature work.
