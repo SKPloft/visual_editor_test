@@ -26,10 +26,10 @@
 
 ## 5. Portable GLB Profile
 
-- [ ] 5.1 Wrap the selected maintained GLB parser/validator behind package-owned interfaces and enforce byte/node/primitive/material/texture/image limits plus v1's no-external-URI rule.
-- [ ] 5.2 Implement Portable Prefab Profile checks for permitted geometry/PBR/lights, registered Nook components, unsupported native/extension features, and capability usage discovery.
-- [ ] 5.3 Validate exactly one marked logical root per representation, reserved `nook.root` identity, and the single-root versus synthetic-wrapper rules.
-- [ ] 5.4 Parse and validate `extras.nook.prefabInstance` records and registered `extras.nook.components` without executing or instantiating package content.
+- [x] 5.1 Wrap the selected maintained GLB parser/validator behind package-owned interfaces and enforce byte/node/primitive/material/texture/image limits plus v1's no-external-URI rule.
+- [x] 5.2 Implement Portable Prefab Profile checks for permitted geometry/PBR/lights, registered Nook components, unsupported native/extension features, and capability usage discovery.
+- [x] 5.3 Validate exactly one marked logical root per representation, reserved `nook.root` identity, and the single-root versus synthetic-wrapper rules.
+- [x] 5.4 Parse and validate `extras.nook.prefabInstance` records and registered `extras.nook.components` without executing or instantiating package content.
 - [ ] 5.5 Add proxy/full GLB fixtures covering single and multiple source roots, non-identity root transforms, manual structural divergence, unsupported features, external URIs, malformed GLBs, and resource caps.
 
 ## 6. Parameters, Paths, and Capabilities
