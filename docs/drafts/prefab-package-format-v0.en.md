@@ -1,6 +1,8 @@
 # Nook Prefab Package Format · Draft v0.1
 
-> **Status: DRAFT (exploratory draft, not approved)**
+> **Status: PROMOTED — non-normative source history.**
+> This draft was promoted to the stable contract [`../PREFAB_PACKAGE_FORMAT.md`](../PREFAB_PACKAGE_FORMAT.md) by OpenSpec change `prefab-contract-foundation`. Read the stable contract for normative rules; where the two disagree, the stable contract wins. This file is retained unchanged below as the record of what was decided in the original discussion.
+>
 > This document consolidates the conclusions of the 2026-07-24/25 discussion on prefab internal structure and format, for review and subsequent PoC use.
 > **v0.1 (2026-07-25)**: incorporates the external review and follow-up discussion (discussion log R7/R8) — Portable Prefab Profile, representation-scoped bindings, path language, logical root constraint, nested-instance encoding, reference envelope, parameterReplacements, JCS hashing, validation & security, forward-compatibility tiers, and the "semantic consistency" rename.
 > It is **not yet** a stable repository contract; the formalization path is the OpenSpec change `prefab-contract-foundation` (which will also record the disposition stance for the legacy implementation path).

@@ -16,16 +16,17 @@ When sources disagree, do not silently choose an old document. Reconcile code an
 
 ## Active contracts
 
-- [`CANONICAL_FORMAT.md`](CANONICAL_FORMAT.md) — engine-agnostic scene-data contract and JSON Schema.
-- [`UNITY_EXPORT.md`](UNITY_EXPORT.md) — generated Unity importer package behavior.
+- [`PREFAB_PACKAGE_FORMAT.md`](PREFAB_PACKAGE_FORMAT.md) — Nook prefab package interchange contract (manifest, payloads, parameters, capabilities, validation). Supersedes the prefab portions of `CANONICAL_FORMAT.md`.
+- [`CANONICAL_FORMAT.md`](CANONICAL_FORMAT.md) — engine-agnostic scene-data contract and JSON Schema. Its prefab model is legacy prototype behavior.
+- [`UNITY_EXPORT.md`](UNITY_EXPORT.md) — generated Unity importer package behavior. Its prefab generation is frozen.
 - [`TECHNICAL_DEBT.md`](TECHNICAL_DEBT.md) — active engineering debt only; not a feature backlog.
 
-## Drafts (exploratory, not approved)
+## Rationale records (non-normative)
 
-- [`drafts/prefab-package-format-v0.md`](drafts/prefab-package-format-v0.md) — draft prefab package format standard (中文草案); formalization path is OpenSpec change `prefab-contract-foundation`.
-- [`drafts/prefab-format-discussion-log.md`](drafts/prefab-format-discussion-log.md) — discussion record: questions, options, chosen answers, rationale, and open items.
+- [`drafts/prefab-package-format-v0.md`](drafts/prefab-package-format-v0.md) / [`.en.md`](drafts/prefab-package-format-v0.en.md) — v0.1 draft, promoted to `PREFAB_PACKAGE_FORMAT.md` by OpenSpec change `prefab-contract-foundation`. Retained as source history.
+- [`drafts/prefab-format-discussion-log.md`](drafts/prefab-format-discussion-log.md) / [`.en.md`](drafts/prefab-format-discussion-log.en.md) — discussion record: questions, options, chosen answers, rationale, and open items.
 
-Drafts are pre-OpenSpec working documents. They do not override active contracts until an OpenSpec change is approved and archived.
+These documents record why the contract says what it says. They are not runtime contracts and do not override the active contracts above.
 
 ## Architecture decisions
 
@@ -34,6 +35,7 @@ Drafts are pre-OpenSpec working documents. They do not override active contracts
 - [`ADR/003-unity-editor-script-export.md`](ADR/003-unity-editor-script-export.md) — superseded.
 - [`ADR/004-no-rogue-adapter.md`](ADR/004-no-rogue-adapter.md)
 - [`ADR/005-generated-unity-importer-package.md`](ADR/005-generated-unity-importer-package.md)
+- [`ADR/006-prefab-package-interchange.md`](ADR/006-prefab-package-interchange.md)
 
 ADRs capture durable, expensive-to-reverse choices. Feature acceptance criteria and task lists belong in OpenSpec changes.
 

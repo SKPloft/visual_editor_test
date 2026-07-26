@@ -1,5 +1,7 @@
 # CANONICAL_FORMAT.md
 
+> **Prefab scope notice.** The embedded prefab model in this document — `PrefabAsset.rootNode` (§2.2) and the `prefabRef` component (§3.5) — is **legacy prototype behavior**. It describes what the current browser editor and generated Unity importer implement, and it is superseded for all future prefab work by [`PREFAB_PACKAGE_FORMAT.md`](PREFAB_PACKAGE_FORMAT.md) (see [`ADR/006`](ADR/006-prefab-package-interchange.md)). New prefab functionality must not target the embedded model. The rest of this scene contract is unaffected and is not redesigned by that change; the world/scene format is a separate future change.
+
 ## Editor-Agnostic JSON Scene Graph Format
 
 ### 1. Design Goals
@@ -90,6 +92,8 @@ interface TextureAsset {
 ```
 
 ##### Prefab Asset
+
+> **Legacy — superseded for future work.** Embedding a complete sub-scene graph in the scene file makes the editor's in-memory model the interchange format. It has no content identity, immutable version, integrity verification, dependency pinning, capability negotiation, or preview/bake fidelity separation. [`PREFAB_PACKAGE_FORMAT.md`](PREFAB_PACKAGE_FORMAT.md) replaces it with a manifest plus content-addressed GLB payloads referenced by `{kind, id, version, digest}`. The shape below remains accurate for the currently implemented prototype and is frozen: it receives no package-format functionality.
 
 ```typescript
 interface PrefabAsset {
@@ -190,6 +194,8 @@ interface ColliderComponent {
 ```
 
 #### 3.5 Prefab Reference Component
+
+> **Legacy — superseded for future work.** A bare string pointing at an in-file `PrefabAsset.id` cannot express an exact immutable package version. The minimum instance record in [`PREFAB_PACKAGE_FORMAT.md`](PREFAB_PACKAGE_FORMAT.md) §9 uses an exact `{kind, id, version, digest}` reference plus a placement transform and parameter assignments keyed by `paramId`. The shape below remains accurate for the currently implemented prototype and is frozen.
 
 ```typescript
 interface PrefabReferenceComponent {

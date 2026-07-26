@@ -1,6 +1,7 @@
 # 预制体格式 · 讨论与决策记录
 
-> **状态：讨论纪要（2026-07-24/25，R8 更新），配合 [`prefab-package-format-v0.md`](prefab-package-format-v0.md) 阅读。**
+> **状态：非规范性理据。讨论纪要（2026-07-24/25，R8 更新）。**
+> 本文记录契约条款背后的理由，本身不是运行时契约，也不会成为契约。规范性文档为 [`../PREFAB_PACKAGE_FORMAT.md`](../PREFAB_PACKAGE_FORMAT.md)；配合 [`prefab-package-format-v0.md`](prefab-package-format-v0.md) 阅读。
 > 本文记录讨论过程中**双方提出的问题、列出的选项、选择的答案与理由**，以及尚未决定的部分。
 > 状态图例：✓ 已确认 ｜ ⚑ 待定（需继续讨论） ｜ ⏸ 延期（PoC 后或条件成熟后）
 > 起点材料：飞书《预制体内部结构 · 技术方案对比》（A/B/C 方案对比）、Lark 全流程管道与预制件页面、OpenSpec change `prefab-contract-foundation` 的 proposal。

@@ -1,6 +1,7 @@
 # Prefab Format · Discussion and Decision Log
 
-> **Status: Discussion minutes (2026-07-24/25, updated at R8). Read alongside [`prefab-package-format-v0.en.md`](prefab-package-format-v0.en.md).**
+> **Status: Non-normative rationale. Discussion minutes (2026-07-24/25, updated at R8).**
+> These minutes record why the contract says what it says. They are not a runtime contract and never become one. The normative document is [`../PREFAB_PACKAGE_FORMAT.md`](../PREFAB_PACKAGE_FORMAT.md); read alongside [`prefab-package-format-v0.en.md`](prefab-package-format-v0.en.md).
 > This document records the **questions raised by both parties, the options considered, the chosen answers, and their rationale**, as well as the parts not yet decided.
 > Status legend: ✓ Confirmed ｜ ⚑ Pending (needs further discussion) ｜ ⏸ Deferred (until after PoC or when conditions mature)
 > Starting materials: Lark's "Prefab Internal Structure · Technical Comparison" (options A/B/C), the Lark end-to-end pipeline and prefabs pages, and the proposal of OpenSpec change `prefab-contract-foundation`.

@@ -1,9 +1,9 @@
 ## 1. Contract Promotion and Legacy Boundary
 
-- [ ] 1.1 Promote the approved prefab package v0.1 decisions into a stable English contract document, retaining the discussion log as non-normative rationale.
-- [ ] 1.2 Add an ADR for interchange-first packaging, GLB structural ownership, manifest-plus-CAS identity, root composition, declared parameters, capability governance, and staged legacy migration.
-- [ ] 1.3 Update `docs/CANONICAL_FORMAT.md` to mark its embedded `PrefabAsset.rootNode` model as legacy prototype behavior superseded for future prefab development, without redesigning the remaining world format.
-- [ ] 1.4 Update `docs/UNITY_EXPORT.md` to mark current embedded-prefab generation as frozen implemented behavior and identify later package/bake integration as a separate change.
+- [x] 1.1 Promote the approved prefab package v0.1 decisions into a stable English contract document, retaining the discussion log as non-normative rationale.
+- [x] 1.2 Add an ADR for interchange-first packaging, GLB structural ownership, manifest-plus-CAS identity, root composition, declared parameters, capability governance, and staged legacy migration.
+- [x] 1.3 Update `docs/CANONICAL_FORMAT.md` to mark its embedded `PrefabAsset.rootNode` model as legacy prototype behavior superseded for future prefab development, without redesigning the remaining world format.
+- [x] 1.4 Update `docs/UNITY_EXPORT.md` to mark current embedded-prefab generation as frozen implemented behavior and identify later package/bake integration as a separate change.
 
 ## 2. Dependency and Module Foundation
 

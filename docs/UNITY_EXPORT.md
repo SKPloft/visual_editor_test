@@ -1,6 +1,8 @@
 # World Creator — Unity Export Specification
 
 > **Status:** Implemented. The browser-side generator is `src/export/unityPackageGenerator.ts`. The generated mini Unity package imports canonical JSON into Unity via `World Creator → Import Scene from JSON`.
+>
+> **Prefab scope notice.** Prefab generation described in §3.3 is **frozen implemented behavior**. It builds Unity prefabs from the legacy embedded `PrefabAsset.rootNode` model and receives no Nook prefab package functionality. Consuming `.nookpkg` packages, resolving pinned `{kind, id, version, digest}` references, and bake/export integration are out of scope here and belong to separate future changes; see [`PREFAB_PACKAGE_FORMAT.md`](PREFAB_PACKAGE_FORMAT.md) and [`ADR/006`](ADR/006-prefab-package-interchange.md). This document is not rewritten as package support.
 
 ## 1. Overview
 
@@ -94,6 +96,8 @@ Mapping rules:
 If a texture is referenced but not found in the `textures` array, a warning is logged and the material falls back to the albedo color.
 
 ### 3.3 Prefabs Folder
+
+> **Frozen.** This section documents the prototype path that consumes the legacy embedded prefab model. It is accurate for the shipped importer and must not be extended. Nook prefab package consumption is a separate future change.
 
 For every `PrefabAsset` in the JSON `assetLibrary`, the importer creates a real `.prefab` asset:
 
@@ -208,6 +212,7 @@ The following limitations apply to the basic prototype importer. They are intent
 | **Coordinate system conversion** | Z positions are negated when importing into Unity's left-handed space. Rotation handedness conversion for non-trivial orientations is unresolved technical debt; see `docs/TECHNICAL_DEBT.md`. |
 | **No nested parenting by `parent` ID** | The `parent` field on nodes is not part of the canonical format; only the `children` array defines hierarchy. |
 | **No scene cleanup on re-import** | Re-importing a scene creates a second root GameObject. Manual deletion of the old root is required. |
+| **No Nook prefab package support** | The importer reads only embedded `PrefabAsset.rootNode` trees. It does not read `.nookpkg` archives, verify manifest or blob digests, resolve pinned package references, apply declared parameters, or honor package-root transform composition. Package/bake integration is a separate future change. |
 
 ---
 
