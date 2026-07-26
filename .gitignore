@@ -153,3 +153,6 @@ dist
 
 # Local build archives
 /dist.zip
+
+# Regenerable prefab package fixture artifacts (bun run fixtures:emit)
+tests/fixtures/prefab-package/generated/

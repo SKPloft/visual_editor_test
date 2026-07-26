@@ -57,7 +57,7 @@
 
 ## 9. Verification and Progressive Handoff
 
-- [ ] 9.1 Run type checking, unit tests, fixture conformance tests, archive-security tests, and the production build; resolve all failures attributable to this change.
-- [ ] 9.2 Exercise the inspector end to end on at least one valid `.nookpkg` fixture and representative invalid packages, verifying metadata, support/validity states, integrity results, and exact diagnostic codes.
-- [ ] 9.3 Confirm through diff review that current browser prefab placement/rendering and generated Unity importer implementation were not coupled to or expanded by the PoC.
-- [ ] 9.4 Document follow-on OpenSpec boundaries and dependency order for creator SDK export, registry/CAS, browser package consumption, world instances, version upgrades, and bake/export integration.
+- [x] 9.1 Run type checking, unit tests, fixture conformance tests, archive-security tests, and the production build; resolve all failures attributable to this change.
+- [x] 9.2 Exercise the inspector end to end on at least one valid `.nookpkg` fixture and representative invalid packages, verifying metadata, support/validity states, integrity results, and exact diagnostic codes.
+- [x] 9.3 Confirm through diff review that current browser prefab placement/rendering and generated Unity importer implementation were not coupled to or expanded by the PoC.
+- [x] 9.4 Document follow-on OpenSpec boundaries and dependency order for creator SDK export, registry/CAS, browser package consumption, world instances, version upgrades, and bake/export integration.
