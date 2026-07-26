@@ -53,6 +53,23 @@ export { verifyIntegrity, type BlobEntry, type IntegrityResult } from "./integri
 export { MANIFEST_ENTRY_NAME, BLOB_DIRECTORY, normalizePath, readNookPackage } from "./archive.ts";
 
 export {
+  parsePath,
+  registeredTargets,
+  resolveTargetOnNode,
+  type PathTarget,
+  type ResolvedPath,
+} from "./path.ts";
+
+export {
+  describeValueProblem,
+  validateParameterValue,
+  validateParameters,
+  validateReferenceCategory,
+} from "./parameters.ts";
+
+export { assessCapabilities, parseCapabilityId } from "./capabilities.ts";
+
+export {
   COMPONENT_REGISTRY,
   ENUM_DOMAINS,
   KNOWN_REPRESENTATIONS,

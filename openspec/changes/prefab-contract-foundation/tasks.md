@@ -34,11 +34,11 @@
 
 ## 6. Parameters, Paths, and Capabilities
 
-- [ ] 6.1 Implement v1 parameter declaration/value validation for supported scalar, enum, color, vector, and `prefabRef` types, including defaults and constraints; reject reserved unsupported `materialRef`/`textureRef` use.
-- [ ] 6.2 Implement the bounded `nook.path/1` parser, escaping, by-index/by-name segments needed by v1, writable-target whitelist, and parameter-type compatibility table.
-- [ ] 6.3 Implement representation-scoped binding validation so required full targets error and absent optional proxy targets produce stable degraded-preview diagnostics.
-- [ ] 6.4 Implement unified reference-envelope validation, `prefabRef` category restrictions, and exceptional `parameterReplacements` validation.
-- [ ] 6.5 Implement `requires` usage derivation, sorted/deduplicated superset checks, independent capability-version support, unsupported-capability states, inspect-only degradation, and marketplace rejection of `x.*` capabilities.
+- [x] 6.1 Implement v1 parameter declaration/value validation for supported scalar, enum, color, vector, and `prefabRef` types, including defaults and constraints; reject reserved unsupported `materialRef`/`textureRef` use.
+- [x] 6.2 Implement the bounded `nook.path/1` parser, escaping, by-index/by-name segments needed by v1, writable-target whitelist, and parameter-type compatibility table.
+- [x] 6.3 Implement representation-scoped binding validation so required full targets error and absent optional proxy targets produce stable degraded-preview diagnostics.
+- [x] 6.4 Implement unified reference-envelope validation, `prefabRef` category restrictions, and exceptional `parameterReplacements` validation.
+- [x] 6.5 Implement `requires` usage derivation, sorted/deduplicated superset checks, independent capability-version support, unsupported-capability states, inspect-only degradation, and marketplace rejection of `x.*` capabilities.
 - [ ] 6.6 Add parameter/path/capability fixtures for valid mappings, type mismatches, missing nodes, fragile/invalid paths, unsupported types, under-reported requirements, and unknown required capabilities.
 
 ## 7. Dependencies and Semantic Consistency
