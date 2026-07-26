@@ -29,6 +29,28 @@ export {
 } from "./policy.ts";
 
 export {
+  blobFileName,
+  canonicalJsonBytes,
+  canonicalJsonString,
+  canonicalStringArray,
+  digestOfManifest,
+  isCanonicalStringArray,
+  isValidDigest,
+  manifestDigest,
+  sha256Digest,
+} from "./canonical.ts";
+
+export {
+  isExactSemver,
+  isValidIdentifier,
+  parseManifest,
+  parseManifestBytes,
+  parseReference,
+} from "./manifest.ts";
+
+export { verifyIntegrity, type BlobEntry, type IntegrityResult } from "./integrity.ts";
+
+export {
   COMPONENT_REGISTRY,
   ENUM_DOMAINS,
   KNOWN_REPRESENTATIONS,

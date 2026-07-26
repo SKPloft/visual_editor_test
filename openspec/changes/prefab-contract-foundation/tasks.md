@@ -13,9 +13,9 @@
 
 ## 3. Canonical Manifest and Integrity
 
-- [ ] 3.1 Implement `nook.prefab/1` manifest parsing and structural validation, including identifiers, semantic versions, exact references, unique parameter IDs, canonical arrays, payload roles, and extensible unknown fields.
-- [ ] 3.2 Implement RFC 8785 JCS serialization and `sha256:<lowercase hex>` manifest identity calculation, excluding any self-digest and enforcing sorted/deduplicated contract arrays.
-- [ ] 3.3 Implement raw blob digest and size verification plus deterministic payload inventory checks for required `proxy`/`full`, missing blobs, extra blobs, and unknown optional slots.
+- [x] 3.1 Implement `nook.prefab/1` manifest parsing and structural validation, including identifiers, semantic versions, exact references, unique parameter IDs, canonical arrays, payload roles, and extensible unknown fields.
+- [x] 3.2 Implement RFC 8785 JCS serialization and `sha256:<lowercase hex>` manifest identity calculation, excluding any self-digest and enforcing sorted/deduplicated contract arrays.
+- [x] 3.3 Implement raw blob digest and size verification plus deterministic payload inventory checks for required `proxy`/`full`, missing blobs, extra blobs, and unknown optional slots.
 - [ ] 3.4 Add unit tests and independent digest fixtures proving equivalent manifests produce identical identity and changed semantics/payload references change identity.
 
 ## 4. Secure Archive Inspection
