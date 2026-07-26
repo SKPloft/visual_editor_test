@@ -243,7 +243,7 @@ suite("invariant 3 — identity and version consistency", () => {
     const newer = { ...parsed, version: "2.1.0" };
 
     const result = await inspectPackageArchive(archive, {
-      resolver: createLocalResolver([parsed, newer]),
+      resolver: await createLocalResolver([parsed, newer]),
     });
 
     expect(result.dependencyReport!.declared[0].version).toBe(BULB_VERSION);

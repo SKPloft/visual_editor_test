@@ -68,6 +68,7 @@ export const DIAGNOSTIC_CATALOG = {
   // --- canonical identity and blob integrity --------------------------------
   "NOOK-MANIFEST-DIGEST-MISMATCH": { phase: "integrity", severity: "ERROR", fatal: false },
   "NOOK-BLOB-MISSING": { phase: "integrity", severity: "ERROR", fatal: false },
+  "NOOK-BLOB-NOT-INSPECTED": { phase: "integrity", severity: "INFO", fatal: false },
   "NOOK-BLOB-EXTRA": { phase: "integrity", severity: "ERROR", fatal: false },
   "NOOK-BLOB-SIZE-MISMATCH": { phase: "integrity", severity: "ERROR", fatal: false },
   "NOOK-BLOB-DIGEST-MISMATCH": { phase: "integrity", severity: "ERROR", fatal: false },

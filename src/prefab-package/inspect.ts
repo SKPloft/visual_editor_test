@@ -89,6 +89,7 @@ async function runSemanticPhases(
   // --- phase 3: canonical identity and blob integrity ----------------------
   const integrity = await verifyIntegrity(manifest, blobs, diagnostics, {
     expectedManifestDigest: options.expectedManifestDigest,
+    expectedRoles: policy.expectedRoles,
   });
 
   // An unsupported major means this consumer cannot interpret the manifest's
@@ -152,6 +153,7 @@ async function runSemanticPhases(
   // --- phase 6: dependency coverage and graph ------------------------------
   const dependencyReport = validateDependencies(
     manifest,
+    integrity.manifestDigest,
     representations,
     parameters.discoveredReferences,
     options.resolver ?? null,

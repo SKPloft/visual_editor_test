@@ -252,6 +252,14 @@ export interface InspectionPolicy {
   payload: PayloadLimits;
   path: PathLimits;
   role: ConsumerRole;
+  /**
+   * Payload roles this inspection is expected to receive and verify.
+   *
+   * Omitted means every declared role, which is the strict archive/publication
+   * default. A preview caller passes `["proxy"]`; absent non-expected roles
+   * remain visible as not inspected rather than making that preview invalid.
+   */
+  expectedRoles?: readonly string[];
   /** Capability identifiers this consumer supports, e.g. `nook.parameter/color@1`. */
   supportedCapabilities: readonly string[];
   /** Highest supported `nook.prefab` major. */
@@ -269,12 +277,28 @@ export interface InspectionPolicy {
 // ---------------------------------------------------------------------------
 
 /**
+ * A dependency artifact attested by its retrieval boundary.
+ *
+ * `digest` is computed from the bytes the resolver actually read — RFC 8785
+ * JCS plus SHA-256 for a manifest — rather than copied from the caller's
+ * reference. This is the trust boundary that detects cache poisoning, registry
+ * substitution, and fixture-set mistakes before the inspector uses the parsed
+ * manifest for cycle or parameter validation.
+ */
+export interface ResolvedDependency {
+  manifest: PrefabManifest;
+  digest: string;
+}
+
+/**
  * Injected local dependency context. The inspector never fetches: a resolver
  * returning `null` means "not available locally", which is reported distinctly
- * from an inconsistent declaration.
+ * from an inconsistent package. A non-null result attests to the actual bytes
+ * retrieved; the inspector compares its digest to the pinned reference before
+ * trusting its manifest.
  */
 export interface DependencyResolver {
-  resolve(reference: PackageReference): PrefabManifest | null;
+  resolve(reference: PackageReference): ResolvedDependency | null;
 }
 
 export interface DiscoveredReference {

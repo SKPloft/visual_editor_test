@@ -9,7 +9,7 @@ import {
   WALL_LAMP_VERSION,
   buildWallLamp,
 } from "../fixtures/prefab-package/packages.ts";
-import { describe, errorCodes, find } from "./helpers.ts";
+import { codes, describe, errorCodes, find } from "./helpers.ts";
 
 suite("valid package inspection", () => {
   test("the reference package inspects clean", async () => {
@@ -67,6 +67,56 @@ suite("valid package inspection", () => {
     expect(fromWire.diagnostics.map((d) => d.code)).toEqual(
       fromArchive.diagnostics.map((d) => d.code),
     );
+  });
+
+
+  test("a proxy-only consumer is valid and records full as not inspected", async () => {
+    const { manifestBytes, blobs, digests } = await buildWallLamp();
+    const proxyOnly = blobs.filter((blob) => blob.path.includes(digests.proxy.replace(":", "_")));
+
+    const { inspectPackage } = await import("../../src/prefab-package/index.ts");
+    const result = await inspectPackage(manifestBytes, proxyOnly, {
+      policy: { role: "proxy-render-only", expectedRoles: ["proxy"] },
+    });
+
+    expect(result.valid).toBe(true);
+    expect(result.configurable).toBe(false);
+    expect(result.representations.find((representation) => representation.role === "proxy")?.parsed).toBe(true);
+    expect(result.representations.find((representation) => representation.role === "full")?.parsed).toBe(false);
+
+    const skipped = find(result, "NOOK-BLOB-NOT-INSPECTED");
+    expect(skipped?.severity).toBe("INFO");
+    expect(skipped?.representation).toBe("full");
+    expect(skipped?.detail).toContain("integrity was not verified");
+    expect(codes(result)).not.toContain("NOOK-BLOB-MISSING");
+  });
+
+  test("a baking consumer without its expected full payload is invalid", async () => {
+    const { manifestBytes, blobs, digests } = await buildWallLamp();
+    const proxyOnly = blobs.filter((blob) => blob.path.includes(digests.proxy.replace(":", "_")));
+
+    const { inspectPackage } = await import("../../src/prefab-package/index.ts");
+    const result = await inspectPackage(manifestBytes, proxyOnly, {
+      policy: { role: "bake", expectedRoles: ["full"] },
+    });
+
+    expect(result.valid).toBe(false);
+    expect(find(result, "NOOK-BLOB-MISSING")?.representation).toBe("full");
+    // Proxy was supplied and verified even though this role does not require it,
+    // so there is no not-inspected record for it.
+    expect(result.payloads.find((payload) => payload.role === "proxy")?.digestVerified).toBe(true);
+  });
+
+  test("strict archive inspection without full remains invalid", async () => {
+    const { manifestBytes, blobs, digests } = await buildWallLamp();
+    const proxyOnly = blobs.filter((blob) => blob.path.includes(digests.proxy.replace(":", "_")));
+
+    const { inspectPackage } = await import("../../src/prefab-package/index.ts");
+    const result = await inspectPackage(manifestBytes, proxyOnly);
+
+    expect(result.valid).toBe(false);
+    expect(find(result, "NOOK-BLOB-MISSING")?.representation).toBe("full");
+    expect(codes(result)).not.toContain("NOOK-BLOB-NOT-INSPECTED");
   });
 });
 

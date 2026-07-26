@@ -114,6 +114,7 @@ export type {
   ConsumerRole,
   DependencyReport,
   DependencyResolver,
+  ResolvedDependency,
   DiscoveredReference,
   InspectionPolicy,
   InspectionResult,

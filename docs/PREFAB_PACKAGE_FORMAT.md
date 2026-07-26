@@ -87,6 +87,7 @@ Unknown optional fields at every extensible level MUST be preserved verbatim (§
 - Each `(id, version)` tuple MAY be published only once.
 - Republishing the same tuple with a different digest MUST be rejected without changing the existing binding.
 - Dependency digests participate in the manifest hash, producing a recursive fingerprint.
+- A dependency resolver SHALL attest the manifest digest it computed from the bytes it actually retrieved (`sha256(JCS(manifest))`). A consumer MUST compare that attested digest with the pinned reference before using the resolved manifest for graph traversal or parameter validation. A mismatch is `NOOK-MANIFEST-DIGEST-MISMATCH` and is always an `ERROR`; it indicates substitution, corruption, or a registry/cache fault.
 - Blob digest and declared size MUST both be verified before a blob is parsed as a trusted payload.
 
 ### 3.2 Identity allocation
@@ -151,6 +152,16 @@ Each payload descriptor MUST declare `digest`, non-negative `size`, and `mediaTy
 `proxy` and `full` are independent GLBs. The profile MUST NOT require identical hierarchy, primitive layout, material indices, polygon count, or pixels between them.
 
 Both GLBs MUST be self-contained in v1: external buffer or image URIs are forbidden.
+
+### 6.1.1 Role-scoped retrieval and inspection
+
+`proxy` and `full` are required **package roles**, but a consumer need not retrieve every role to perform its own role-scoped work. Inspection policy MAY declare `expectedRoles`:
+
+- When omitted, every declared role is expected. This is the strict default for `.nookpkg` archive inspection, registry acceptance, and publication validation. An absent expected role emits `NOOK-BLOB-MISSING` (`ERROR`).
+- A preview/editor consumer that has deliberately fetched only proxy declares `expectedRoles: ["proxy"]`. An absent `full` then emits `NOOK-BLOB-NOT-INSPECTED` (`INFO`): the payload is known to exist in the manifest, but its integrity and semantics were not verified in this inspection. The package MAY be valid for the preview consumer if no `ERROR` applies to proxy-relevant semantics.
+- A bake consumer declares at least `expectedRoles: ["full"]`; absence of full remains `NOOK-BLOB-MISSING` (`ERROR`).
+
+Role mappings are caller policy, not a package rule. `NOOK-BLOB-NOT-INSPECTED` never claims the skipped payload is valid; it preserves the trail a downstream consumer needs to decide whether more bytes must be fetched.
 
 ### 6.2 Logical root and transform composition
 
@@ -379,11 +390,13 @@ A fatal safety or envelope error MAY stop deeper parsing. Otherwise all safely d
 
 ### 12.2 Checks
 
-**Manifest** — supported `spec` major; legal `id` and semantic `version`; dependencies pinned with no duplicate tuples; no dependency cycles; unique `paramId` values; defaults satisfy constraints; bindings type-compatible; `requires ⊇ actual usage`, sorted and deduplicated.
+**Manifest** — supported `spec` major; legal `id` and semantic `version`; dependencies pinned with no duplicate tuples; resolver-attested digest equality before resolved content is trusted; no dependency cycles; unique `paramId` values; defaults satisfy constraints; bindings type-compatible; `requires ⊇ actual usage`, sorted and deduplicated.
 
-**Archive and blob** — digest/size mismatch; missing or extra blobs; path traversal; absolute paths; duplicate normalized paths; unexpected manifest location; unsafe links; encrypted entries; decompression bombs; entry-count, archive-byte, per-entry and total-expanded-byte, compression-ratio, and manifest-byte limits.
+**Archive and blob** — digest/size mismatch; missing expected blobs; deliberately un-fetched non-expected blobs; extra blobs; path traversal; absolute paths; duplicate normalized paths; unexpected manifest location; unsafe links; encrypted entries; decompression bombs; entry-count, archive-byte, per-entry and total-expanded-byte, compression-ratio, and manifest-byte limits.
 
-**GLB and profile** — malformed GLB structure; external URIs (forbidden in v1); node, primitive, material, texture, and image caps; unsupported required glTF or Nook extensions; unique package root; safe inspection of registered `extras.nook` records.
+**GLB and profile** — malformed GLB structure; external URIs (forbidden in v1); node, primitive, material, texture, and image caps; unsupported required glTF or Nook extensions including `KHR_texture_transform` support where its registered parameter targets are used; unique package root; safe inspection of registered `extras.nook` records.
+
+**Validation subject and priority** — checks apply to the artifact in transit: original archive bytes and original GLB JSON/resources, never a parser-normalized or inlined substitute. When multiple rules match, the validator emits the most specific actionable diagnostic first (for example, an ambiguous parameter-replacement chain rather than a downstream missing-target consequence). Binding validation is semantic: a syntactically registered path also has to address the corresponding material, texture, component, or node in the representation.
 
 ### 12.3 Severity policy
 
@@ -391,7 +404,7 @@ A fatal safety or envelope error MAY stop deeper parsing. Otherwise all safely d
 | --- | --- |
 | `ERROR` | the package cannot be imported, published, or baked |
 | `WARNING` | the package is valid, but preview or migration behavior is degraded |
-| `INFO` | compatibility or optimization information |
+| `INFO` | compatibility, incomplete-inspection, or optimization information |
 
 Every diagnostic carries a stable machine-readable code, a severity, a package-relative location or semantic path, and human-readable detail. Blob role/digest and involved package/node/parameter identities are included when applicable. Message wording MAY evolve without changing a code's meaning. Validity is exposed separately from diagnostic count.
 

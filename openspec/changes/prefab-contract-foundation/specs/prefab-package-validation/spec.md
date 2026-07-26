@@ -48,7 +48,7 @@ Archive inspection SHALL reject path traversal, absolute paths, duplicate normal
 - **THEN** inspection stops expansion and reports a resource-limit error
 
 ### Requirement: Manifest and blob integrity validation
-The validator SHALL verify manifest schema/version, JCS-derived manifest digest when an expected digest is supplied, payload inventory, raw blob digest, declared blob size, legal identifiers and semantic versions, sorted/deduplicated canonical arrays, unique parameter IDs, and exact dependency references before trusting payload semantics.
+The validator SHALL verify manifest schema/version, JCS-derived manifest digest when an expected digest is supplied, resolver-attested dependency-manifest digest equality before trusting resolved dependency content, payload inventory, raw blob digest, declared blob size, legal identifiers and semantic versions, sorted/deduplicated canonical arrays, unique parameter IDs, and exact dependency references before trusting payload semantics. All checks SHALL apply to the original artifact in transit rather than parser-normalized or inlined output; when multiple rules apply, the validator SHALL emit the most specific actionable diagnostic first.
 
 #### Scenario: Blob content is substituted
 - **WHEN** an archive contains the expected blob filename but different raw bytes
@@ -57,6 +57,10 @@ The validator SHALL verify manifest schema/version, JCS-derived manifest digest 
 #### Scenario: Requires list is noncanonical
 - **WHEN** `requires` contains duplicates or is not sorted according to the contract
 - **THEN** validation reports a canonical-manifest error because ordering affects deterministic identity
+
+#### Scenario: Resolver supplies substituted dependency bytes
+- **WHEN** a reference pins one digest and the injected resolver returns a manifest with a digest computed from different retrieved bytes
+- **THEN** validation emits `NOOK-MANIFEST-DIGEST-MISMATCH` with the involved package reference, treats it as an `ERROR`, and does not use the substituted manifest for dependency graph or nested-parameter validation
 
 ### Requirement: Capability usage and unsupported behavior
 The validator SHALL derive capabilities used by manifest fields and payload semantics and require `manifest.requires` to be a sorted, deduplicated superset of actual usage. Unknown required capabilities SHALL reject normal consumption with `NOOK-UNSUPPORTED-CAPABILITY`. Explicit inspect-only or proxy-render-only degradation MAY preserve/show data, but SHALL prohibit configuration and republication.
@@ -85,7 +89,7 @@ The inspector SHALL bound GLB bytes, nodes, primitives, materials, textures/imag
 - **THEN** the representation is rejected or role-degraded according to declared capability semantics
 
 ### Requirement: Dependency validation without implicit fetching
-The local PoC SHALL derive exact package references, compare them with declared dependencies, and use only an injected local dependency resolver/context. It SHALL perform no implicit network fetch. When all dependency manifests are provided, it SHALL detect direct and transitive cycles. Missing external context SHALL be distinguished from an internally inconsistent declaration.
+The local PoC SHALL derive exact package references, compare them with declared dependencies, and use only an injected local dependency resolver/context. It SHALL perform no implicit network fetch. A resolver SHALL return both a parsed manifest and the RFC 8785 JCS/SHA-256 digest it computed from the bytes it actually retrieved; consumers SHALL compare that attestation with the pinned digest before trusting resolved content. When all dependency manifests are provided and attest to their pinned digests, it SHALL detect direct and transitive cycles. Missing external context SHALL be distinguished from an internally inconsistent declaration.
 
 #### Scenario: Fixture dependency cycle
 - **WHEN** injected manifests form `A -> B -> A`
@@ -94,6 +98,17 @@ The local PoC SHALL derive exact package references, compare them with declared 
 #### Scenario: External dependency is unavailable locally
 - **WHEN** a package consistently declares an exact dependency but the local resolver has no matching manifest
 - **THEN** inspection reports unresolved external context rather than inventing a version or fetching the network
+
+### Requirement: Role-scoped payload inspection
+An inspection policy MAY declare the payload roles it expects to receive. With no declared role scope, inspection SHALL expect every payload role for strict archive, registry, and publication validation. Missing bytes for an expected role SHALL produce `NOOK-BLOB-MISSING` with `ERROR` severity. Bytes deliberately not provided for a non-expected role SHALL produce `NOOK-BLOB-NOT-INSPECTED` with `INFO` severity, retaining the fact that their integrity was not verified without treating the package as defective for the inspecting role.
+
+#### Scenario: Proxy-only inspection
+- **WHEN** a preview consumer declares `proxy` as the expected role and supplies the manifest plus a valid proxy blob but not full
+- **THEN** the result is valid for preview, parses proxy semantics, and records `NOOK-BLOB-NOT-INSPECTED` for full
+
+#### Scenario: Bake lacks full
+- **WHEN** a bake consumer declares `full` as an expected role and does not supply it
+- **THEN** inspection emits `NOOK-BLOB-MISSING` with `ERROR` severity and the result is invalid
 
 ### Requirement: Round-trip and inspection output
 The PoC SHALL return structured manifest metadata, payload inventory, discovered references/capabilities, validity and support state, and diagnostics while retaining unknown extensible data needed for round-trip preservation. Inspecting invalid content SHALL still return safely parsed information where available.

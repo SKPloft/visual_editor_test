@@ -35,6 +35,11 @@ export interface IntegrityOptions {
    */
   expectedManifestDigest?: string;
   /**
+   * Payload roles the caller deliberately obtained and expects to verify.
+   * Omitted means every declared role, the strict archive/publication default.
+   */
+  expectedRoles?: readonly string[];
+  /**
    * Blobs present in the archive that no payload declares. `.nookpkg` is a
    * single-package archive, so extras are a defect rather than a dependency
    * bundle.
@@ -74,6 +79,12 @@ export async function verifyIntegrity(
   const inventory: PayloadInventoryEntry[] = [];
   const verified = new Map<string, Uint8Array>();
   const claimed = new Set<BlobEntry>();
+  // Strict archive/publication inspection expects every declared role. A caller
+  // that deliberately fetched only a preview proxy opts into a narrower set;
+  // absent roles are then an explicit incomplete-inspection fact, not a broken
+  // package. `expectedRoles` is a caller decision because role-to-payload maps
+  // vary by consumer and do not belong in this generic policy mechanism.
+  const expectedRoles = new Set(options.expectedRoles ?? Object.keys(manifest.payloads));
 
   for (const role of Object.keys(manifest.payloads).sort()) {
     const descriptor = manifest.payloads[role];
@@ -81,10 +92,14 @@ export async function verifyIntegrity(
 
     if (!entry) {
       const expectedPath = descriptor.digest ? blobFileName(descriptor.digest) : `blobs/${role}`;
+      const expected = expectedRoles.has(role);
       diagnostics.add(
-        "NOOK-BLOB-MISSING",
+        expected ? "NOOK-BLOB-MISSING" : "NOOK-BLOB-NOT-INSPECTED",
         expectedPath,
-        `Payload role ${role} declares ${descriptor.digest} but no blob with those bytes is available.`,
+        expected
+          ? `Payload role ${role} declares ${descriptor.digest} but no blob with those bytes is available.`
+          : `Payload role ${role} was not provided for this inspection, so its integrity was not verified. ` +
+            "Fetch it before consuming a workflow that requires this role.",
         { representation: role, blobDigest: descriptor.digest || undefined },
       );
       inventory.push({

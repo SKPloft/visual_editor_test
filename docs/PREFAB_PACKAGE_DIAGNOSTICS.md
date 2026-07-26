@@ -26,6 +26,8 @@ The machine-readable source of truth is `DIAGNOSTIC_CATALOG` in `src/prefab-pack
 
 Two codes take their severity from policy rather than this catalog: `NOOK-DEPENDENCY-UNUSED` (`unusedDependencySeverity`, default `WARNING`) and `NOOK-DEPENDENCY-UNRESOLVED` (`unresolvedDependencySeverity`, default `INFO`). Both describe conditions whose seriousness legitimately differs between a publishing gate and a local inspector. A conformance claim must therefore state its policy.
 
+Payload availability is scoped separately by `InspectionPolicy.expectedRoles`: omitted means every declared role is expected for strict archive/registry/publication inspection; a role deliberately outside that set emits `NOOK-BLOB-NOT-INSPECTED` (`INFO`) rather than `NOOK-BLOB-MISSING` (`ERROR`).
+
 Diagnostics are ordered deterministically by phase, then `location`, then `code`.
 
 ---
@@ -81,15 +83,16 @@ Verifies the manifest digest against a caller-supplied expectation, and every bl
 
 | Code | Severity | Fatal | Means | Remedy |
 | --- | --- | --- | --- | --- |
-| `NOOK-MANIFEST-DIGEST-MISMATCH` | ERROR | no | The manifest canonicalizes to a different digest than the caller expected. | The content does not match the identity it is being resolved under; re-fetch, or correct the pinned reference. |
-| `NOOK-BLOB-MISSING` | ERROR | no | A declared payload's bytes are not available. | Bundle every blob the manifest declares, or supply it from the CAS. |
+| `NOOK-MANIFEST-DIGEST-MISMATCH` | ERROR | no | The manifest canonicalizes to a different digest than the caller expected, or a resolver attests retrieved dependency bytes whose canonical digest disagrees with the pinned reference. | The content does not match the identity it is being resolved under; re-fetch, correct the pinned reference, or repair the registry/cache. Do not use the substituted dependency for graph or parameter validation. |
+| `NOOK-BLOB-MISSING` | ERROR | no | A payload role expected by this inspection is not available. | Bundle every expected blob, or supply it from the CAS. Strict archive/publication inspection expects every declared role. |
+| `NOOK-BLOB-NOT-INSPECTED` | INFO | no | A declared role was deliberately outside `expectedRoles`, so its bytes were not supplied and its integrity was not verified. | Fetch it before consuming a workflow that needs that role. This is not a claim that the skipped payload is valid. |
 | `NOOK-BLOB-EXTRA` | ERROR | no | A blob exists that no payload descriptor declares. | A `.nookpkg` carries exactly one manifest and that package's own payloads, not a dependency closure. |
 | `NOOK-BLOB-SIZE-MISMATCH` | ERROR | no | Blob byte length differs from the declared `size`. | Regenerate the descriptor from the actual bytes. |
 | `NOOK-BLOB-DIGEST-MISMATCH` | ERROR | no | Blob bytes hash to something other than the declared digest. The bytes are not parsed as a trusted payload. | The payload was substituted or corrupted; re-fetch from a trusted source. |
 
 ## Phase 4 — GLB parse and Portable Prefab Profile
 
-Bounds and parses each verified payload, then checks it against Portable Prefab Profile v1. Out-of-profile content is always reported rather than ignored, so a creator learns what did not survive export.
+Bounds and parses each verified payload, then checks it against Portable Prefab Profile v1. Out-of-profile content is always reported rather than ignored, so a creator learns what did not survive export. Self-containment is judged from the original GLB artifact: parser inlining or normalization may not hide an external resource relationship. `KHR_texture_transform` is a supported v1 extension because registered `vec2` material targets use it.
 
 | Code | Severity | Fatal | Means | Remedy |
 | --- | --- | --- | --- | --- |

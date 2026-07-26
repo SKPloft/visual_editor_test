@@ -8,7 +8,7 @@ For `nook.prefab/1`, each `proxy` and `full` payload SHALL be a GLB whose node h
 - **THEN** it obtains the hierarchy from that representation's GLB rather than reconstructing it from the manifest
 
 ### Requirement: Portable Prefab Profile v1
-A v1 payload SHALL use only profile-supported geometry, glTF metallic-roughness PBR material features and whitelisted official extensions, `KHR_lights_punctual`, transforms, registered Nook semantic components, nested prefab records, and whitelisted parameter targets. An SDK SHALL NOT silently discard native-engine content outside this profile.
+A v1 payload SHALL use only profile-supported geometry, glTF metallic-roughness PBR material features and whitelisted official extensions including `KHR_lights_punctual` and `KHR_texture_transform`, transforms, registered Nook semantic components, nested prefab records, and whitelisted parameter targets. An SDK SHALL NOT silently discard native-engine content outside this profile. Validation SHALL evaluate self-containment and profile rules against the original GLB artifact, not parser-normalized or inlined output.
 
 #### Scenario: Profile-supported source exports
 - **WHEN** creator content uses only Portable Prefab Profile v1 features
@@ -28,6 +28,14 @@ The `proxy` and `full` GLBs SHALL be self-contained in v1 and SHALL NOT depend o
 #### Scenario: Embedded resources
 - **WHEN** all buffers and images required by a payload are embedded in its GLB
 - **THEN** self-containment validation succeeds
+
+#### Scenario: Data URI remains embedded
+- **WHEN** a payload carries a `data:` URI for an embedded resource and a parser internally normalizes or inlines that data
+- **THEN** self-containment validation succeeds because the original artifact did not depend on an external resource
+
+#### Scenario: Normalized output cannot hide an external URI
+- **WHEN** a parser's normalized output no longer exposes an external URI present in the original artifact
+- **THEN** validation still rejects the payload using the original artifact's external-resource evidence
 
 ### Requirement: Distinct proxy and full roles
 The proxy SHALL serve lightweight marketplace/editor preview and the full payload SHALL serve future bake processing. A browser/editor consumer SHALL be able to operate from manifest plus proxy without downloading full. The profile SHALL NOT require identical hierarchy, primitive layout, material indices, polygon count, or pixels between the two roles.

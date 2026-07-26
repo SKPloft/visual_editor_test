@@ -223,6 +223,20 @@ suite("blob inventory", () => {
     expect(result.valid).toBe(false);
   });
 
+
+  test("a strict archive remains invalid when full is absent", async () => {
+    const { archive } = await buildWallLamp({
+      payloadOverrides: { full: { omitBlob: true } },
+    });
+    const result = await inspectPackageArchive(archive);
+
+    expect(result.valid).toBe(false);
+    expect(find(result, "NOOK-BLOB-MISSING")?.representation).toBe("full");
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
+      "NOOK-BLOB-NOT-INSPECTED",
+    );
+  });
+
   test("a blob no descriptor declares is reported", async () => {
     const { archive } = await buildWallLamp({
       extraEntries: { "blobs/sha256_orphan.glb": utf8("orphan bytes") },

@@ -1,6 +1,6 @@
 # Prefab Format · Discussion and Decision Log
 
-> **Status: Non-normative rationale. Discussion minutes (2026-07-24/25, updated at R8).**
+> **Status: Non-normative rationale. Discussion minutes (2026-07-24/25, updated at R9).**
 > These minutes record why the contract says what it says. They are not a runtime contract and never become one. The normative document is [`../PREFAB_PACKAGE_FORMAT.md`](../PREFAB_PACKAGE_FORMAT.md); read alongside [`prefab-package-format-v0.en.md`](prefab-package-format-v0.en.md).
 > This document records the **questions raised by both parties, the options considered, the chosen answers, and their rationale**, as well as the parts not yet decided.
 > Status legend: ✓ Confirmed ｜ ⚑ Pending (needs further discussion) ｜ ⏸ Deferred (until after PoC or when conditions mature)
@@ -19,6 +19,9 @@ R5     Identity allocation (thread 4)       Four identities × strategy allocati
 R6     Package anatomy (thread 2)           β structural ownership; manifest+CAS; two physical forms; upload Option A
 R7     External review (another agent)      13 findings: 5 pure tightenings, 4 corrections, 3 product calls, §5 deep-dive
 R8     Review disposition + compat final    All accepted (with amendments); semantic-consistency rename; 3-tier behavior → v0.1
+R9     PoC implementation review alignment   Two product calls confirmed (digest at trust boundary, role-scoped
+                                            validity dual-code); three validation-spec principles; error-text
+                                            matching logged as tech debt
 ```
 
 ## 2. Initial questions (raised by the user)
@@ -208,7 +211,37 @@ The review's four tiers and `requires` suggestion are directionally right, but t
 - Out of scope: cloud APIs/storage implementation, marketplace launch, auth/entitlements, production backend, full world format, upgrade UI, full SDK, bake implementation, VRChat publishing, runtime dynamic parameters.
 - The disposition stance for the legacy path must be recorded (Q11).
 
-## 8. Consolidated open questions
+## 8. PoC implementation review alignment (R9)
+
+Background: after the PoC implementation of `prefab-contract-foundation` per draft v0.1 (`src/prefab-package/` + capability specs) was completed, the review returned two parts: part one contained two contract-conformance defects; part two contained four fixture-found implementation defects (already fixed). This round records the two [product-confirmed] judgments and the principles distilled into the validation spec.
+
+### 8.1 Dependency resolution must verify pinned digests [product-confirmed]
+
+- Defect: `createLocalResolver` keyed manifests by `prefab:<id>@<version>`, discarding the digest; `validateDependencies` only checked resolvability and never recomputed the canonical digest of the resolved manifest — a substituted artifact was silently accepted (violating the identity-consistency requirement in semantic-consistency).
+- Decision: **the check belongs at the trust boundary** — the `DependencyResolver.resolve()` contract changes to return `{ manifest, digest } | null`, where digest is computed by the resolver from the bytes it actually read; `validateDependencies` stays synchronous and compares. Registry/cache-backed resolvers thereby assume the duty of self-verification at fetch time (cache-poisoning defense).
+- Decision: **mismatch is always ERROR, with no severity tiers**. Per the existing contract: workspace dependencies are unpinned ranges and pinning happens at publish — so "pinned but mismatching" is always a genuine anomaly (cache corruption / file substitution / registry bug), with no legitimate false-positive scenario.
+- Diagnostic code: reuse `NOOK-MANIFEST-DIGEST-MISMATCH` (with `packageRef`), no new code — the taxonomy is by location of disagreement: in-package (nested record vs declaration) = `NOOK-DEPENDENCY-MISMATCH`; resolved artifact vs pinned digest = same meaning as the standalone expectedDigest check.
+- SDK-layer guidance (not in the contract): workspace tooling offers a "re-pin to the current local build" recovery path on mismatch (the npm lockfile-update mental model).
+
+### 8.2 Validity is a (package × consumer-role) relation [product-confirmed]
+
+- Defect: `verifyIntegrity` emitted `NOOK-BLOB-MISSING` (ERROR) for every declared role lacking a blob, with no role policy — a preview consumer holding only manifest+proxy was judged invalid, violating the portable-profile requirement that consumers work with manifest+proxy alone.
+- Decision: `InspectionPolicy.expectedRoles?: readonly string[]`, defaulting to all declared roles (archive/publish inspection stays strictest). Role mapping is the caller's business: preview/editor → `["proxy"]`; bake → `["full"]` + closure; registry/publish → all.
+- Decision: **dual codes** (replacing the review's suggested single-code downgrade) — a missing blob for an expected role = `NOOK-BLOB-MISSING` (ERROR, package defect); an unprovided blob for a non-expected role = `NOOK-BLOB-NOT-INSPECTED` (INFO, "this payload's integrity was not verified this time"). Rationale: the INFO trail must let downstream stages know what was verified (a bake backend seeing `NOT-INSPECTED: full` is essential information); downgrading MISSING would lie in the logs — full is not missing, it simply was never fetched.
+
+### 8.3 Principles distilled into the validation spec (from fixture defects)
+
+1. **Artifact-as-transferred principle**: checks are defined over the artifact as transferred (raw bytes / original JSON), never over a parser's normalized/inlined output (the root cause of the self-containment miss — any rule can be silently neutralized by normalization). Data URIs = embedded, legal; external file URIs = rejected.
+2. **Diagnostic precedence principle**: when multiple rules could fire on the same data, the most specific/actionable diagnostic must fire first (the replacement-chain case, where "target not declared" was misleading). Diagnostic codes and messages are the product surface of the migration review UI.
+3. **Binding validation is semantic validation**: binding resolution must verify that the target semantically exists (e.g. the material actually declares that texture), not merely that the path is syntactically parseable — mutually reinforcing the §7 path-language rules.
+4. Governance note: `KHR_texture_transform` (introduced by the vec2-target fix) enters the field of glTF extensions consumers must support (capability governance).
+
+### 8.4 Error-message-text matching — accept current approach + reinforcement [product-confirmed]
+
+- Keep: gltf-transform pinned to an exact version + call-site comments + safe degradation (wording changes → `NOOK-GLB-MALFORMED`, still ERROR, still rejected, only less specific).
+- Reinforce: register in `docs/TECHNICAL_DEBT.md` with mitigations and revisit triggers (switch when upstream exposes structured error codes; re-evaluate if we ever gain our own GLB chunk-reading layer). Do NOT hand-roll GLB JSON-chunk parsing — the "maintained parsers only" rule exists precisely to prevent ad-hoc binary parsing surfaces. Optional: file an upstream issue requesting structured error codes.
+
+## 9. Consolidated open questions
 
 | Question | Status | Trigger |
 | --- | --- | --- |
@@ -228,9 +261,10 @@ The review's four tiers and `requires` suggestion are directionally right, but t
 | Texture extraction into standalone blobs | ⏸ | based on real data |
 | `.nookbundle` closure archive | ⏸ | when offline whole-tree migration is needed |
 | Whether instance params store only non-default values | ⚑ | when the world format is discussed |
+| Workspace re-pin UX guidance | ⏸ | SDK design phase (R9 8.1) |
 | Paid/licensed assets | ⏸ | beyond current scope |
 
-## 9. Precedents referenced during the discussion
+## 10. Precedents referenced during the discussion
 
 | Decision point | glTF | USD | Unity | Godot | npm/OCI |
 | --- | --- | --- | --- | --- | --- |

@@ -24,6 +24,16 @@ This file tracks active engineering debt that can be evaluated independently of 
 - **Current state:** Navigation follows Unity-like right-drag orbit, middle-drag pan, scroll zoom, and RMB + WASD fly controls.
 - **Done when:** Product-approved alternative bindings are specified and verified without conflicting with transform shortcuts or text input.
 
+## Prefab package inspection
+
+### GLB external-resource diagnostic classification
+
+- **Impact:** Low. Safety is unaffected; only the specificity of one rejected-payload diagnostic depends on upstream text.
+- **Current state:** `@gltf-transform/core@4.4.2` rejects external GLB buffers/images from `binaryToJSON()` with human-readable error messages. `src/prefab-package/glb.ts` recognizes its exact external-resource wording and emits `NOOK-GLB-EXTERNAL-URI`; an upstream wording change falls back safely to `NOOK-GLB-MALFORMED` (`ERROR`).
+- **Existing mitigations:** The dependency is pinned to an exact version; the call site documents the text-match dependency; both the specific and fallback paths reject the payload; fixtures cover external URI and embedded `data:` URI cases.
+- **Revisit when:** gltf-transform exposes structured error codes or typed external-resource failures; the project adopts a maintained GLB parser with structured classification; or parser upgrade work changes the pinned version.
+- **Done when:** The maintained parser exposes a structured classification that replaces the message match, with the same external-URI fixture coverage. Do **not** add a custom GLB JSON-chunk parser solely to improve this diagnostic.
+
 ## Unity fidelity
 
 ### Rotation handedness

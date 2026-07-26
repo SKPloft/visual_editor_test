@@ -38,6 +38,9 @@ export const DEFAULT_POLICY: InspectionPolicy = {
     maxSegments: 32,
   },
   role: "import",
+  // Undefined means every manifest role is expected, preserving strict archive
+  // and publication validation. Role-to-payload mapping belongs to the caller.
+  expectedRoles: undefined,
   supportedCapabilities: defaultSupportedCapabilities(),
   supportedSpecMajor: SUPPORTED_SPEC_MAJOR,
   marketplace: false,

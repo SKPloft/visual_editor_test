@@ -26,8 +26,8 @@ Every consumer SHALL interpret `{kind, id, version, digest}` as one exact immuta
 - **THEN** every consumer continues resolving `1.2.0` at the pinned digest until an explicit future upgrade operation changes the instance
 
 #### Scenario: Digest disagrees with registry tuple
-- **WHEN** a reference's `id` and `version` resolve to a digest different from the pinned digest
-- **THEN** consumers report identity inconsistency rather than selecting either artifact silently
+- **WHEN** a reference's `id` and `version` resolve to a manifest whose resolver-attested digest differs from the pinned digest
+- **THEN** consumers emit `NOOK-MANIFEST-DIGEST-MISMATCH` with the involved package reference, treat it as `ERROR`, and do not use either artifact silently
 
 ### Requirement: Diagnostic semantic consistency
 Independent conforming validators SHALL assign the same stable diagnostic code and severity to the same contract violation under the same validation role and policy. Locations and involved identities SHALL refer to the same semantic target even if message wording differs.

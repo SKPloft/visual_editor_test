@@ -14,7 +14,7 @@
 
 import type { DiagnosticCollector } from "./diagnostics.ts";
 import { validateParameterValue } from "./parameters.ts";
-import { referenceKey } from "./types.ts";
+import { referenceIdentity, referenceKey } from "./types.ts";
 import type {
   DependencyReport,
   DependencyResolver,
@@ -47,6 +47,7 @@ export function collectNestedReferences(
 
 export function validateDependencies(
   manifest: PrefabManifest,
+  manifestDigest: string,
   representations: readonly PayloadRepresentation[],
   parameterReferences: readonly DiscoveredReference[],
   resolver: DependencyResolver | null,
@@ -137,7 +138,8 @@ export function validateDependencies(
 
   if (resolver) {
     for (const dependency of declaredByKey.values()) {
-      if (resolver.resolve(dependency) === null) {
+      const resolved = resolver.resolve(dependency);
+      if (resolved === null) {
         unresolved.push(dependency);
         diagnostics.add(
           "NOOK-DEPENDENCY-UNRESOLVED",
@@ -147,10 +149,25 @@ export function validateDependencies(
           { packageRef: referenceKey(dependency) },
           policy.unresolvedDependencySeverity,
         );
+        continue;
+      }
+
+      // The resolver attests to bytes it actually read. Its digest is the trust
+      // boundary: never validate cycles or nested values against a manifest
+      // whose bytes disagree with the immutable digest the package pins.
+      if (resolved.digest !== dependency.digest) {
+        diagnostics.add(
+          "NOOK-MANIFEST-DIGEST-MISMATCH",
+          "manifest.json#/dependencies",
+          `Resolver returned ${resolved.digest} for ${referenceKey(dependency)}, but this package ` +
+            `pins ${dependency.digest}. The retrieved artifact is not the pinned version and is ` +
+            "not trusted for dependency validation.",
+          { packageRef: referenceKey(dependency) },
+        );
       }
     }
 
-    for (const cycle of detectCycles(manifest, resolver)) {
+    for (const cycle of detectCycles(manifest, manifestDigest, resolver, diagnostics)) {
       cycles.push(cycle);
       diagnostics.add(
         "NOOK-DEPENDENCY-CYCLE",
@@ -160,7 +177,6 @@ export function validateDependencies(
         { packageRef: cycle[0] },
       );
     }
-
     validateNestedParameterValues(representations, resolver, diagnostics);
   }
 
@@ -182,19 +198,55 @@ export function validateDependencies(
  * branch quietly — it was already reported as missing context, and inventing a
  * verdict about a package we cannot read would be worse than saying nothing.
  */
-function detectCycles(root: PrefabManifest, resolver: DependencyResolver): string[][] {
-  const rootKey = `prefab:${root.id}@${root.version}`;
+function detectCycles(
+  root: PrefabManifest,
+  rootDigest: string,
+  resolver: DependencyResolver,
+  diagnostics: DiagnosticCollector,
+): string[][] {
+  const rootKey = `prefab:${root.id}@${root.version}#${rootDigest}`;
   const cycles: string[][] = [];
   const reported = new Set<string>();
   const stack: string[] = [];
   const onStack = new Set<string>();
 
-  const visit = (key: string, manifest: PrefabManifest): void => {
+  /**
+   * Resolves and attests an edge before asking whether it closes a cycle.
+   *
+   * Tuple equality alone is not identity equality: `prefab:A@1.0.0` can be
+   * paired with a forged digest that points nowhere. Recording such an edge as
+   * a cycle would make an untrusted artifact graph look validly connected.
+   */
+  const visit = (
+    key: string,
+    manifest: PrefabManifest,
+    reportMismatches: boolean,
+  ): void => {
     stack.push(key);
     onStack.add(key);
 
     for (const dependency of manifest.dependencies) {
-      const next = referenceKey(dependency);
+      const resolved = resolver.resolve(dependency);
+      if (resolved === null) continue;
+
+      if (resolved.digest !== dependency.digest) {
+        // Direct dependencies were already reported by validateDependencies.
+        // Nested graph edges reach here first, so emit their retrieval-boundary
+        // failure at the moment it is discovered.
+        if (reportMismatches) {
+          diagnostics.add(
+            "NOOK-MANIFEST-DIGEST-MISMATCH",
+            "manifest.json#/dependencies",
+            `Resolver returned ${resolved.digest} for ${referenceKey(dependency)}, but this package ` +
+              `pins ${dependency.digest}. The retrieved artifact is not the pinned version and is ` +
+              "not trusted for dependency validation.",
+            { packageRef: referenceKey(dependency) },
+          );
+        }
+        continue;
+      }
+
+      const next = referenceIdentity(dependency);
       if (onStack.has(next)) {
         const chain = [...stack.slice(stack.indexOf(next)), next];
         const signature = chain.join(">");
@@ -204,15 +256,17 @@ function detectCycles(root: PrefabManifest, resolver: DependencyResolver): strin
         }
         continue;
       }
-      const resolved = resolver.resolve(dependency);
-      if (resolved) visit(next, resolved);
+      visit(next, resolved.manifest, true);
     }
 
     onStack.delete(key);
     stack.pop();
   };
 
-  visit(rootKey, root);
+  // validateDependencies has already checked and diagnosed the root's direct
+  // edges. Still resolve them here to start trusted graph traversal, but avoid
+  // duplicate mismatch diagnostics for the same direct failure.
+  visit(rootKey, root, false);
   return cycles;
 }
 
@@ -231,8 +285,23 @@ function validateNestedParameterValues(
       if (!instance) continue;
       const nested = resolver.resolve(instance.reference);
       if (!nested) continue;
+      if (nested.digest !== instance.reference.digest) {
+        diagnostics.add(
+          "NOOK-MANIFEST-DIGEST-MISMATCH",
+          `${blobLocation(representation)}#/nodes/${node.index}/extras/nook/prefabInstance`,
+          `Resolver returned ${nested.digest} for ${referenceKey(instance.reference)}, but this ` +
+            `nested instance pins ${instance.reference.digest}. The retrieved artifact is not trusted ` +
+            "for parameter validation.",
+          {
+            packageRef: referenceKey(instance.reference),
+            representation: representation.role,
+            nodeId: node.nodeId,
+          },
+        );
+        continue;
+      }
 
-      const declarations = new Map(nested.parameters.map((p) => [p.paramId, p]));
+      const declarations = new Map(nested.manifest.parameters.map((p) => [p.paramId, p]));
       const base = `${blobLocation(representation)}#/nodes/${node.index}/extras/nook/prefabInstance/params`;
 
       for (const paramId of Object.keys(instance.params).sort()) {
@@ -275,10 +344,23 @@ function compareDiscovered(a: DiscoveredReference, b: DiscoveredReference): numb
 }
 
 /** A dependency resolver backed by an in-memory manifest set, for local fixtures and tests. */
-export function createLocalResolver(manifests: readonly PrefabManifest[]): DependencyResolver {
-  const byIdentity = new Map<string, PrefabManifest>();
+/**
+ * A fixture/local resolver that attests each manifest from its verbatim JSON.
+ *
+ * Production cache and registry resolvers make the same promise from the bytes
+ * they actually fetched. Keeping the digest alongside the parsed manifest
+ * prevents a caller's pinned digest from becoming an unchecked lookup hint.
+ */
+export async function createLocalResolver(
+  manifests: readonly PrefabManifest[],
+): Promise<DependencyResolver> {
+  const byIdentity = new Map<string, { manifest: PrefabManifest; digest: string }>();
+  const { manifestDigest } = await import("./canonical.ts");
   for (const manifest of manifests) {
-    byIdentity.set(`prefab:${manifest.id}@${manifest.version}`, manifest);
+    byIdentity.set(`prefab:${manifest.id}@${manifest.version}`, {
+      manifest,
+      digest: await manifestDigest(manifest.raw),
+    });
   }
   return {
     resolve(reference) {
