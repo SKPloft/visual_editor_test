@@ -20,8 +20,8 @@
 
 ## 4. Secure Archive Inspection
 
-- [ ] 4.1 Implement bounded `.nookpkg` inspection for one root `manifest.json` and package-owned `blobs/` without extracting untrusted paths to the filesystem.
-- [ ] 4.2 Enforce archive policies for path traversal, absolute/duplicate normalized paths, links/encryption, entry count, compressed/archive bytes, per-entry and total expanded bytes, compression ratio, and manifest limits.
+- [x] 4.1 Implement bounded `.nookpkg` inspection for one root `manifest.json` and package-owned `blobs/` without extracting untrusted paths to the filesystem.
+- [x] 4.2 Enforce archive policies for path traversal, absolute/duplicate normalized paths, links/encryption, entry count, compressed/archive bytes, per-entry and total expanded bytes, compression ratio, and manifest limits.
 - [ ] 4.3 Add adversarial archive tests for traversal, duplicate paths, missing/extra blobs, substituted bytes, malformed archives, and decompression-limit failures.
 
 ## 5. Portable GLB Profile

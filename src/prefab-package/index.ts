@@ -50,6 +50,8 @@ export {
 
 export { verifyIntegrity, type BlobEntry, type IntegrityResult } from "./integrity.ts";
 
+export { MANIFEST_ENTRY_NAME, BLOB_DIRECTORY, normalizePath, readNookPackage } from "./archive.ts";
+
 export {
   COMPONENT_REGISTRY,
   ENUM_DOMAINS,
