@@ -7,9 +7,9 @@
 
 ## 2. Dependency and Module Foundation
 
-- [ ] 2.1 Evaluate maintained browser/Bun-compatible JCS, bounded ZIP, and GLB/glTF libraries against the design criteria; document selected dependencies and rejected alternatives.
-- [ ] 2.2 Add only the selected package-inspection dependencies and create isolated prefab-package modules that do not import or mutate current editor scene state.
-- [ ] 2.3 Define public TypeScript models for manifest data, unified references, payload descriptors, parameters, bindings, capabilities, diagnostics, inspection policy, dependency resolution, and inspection results, with explicit unknown-field preservation.
+- [x] 2.1 Evaluate maintained browser/Bun-compatible JCS, bounded ZIP, and GLB/glTF libraries against the design criteria; document selected dependencies and rejected alternatives.
+- [x] 2.2 Add only the selected package-inspection dependencies and create isolated prefab-package modules that do not import or mutate current editor scene state.
+- [x] 2.3 Define public TypeScript models for manifest data, unified references, payload descriptors, parameters, bindings, capabilities, diagnostics, inspection policy, dependency resolution, and inspection results, with explicit unknown-field preservation.
 
 ## 3. Canonical Manifest and Integrity
 
