@@ -70,6 +70,24 @@ export {
 export { assessCapabilities, parseCapabilityId } from "./capabilities.ts";
 
 export {
+  collectNestedReferences,
+  createLocalResolver,
+  validateDependencies,
+} from "./dependencies.ts";
+
+export {
+  IDENTITY_MATRIX,
+  TRANSFORM_TOLERANCE,
+  composeEffectiveRoot,
+  composeNestedRoot,
+  fromTRS,
+  isIdentity,
+  matricesEquivalent,
+  multiply,
+  multiplyAll,
+} from "./transform.ts";
+
+export {
   COMPONENT_REGISTRY,
   ENUM_DOMAINS,
   KNOWN_REPRESENTATIONS,

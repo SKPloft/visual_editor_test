@@ -43,9 +43,9 @@
 
 ## 7. Dependencies and Semantic Consistency
 
-- [ ] 7.1 Collect exact dependency references from nested instances and supported reference-typed defaults, compare them with `manifest.dependencies`, and report missing, mismatched, duplicate, and unused declarations deterministically.
-- [ ] 7.2 Add an injected local dependency-manifest resolver and cycle detection without network access, distinguishing unavailable external context from an inconsistent package.
-- [ ] 7.3 Implement contract-space transform composition utilities/tests for `ancestors × placement × storedPackageRoot`, including nested cases and declared numeric tolerance.
+- [x] 7.1 Collect exact dependency references from nested instances and supported reference-typed defaults, compare them with `manifest.dependencies`, and report missing, mismatched, duplicate, and unused declarations deterministically.
+- [x] 7.2 Add an injected local dependency-manifest resolver and cycle detection without network access, distinguishing unavailable external context from an inconsistent package.
+- [x] 7.3 Implement contract-space transform composition utilities/tests for `ancestors × placement × storedPackageRoot`, including nested cases and declared numeric tolerance.
 - [ ] 7.4 Add normative cross-representation fixtures asserting parameter semantic consistency, exact identity/version behavior, transform composition, and diagnostic-code consistency without pixel comparison.
 
 ## 8. Inspector API and Diagnostics
