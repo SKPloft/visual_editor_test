@@ -5,7 +5,7 @@ This directory contains durable technical documentation. Product planning does n
 ## Authority
 
 | Concern | Authority |
-|---|---|
+| --- | --- |
 | Product direction, UX/application flows, priority, and success criteria | Lark pages linked from `AGENTS.md` |
 | Approved engineering change, requirements, design, and tasks | `openspec/changes/` |
 | Accepted current behavior | `openspec/specs/`, stable contracts below, code, and tests |
@@ -19,6 +19,13 @@ When sources disagree, do not silently choose an old document. Reconcile code an
 - [`CANONICAL_FORMAT.md`](CANONICAL_FORMAT.md) — engine-agnostic scene-data contract and JSON Schema.
 - [`UNITY_EXPORT.md`](UNITY_EXPORT.md) — generated Unity importer package behavior.
 - [`TECHNICAL_DEBT.md`](TECHNICAL_DEBT.md) — active engineering debt only; not a feature backlog.
+
+## Drafts (exploratory, not approved)
+
+- [`drafts/prefab-package-format-v0.md`](drafts/prefab-package-format-v0.md) — draft prefab package format standard (中文草案); formalization path is OpenSpec change `prefab-contract-foundation`.
+- [`drafts/prefab-format-discussion-log.md`](drafts/prefab-format-discussion-log.md) — discussion record: questions, options, chosen answers, rationale, and open items.
+
+Drafts are pre-OpenSpec working documents. They do not override active contracts until an OpenSpec change is approved and archived.
 
 ## Architecture decisions
 
