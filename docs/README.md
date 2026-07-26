@@ -17,6 +17,7 @@ When sources disagree, do not silently choose an old document. Reconcile code an
 ## Active contracts
 
 - [`PREFAB_PACKAGE_FORMAT.md`](PREFAB_PACKAGE_FORMAT.md) — Nook prefab package interchange contract (manifest, payloads, parameters, capabilities, validation). Supersedes the prefab portions of `CANONICAL_FORMAT.md`.
+- [`PREFAB_PACKAGE_DIAGNOSTICS.md`](PREFAB_PACKAGE_DIAGNOSTICS.md) — stable diagnostic-code catalog for prefab package validation.
 - [`CANONICAL_FORMAT.md`](CANONICAL_FORMAT.md) — engine-agnostic scene-data contract and JSON Schema. Its prefab model is legacy prototype behavior.
 - [`UNITY_EXPORT.md`](UNITY_EXPORT.md) — generated Unity importer package behavior. Its prefab generation is frozen.
 - [`TECHNICAL_DEBT.md`](TECHNICAL_DEBT.md) — active engineering debt only; not a feature backlog.

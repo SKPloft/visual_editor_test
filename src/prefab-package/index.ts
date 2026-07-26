@@ -8,6 +8,8 @@
  * why each parser was chosen.
  */
 
+export { inspectPackage, inspectPackageArchive, type InspectOptions } from "./inspect.ts";
+
 export {
   DIAGNOSTIC_CATALOG,
   DIAGNOSTIC_CODES,

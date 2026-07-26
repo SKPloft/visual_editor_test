@@ -16,13 +16,13 @@
 - [x] 3.1 Implement `nook.prefab/1` manifest parsing and structural validation, including identifiers, semantic versions, exact references, unique parameter IDs, canonical arrays, payload roles, and extensible unknown fields.
 - [x] 3.2 Implement RFC 8785 JCS serialization and `sha256:<lowercase hex>` manifest identity calculation, excluding any self-digest and enforcing sorted/deduplicated contract arrays.
 - [x] 3.3 Implement raw blob digest and size verification plus deterministic payload inventory checks for required `proxy`/`full`, missing blobs, extra blobs, and unknown optional slots.
-- [ ] 3.4 Add unit tests and independent digest fixtures proving equivalent manifests produce identical identity and changed semantics/payload references change identity.
+- [x] 3.4 Add unit tests and independent digest fixtures proving equivalent manifests produce identical identity and changed semantics/payload references change identity.
 
 ## 4. Secure Archive Inspection
 
 - [x] 4.1 Implement bounded `.nookpkg` inspection for one root `manifest.json` and package-owned `blobs/` without extracting untrusted paths to the filesystem.
 - [x] 4.2 Enforce archive policies for path traversal, absolute/duplicate normalized paths, links/encryption, entry count, compressed/archive bytes, per-entry and total expanded bytes, compression ratio, and manifest limits.
-- [ ] 4.3 Add adversarial archive tests for traversal, duplicate paths, missing/extra blobs, substituted bytes, malformed archives, and decompression-limit failures.
+- [x] 4.3 Add adversarial archive tests for traversal, duplicate paths, missing/extra blobs, substituted bytes, malformed archives, and decompression-limit failures.
 
 ## 5. Portable GLB Profile
 
@@ -30,7 +30,7 @@
 - [x] 5.2 Implement Portable Prefab Profile checks for permitted geometry/PBR/lights, registered Nook components, unsupported native/extension features, and capability usage discovery.
 - [x] 5.3 Validate exactly one marked logical root per representation, reserved `nook.root` identity, and the single-root versus synthetic-wrapper rules.
 - [x] 5.4 Parse and validate `extras.nook.prefabInstance` records and registered `extras.nook.components` without executing or instantiating package content.
-- [ ] 5.5 Add proxy/full GLB fixtures covering single and multiple source roots, non-identity root transforms, manual structural divergence, unsupported features, external URIs, malformed GLBs, and resource caps.
+- [x] 5.5 Add proxy/full GLB fixtures covering single and multiple source roots, non-identity root transforms, manual structural divergence, unsupported features, external URIs, malformed GLBs, and resource caps.
 
 ## 6. Parameters, Paths, and Capabilities
 
@@ -39,21 +39,21 @@
 - [x] 6.3 Implement representation-scoped binding validation so required full targets error and absent optional proxy targets produce stable degraded-preview diagnostics.
 - [x] 6.4 Implement unified reference-envelope validation, `prefabRef` category restrictions, and exceptional `parameterReplacements` validation.
 - [x] 6.5 Implement `requires` usage derivation, sorted/deduplicated superset checks, independent capability-version support, unsupported-capability states, inspect-only degradation, and marketplace rejection of `x.*` capabilities.
-- [ ] 6.6 Add parameter/path/capability fixtures for valid mappings, type mismatches, missing nodes, fragile/invalid paths, unsupported types, under-reported requirements, and unknown required capabilities.
+- [x] 6.6 Add parameter/path/capability fixtures for valid mappings, type mismatches, missing nodes, fragile/invalid paths, unsupported types, under-reported requirements, and unknown required capabilities.
 
 ## 7. Dependencies and Semantic Consistency
 
 - [x] 7.1 Collect exact dependency references from nested instances and supported reference-typed defaults, compare them with `manifest.dependencies`, and report missing, mismatched, duplicate, and unused declarations deterministically.
 - [x] 7.2 Add an injected local dependency-manifest resolver and cycle detection without network access, distinguishing unavailable external context from an inconsistent package.
 - [x] 7.3 Implement contract-space transform composition utilities/tests for `ancestors × placement × storedPackageRoot`, including nested cases and declared numeric tolerance.
-- [ ] 7.4 Add normative cross-representation fixtures asserting parameter semantic consistency, exact identity/version behavior, transform composition, and diagnostic-code consistency without pixel comparison.
+- [x] 7.4 Add normative cross-representation fixtures asserting parameter semantic consistency, exact identity/version behavior, transform composition, and diagnostic-code consistency without pixel comparison.
 
 ## 8. Inspector API and Diagnostics
 
-- [ ] 8.1 Implement the staged, side-effect-free inspection entry points for `.nookpkg` bytes and manifest-plus-blob access, returning safe partial metadata, support state, validity, discovered capabilities/references, and deterministic diagnostics.
-- [ ] 8.2 Define and document the stable diagnostic-code catalog with severities, semantic locations, representation/blob context, involved identities, and remediation-oriented detail.
-- [ ] 8.3 Ensure fatal envelope failures stop unsafe parsing while all other safely discoverable diagnostics are accumulated and ordered by phase, location, and code.
-- [ ] 8.4 Add round-trip tests proving unknown optional metadata, payload slots, and safely retained unsupported values survive read-modify-write and continue participating in canonical identity.
+- [x] 8.1 Implement the staged, side-effect-free inspection entry points for `.nookpkg` bytes and manifest-plus-blob access, returning safe partial metadata, support state, validity, discovered capabilities/references, and deterministic diagnostics.
+- [x] 8.2 Define and document the stable diagnostic-code catalog with severities, semantic locations, representation/blob context, involved identities, and remediation-oriented detail.
+- [x] 8.3 Ensure fatal envelope failures stop unsafe parsing while all other safely discoverable diagnostics are accumulated and ordered by phase, location, and code.
+- [x] 8.4 Add round-trip tests proving unknown optional metadata, payload slots, and safely retained unsupported values survive read-modify-write and continue participating in canonical identity.
 
 ## 9. Verification and Progressive Handoff
 
